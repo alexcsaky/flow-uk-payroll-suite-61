@@ -2,11 +2,11 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import PayrollSummaryCard from "@/components/dashboard/PayrollSummaryCard";
-import InvoiceSummaryCard from "@/components/dashboard/InvoiceSummaryCard";
-import StatCard from "@/components/dashboard/StatCard";
-import RecentActivityCard from "@/components/dashboard/RecentActivityCard";
-import PayrollChart from "@/components/dashboard/PayrollChart";
+import { PayrollSummaryCard } from "@/components/dashboard/PayrollSummaryCard";
+import { InvoiceSummaryCard } from "@/components/dashboard/InvoiceSummaryCard";
+import { StatCard } from "@/components/dashboard/StatCard";
+import { RecentActivityCard } from "@/components/dashboard/RecentActivityCard";
+import { PayrollChart } from "@/components/dashboard/PayrollChart";
 import { useBillingFeatures } from "@/hooks/use-billing-features";
 
 const Dashboard = () => {
@@ -21,6 +21,59 @@ const Dashboard = () => {
     { name: "May", value: 28900 },
     { name: "Jun", value: 29100 },
   ];
+
+  // Mock data for the RecentActivityCard
+  const activities = [
+    {
+      id: "1",
+      title: "Payroll processed",
+      description: "Monthly payroll for 146 employees completed",
+      timestamp: "Today at 12:30 PM",
+      type: "payroll",
+    },
+    {
+      id: "2",
+      title: "Invoice #INV-2023-001 sent",
+      description: "£12,450 to Client XYZ Ltd",
+      timestamp: "Yesterday at 3:45 PM",
+      type: "invoice",
+    },
+    {
+      id: "3",
+      title: "New employee added",
+      description: "John Smith added to IT Department",
+      timestamp: "Apr 3, 2023 at 10:15 AM",
+      type: "employee",
+    },
+    {
+      id: "4",
+      title: "Client payment received",
+      description: "£8,750 from ABC Corp for invoice #INV-2023-005",
+      timestamp: "Apr 2, 2023 at 2:30 PM",
+      type: "client",
+    },
+    {
+      id: "5",
+      title: "System maintenance completed",
+      description: "Scheduled maintenance and updates applied",
+      timestamp: "Apr 1, 2023 at 11:00 PM",
+      type: "system",
+    }
+  ];
+
+  // Mock data for PayrollSummaryCard
+  const payrollSummary = {
+    nextPayrollDate: new Date("2025-04-25"),
+    employeesCount: 146,
+    totalAmount: 287500
+  };
+
+  // Mock data for InvoiceSummaryCard
+  const invoiceSummary = {
+    totalOutstanding: 68500,
+    totalPaid: 156000,
+    percentageComplete: 69
+  };
 
   return (
     <div className="flex flex-col gap-6">
