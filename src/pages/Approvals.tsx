@@ -3,8 +3,30 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CheckCircle2, Clock, Search, Filter } from "lucide-react";
+import { 
+  CheckCircle2, 
+  Clock, 
+  Search, 
+  Filter, 
+  XCircle,
+  Download,
+  ChevronDown
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Approvals = () => {
   // Sample approval requests data
@@ -18,91 +40,117 @@ const Approvals = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Approvals</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Approvals</h1>
+          <p className="text-muted-foreground mt-1">
             Manage approval requests from your team
           </p>
         </div>
-        <Button variant="outline">
-          <Filter className="mr-2 h-4 w-4" />
-          Filter
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" className="h-9">
+            <Download className="h-4 w-4 mr-2" />
+            Export
+          </Button>
+          <Button variant="outline" size="sm" className="h-9">
+            <Filter className="h-4 w-4 mr-2" />
+            Filter
+          </Button>
+        </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>Pending Approvals</CardTitle>
-            <div className="relative">
+      <Card className="overflow-hidden border-none shadow-sm">
+        <CardHeader className="bg-white px-6 py-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <CardTitle className="text-lg font-medium">Pending Approvals</CardTitle>
+            <div className="relative w-full md:w-auto">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 type="search"
                 placeholder="Search requests..."
-                className="w-full md:w-[200px] pl-8"
+                className="w-full md:w-[250px] pl-8 h-9 border-muted"
               />
             </div>
           </div>
         </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="all">
-            <TabsList>
-              <TabsTrigger value="all">All</TabsTrigger>
-              <TabsTrigger value="timesheet">Timesheets</TabsTrigger>
-              <TabsTrigger value="expense">Expenses</TabsTrigger>
-              <TabsTrigger value="leave">Leave</TabsTrigger>
-            </TabsList>
-            <TabsContent value="all" className="mt-4">
-              <div className="rounded-md border">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b bg-muted/50">
-                      <th className="py-3 px-4 text-left font-medium">Type</th>
-                      <th className="py-3 px-4 text-left font-medium">Requester</th>
-                      <th className="py-3 px-4 text-left font-medium">Date</th>
-                      <th className="py-3 px-4 text-left font-medium">Status</th>
-                      <th className="py-3 px-4 text-left font-medium">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
+        <CardContent className="p-0">
+          <Tabs defaultValue="all" className="w-full">
+            <div className="border-b px-6">
+              <TabsList className="bg-transparent -mb-px">
+                <TabsTrigger value="all" className="data-[state=active]:border-b-2 data-[state=active]:border-paycircle data-[state=active]:text-foreground data-[state=active]:shadow-none rounded-none">All</TabsTrigger>
+                <TabsTrigger value="timesheet" className="data-[state=active]:border-b-2 data-[state=active]:border-paycircle data-[state=active]:text-foreground data-[state=active]:shadow-none rounded-none">Timesheets</TabsTrigger>
+                <TabsTrigger value="expense" className="data-[state=active]:border-b-2 data-[state=active]:border-paycircle data-[state=active]:text-foreground data-[state=active]:shadow-none rounded-none">Expenses</TabsTrigger>
+                <TabsTrigger value="leave" className="data-[state=active]:border-b-2 data-[state=active]:border-paycircle data-[state=active]:text-foreground data-[state=active]:shadow-none rounded-none">Leave</TabsTrigger>
+              </TabsList>
+            </div>
+            <TabsContent value="all" className="m-0">
+              <div className="w-full">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="hover:bg-transparent">
+                      <TableHead className="w-[120px]">Type</TableHead>
+                      <TableHead>Requester</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
                     {approvalRequests.map((request) => (
-                      <tr key={request.id} className="border-b">
-                        <td className="py-3 px-4">{request.type}</td>
-                        <td className="py-3 px-4">{request.requester}</td>
-                        <td className="py-3 px-4">{request.date}</td>
-                        <td className="py-3 px-4">
+                      <TableRow key={request.id}>
+                        <TableCell className="font-medium">{request.type}</TableCell>
+                        <TableCell>{request.requester}</TableCell>
+                        <TableCell>{request.date}</TableCell>
+                        <TableCell>
                           <div className="flex items-center gap-1">
                             <Clock className="h-3 w-3 text-amber-500" />
                             <span className="text-amber-500">{request.status}</span>
                           </div>
-                        </td>
-                        <td className="py-3 px-4">
-                          <div className="flex gap-2">
-                            <Button variant="outline" size="sm">Review</Button>
-                            <Button size="sm" className="bg-green-600 hover:bg-green-700">
-                              <CheckCircle2 className="h-4 w-4" />
-                            </Button>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="outline" size="sm" className="h-8">
+                                  Actions
+                                  <ChevronDown className="h-4 w-4 ml-2" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem>
+                                  <CheckCircle2 className="h-4 w-4 mr-2 text-green-600" />
+                                  <span>Approve</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                  <XCircle className="h-4 w-4 mr-2 text-red-600" />
+                                  <span>Decline</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                  <Search className="h-4 w-4 mr-2" />
+                                  <span>View details</span>
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           </div>
-                        </td>
-                      </tr>
+                        </TableCell>
+                      </TableRow>
                     ))}
-                  </tbody>
-                </table>
+                  </TableBody>
+                </Table>
               </div>
             </TabsContent>
-            <TabsContent value="timesheet" className="mt-4">
-              <div className="p-4 text-sm text-muted-foreground">
+            <TabsContent value="timesheet" className="m-0 p-4">
+              <div className="text-sm text-muted-foreground">
                 Timesheet approval requests will appear here.
               </div>
             </TabsContent>
-            <TabsContent value="expense" className="mt-4">
-              <div className="p-4 text-sm text-muted-foreground">
+            <TabsContent value="expense" className="m-0 p-4">
+              <div className="text-sm text-muted-foreground">
                 Expense approval requests will appear here.
               </div>
             </TabsContent>
-            <TabsContent value="leave" className="mt-4">
-              <div className="p-4 text-sm text-muted-foreground">
+            <TabsContent value="leave" className="m-0 p-4">
+              <div className="text-sm text-muted-foreground">
                 Leave approval requests will appear here.
               </div>
             </TabsContent>

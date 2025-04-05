@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -66,18 +66,18 @@ export function SideNavigation({ isOpen, setIsOpen }: SideNavigationProps) {
   return (
     <div
       className={cn(
-        "fixed inset-y-0 left-0 z-40 flex flex-col bg-sidebar border-r border-sidebar-border transition-all duration-300",
+        "fixed inset-y-0 left-0 z-40 flex flex-col bg-white shadow-sm border-r border-sidebar-border transition-all duration-300",
         isOpen ? "w-64" : "w-20"
       )}
     >
       <div className="flex items-center h-16 px-4 border-b border-sidebar-border shrink-0">
         <Link to="/" className="flex items-center gap-2">
-          <div className="bg-flow rounded-md w-10 h-10 flex items-center justify-center text-white font-bold text-xl">
-            F
+          <div className="bg-paycircle rounded-md w-10 h-10 flex items-center justify-center text-white font-bold text-xl">
+            P
           </div>
           {isOpen && (
-            <span className="text-xl font-semibold text-sidebar-foreground tracking-tight animate-fade-in">
-              Flow
+            <span className="text-xl font-semibold tracking-tight animate-fade-in">
+              PayCircle
             </span>
           )}
         </Link>
@@ -85,7 +85,7 @@ export function SideNavigation({ isOpen, setIsOpen }: SideNavigationProps) {
           variant="ghost"
           size="icon"
           className={cn(
-            "ml-auto text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground",
+            "ml-auto hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
             !isOpen && "mx-auto"
           )}
           onClick={() => setIsOpen(!isOpen)}
@@ -113,11 +113,11 @@ export function SideNavigation({ isOpen, setIsOpen }: SideNavigationProps) {
                         "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                         isActive
                           ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                          : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                          : "text-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
                         !isOpen && "justify-center"
                       )}
                     >
-                      <item.icon className={cn("h-5 w-5 shrink-0", isOpen && "mr-2")} />
+                      <item.icon className={cn("h-5 w-5 shrink-0", isActive ? "text-paycircle" : "text-muted-foreground")} />
                       {isOpen && <span>{item.name}</span>}
                     </Link>
                   </TooltipTrigger>
@@ -140,11 +140,12 @@ export function SideNavigation({ isOpen, setIsOpen }: SideNavigationProps) {
               <Link
                 to="/settings"
                 className={cn(
-                  "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                  "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
+                  pathname === "/settings" ? "bg-sidebar-accent text-sidebar-accent-foreground" : "",
                   !isOpen && "justify-center"
                 )}
               >
-                <Settings className="h-5 w-5" />
+                <Settings className={cn("h-5 w-5", pathname === "/settings" ? "text-paycircle" : "text-muted-foreground")} />
                 {isOpen && <span>Settings</span>}
               </Link>
             </TooltipTrigger>
@@ -158,11 +159,11 @@ export function SideNavigation({ isOpen, setIsOpen }: SideNavigationProps) {
               <Button
                 variant="ghost"
                 className={cn(
-                  "w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                  "w-full justify-start hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
                   !isOpen && "justify-center"
                 )}
               >
-                <LogOut className="h-5 w-5" />
+                <LogOut className="h-5 w-5 text-muted-foreground" />
                 {isOpen && <span className="ml-2">Log out</span>}
               </Button>
             </TooltipTrigger>

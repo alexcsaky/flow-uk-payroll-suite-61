@@ -22,7 +22,7 @@ export function AppLayout({ children }: AppLayoutProps) {
         sidebarOpen ? "md:pl-64" : "md:pl-20"
       )}>
         <Header toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
-        <main className="flex-1 p-6">
+        <main className="flex-1 p-4 md:p-6 max-w-7xl mx-auto w-full">
           {children || <Outlet />}
           <Toaster />
         </main>

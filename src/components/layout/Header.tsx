@@ -18,9 +18,9 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
   return (
-    <header className="border-b bg-white sticky top-0 z-30">
+    <header className="border-b bg-white sticky top-0 z-30 shadow-sm">
       <div className="flex h-16 items-center px-4 md:px-6">
-        <Button variant="outline" size="icon" className="md:hidden mr-2" onClick={toggleSidebar}>
+        <Button variant="ghost" size="icon" className="md:hidden mr-2" onClick={toggleSidebar}>
           <Menu className="h-5 w-5" />
           <span className="sr-only">Toggle sidebar</span>
         </Button>
@@ -33,15 +33,15 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="relative">
-                <Bell className="h-5 w-5" />
-                <span className="absolute top-1 right-1 h-2 w-2 bg-destructive rounded-full"></span>
+                <Bell className="h-5 w-5 text-muted-foreground" />
+                <span className="absolute top-1 right-1 h-2 w-2 bg-paycircle rounded-full"></span>
                 <span className="sr-only">Notifications</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-80">
               <div className="flex items-center justify-between p-4 pt-2">
                 <span className="text-sm font-medium">Notifications</span>
-                <Button variant="link" size="sm" className="text-xs">
+                <Button variant="link" size="sm" className="text-xs text-paycircle">
                   Mark all as read
                 </Button>
               </div>
@@ -56,6 +56,6 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
       </div>
     </header>
   );
-};
+}
 
 export default Header;

@@ -63,11 +63,11 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				flow: {
-					DEFAULT: '#1F67B9',
-					dark: '#0D4A8F',
-					light: '#3B8ADE',
-					ultralight: '#EBF3FF',
+				paycircle: {
+					DEFAULT: '#046AF7',
+					dark: '#0452C0',
+					light: '#4E96FF',
+					ultralight: '#E8F1FF',
 					foreground: '#FFFFFF'
 				}
 			},
