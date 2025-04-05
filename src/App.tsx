@@ -9,6 +9,7 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import Dashboard from "@/pages/Dashboard";
 import Settings from "@/pages/Settings";
 import Employees from "@/pages/Employees";
+import Payroll from "@/pages/Payroll";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,8 +26,8 @@ const App = () => (
               <Route index element={<Dashboard />} />
               <Route path="settings" element={<Settings />} />
               <Route path="employees" element={<Employees />} />
+              <Route path="payroll" element={<Payroll />} />
               {/* Add more routes here as they get implemented */}
-              {/* <Route path="payroll" element={<Payroll />} /> */}
               {/* <Route path="timesheets" element={<Timesheets />} /> */}
               {/* <Route path="approvals" element={<Approvals />} /> */}
               {/* <Route path="reports" element={<Reports />} /> */}
