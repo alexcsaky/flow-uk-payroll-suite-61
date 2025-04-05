@@ -11,6 +11,12 @@ import Settings from "@/pages/Settings";
 import Employees from "@/pages/Employees";
 import Payroll from "@/pages/Payroll";
 import Timesheets from "@/pages/Timesheets";
+import Approvals from "@/pages/Approvals";
+import Reports from "@/pages/Reports";
+import Clients from "@/pages/Clients";
+import Invoices from "@/pages/Invoices";
+import Payments from "@/pages/Payments";
+import Analytics from "@/pages/Analytics";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,14 +35,12 @@ const App = () => (
               <Route path="employees" element={<Employees />} />
               <Route path="payroll" element={<Payroll />} />
               <Route path="timesheets" element={<Timesheets />} />
-              {/* Add more routes here as they get implemented */}
-              {/* <Route path="approvals" element={<Approvals />} /> */}
-              {/* <Route path="reports" element={<Reports />} /> */}
-              {/* <Route path="clients" element={<Clients />} /> */}
-              {/* <Route path="invoices" element={<Invoices />} /> */}
-              {/* <Route path="payments" element={<Payments />} /> */}
-              {/* <Route path="analytics" element={<Analytics />} /> */}
-              
+              <Route path="approvals" element={<Approvals />} />
+              <Route path="reports" element={<Reports />} />
+              <Route path="clients" element={<Clients />} />
+              <Route path="invoices" element={<Invoices />} />
+              <Route path="payments" element={<Payments />} />
+              <Route path="analytics" element={<Analytics />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             </Route>
             <Route path="*" element={<NotFound />} />
