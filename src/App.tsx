@@ -8,6 +8,7 @@ import { BillingFeaturesProvider } from "@/hooks/use-billing-features";
 import { AppLayout } from "@/components/layout/AppLayout";
 import Dashboard from "@/pages/Dashboard";
 import Settings from "@/pages/Settings";
+import Employees from "@/pages/Employees";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,8 +24,8 @@ const App = () => (
             <Route path="/" element={<AppLayout />}>
               <Route index element={<Dashboard />} />
               <Route path="settings" element={<Settings />} />
+              <Route path="employees" element={<Employees />} />
               {/* Add more routes here as they get implemented */}
-              {/* <Route path="employees" element={<Employees />} /> */}
               {/* <Route path="payroll" element={<Payroll />} /> */}
               {/* <Route path="timesheets" element={<Timesheets />} /> */}
               {/* <Route path="approvals" element={<Approvals />} /> */}
