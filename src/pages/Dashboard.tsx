@@ -8,7 +8,7 @@ import { StatCard } from "@/components/dashboard/StatCard";
 import { RecentActivityCard } from "@/components/dashboard/RecentActivityCard";
 import { PayrollChart } from "@/components/dashboard/PayrollChart";
 import { useBillingFeatures } from "@/hooks/use-billing-features";
-import { Users, FileText, Building, CheckCircle, Clock, Calendar } from "lucide-react";
+import { Users, FileText, Building, CheckCircle2, Clock, Calendar } from "lucide-react";
 
 const Dashboard = () => {
   const { billingEnabled } = useBillingFeatures();
@@ -23,48 +23,48 @@ const Dashboard = () => {
     { name: "Jun", value: 29100 },
   ];
 
-  // Mock data for the RecentActivityCard
+  // Mock data for the RecentActivityCard - ensuring types are correct
   const activities = [
     {
       id: "1",
       title: "Payroll processed",
       description: "Monthly payroll for 146 employees completed",
       timestamp: "Today at 12:30 PM",
-      type: "payroll",
+      type: "payroll" as const,
     },
     {
       id: "2",
       title: "Invoice #INV-2023-001 sent",
       description: "£12,450 to Client XYZ Ltd",
       timestamp: "Yesterday at 3:45 PM",
-      type: "invoice",
+      type: "invoice" as const,
     },
     {
       id: "3",
       title: "New employee added",
       description: "John Smith added to IT Department",
       timestamp: "Apr 3, 2023 at 10:15 AM",
-      type: "employee",
+      type: "employee" as const,
     },
     {
       id: "4",
       title: "Client payment received",
       description: "£8,750 from ABC Corp for invoice #INV-2023-005",
       timestamp: "Apr 2, 2023 at 2:30 PM",
-      type: "client",
+      type: "client" as const,
     },
     {
       id: "5",
       title: "System maintenance completed",
       description: "Scheduled maintenance and updates applied",
       timestamp: "Apr 1, 2023 at 11:00 PM",
-      type: "system",
+      type: "system" as const,
     }
   ];
 
   // Mock data for PayrollSummaryCard
   const payrollSummary = {
-    nextPayrollDate: new Date("2025-04-25"),
+    nextPayrollDate: new Date(2025, 3, 25), // Using numeric constructor for stability
     employeesCount: 146,
     totalAmount: 287500
   };
@@ -122,7 +122,7 @@ const Dashboard = () => {
             <StatCard
               title="Pending Approvals"
               value="23"
-              icon={CheckCircle}
+              icon={CheckCircle2}
               trend={{ value: 5, isPositive: false }}
               description="from last week"
             />
