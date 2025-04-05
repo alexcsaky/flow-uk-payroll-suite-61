@@ -42,7 +42,7 @@ export function StatCard({
             )}
           >
             {trend.isPositive ? "↑" : "↓"} {Math.abs(trend.value)}%{" "}
-            <span className="text-muted-foreground ml-1">from last month</span>
+            <span className="text-muted-foreground ml-1">{description}</span>
           </p>
         )}
       </CardContent>

@@ -22,7 +22,7 @@ interface RecentActivityCardProps {
   className?: string;
 }
 
-export function RecentActivityCard({ activities, className }: RecentActivityCardProps) {
+export function RecentActivityCard({ activities = [], className }: RecentActivityCardProps) {
   const getActivityIcon = (type: ActivityItem["type"]) => {
     switch (type) {
       case "payroll":
@@ -47,7 +47,7 @@ export function RecentActivityCard({ activities, className }: RecentActivityCard
       <CardContent>
         <ScrollArea className="h-[290px] pr-4">
           <div className="space-y-4">
-            {activities.map((activity) => (
+            {activities && activities.map((activity) => (
               <div key={activity.id} className="flex items-start gap-4 pb-4 last:pb-0 border-b last:border-0">
                 {getActivityIcon(activity.type)}
                 <div className="space-y-1">

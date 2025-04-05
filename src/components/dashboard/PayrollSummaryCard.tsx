@@ -25,6 +25,11 @@ export function PayrollSummaryCard({
   totalAmount,
   className,
 }: PayrollSummaryProps) {
+  // Ensure we have a valid date before formatting
+  const formattedDate = nextPayrollDate instanceof Date && !isNaN(nextPayrollDate.getTime()) 
+    ? format(nextPayrollDate, "PPP") 
+    : "Invalid date";
+
   return (
     <Card className={cn("flow-transition", className)}>
       <CardHeader className="pb-2">
@@ -33,7 +38,7 @@ export function PayrollSummaryCard({
           <CalendarIcon className="h-4 w-4 text-muted-foreground" />
         </div>
         <CardDescription>
-          Due on {format(nextPayrollDate, "PPP")}
+          Due on {formattedDate}
         </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-2">

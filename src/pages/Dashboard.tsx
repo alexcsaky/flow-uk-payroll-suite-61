@@ -8,6 +8,7 @@ import { StatCard } from "@/components/dashboard/StatCard";
 import { RecentActivityCard } from "@/components/dashboard/RecentActivityCard";
 import { PayrollChart } from "@/components/dashboard/PayrollChart";
 import { useBillingFeatures } from "@/hooks/use-billing-features";
+import { Users, FileText, Building, CheckCircle, Clock, Calendar } from "lucide-react";
 
 const Dashboard = () => {
   const { billingEnabled } = useBillingFeatures();
@@ -95,28 +96,25 @@ const Dashboard = () => {
         <StatCard
           title="Total Employees"
           value="146"
-          trend="up"
-          trendValue="+2.5%"
-          trendText="from last month"
-          icon="users"
+          icon={Users}
+          trend={{ value: 2.5, isPositive: true }}
+          description="from last month"
         />
         {billingEnabled ? (
           <>
             <StatCard
               title="Open Invoices"
               value="12"
-              trend="down"
-              trendValue="-4"
-              trendText="from last week"
-              icon="fileText"
+              icon={FileText}
+              trend={{ value: 4, isPositive: false }}
+              description="from last week"
             />
             <StatCard
               title="Clients"
               value="38"
-              trend="up"
-              trendValue="+2"
-              trendText="new this month"
-              icon="building"
+              icon={Building}
+              trend={{ value: 2, isPositive: true }}
+              description="new this month"
             />
           </>
         ) : (
@@ -124,28 +122,25 @@ const Dashboard = () => {
             <StatCard
               title="Pending Approvals"
               value="23"
-              trend="down"
-              trendValue="-5"
-              trendText="from last week"
-              icon="checkCircle"
+              icon={CheckCircle}
+              trend={{ value: 5, isPositive: false }}
+              description="from last week"
             />
             <StatCard
               title="Hours Logged"
               value="1,248"
-              trend="up"
-              trendValue="+12.5%"
-              trendText="from last month"
-              icon="clock"
+              icon={Clock}
+              trend={{ value: 12.5, isPositive: true }}
+              description="from last month"
             />
           </>
         )}
         <StatCard
           title="Next Pay Run"
           value="Apr 25"
-          trend="soon"
-          trendValue="5 days"
-          trendText="until processing"
-          icon="calendar"
+          icon={Calendar}
+          trend={{ value: 5, isPositive: true }}
+          description="until processing"
         />
       </div>
 
@@ -169,15 +164,25 @@ const Dashboard = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <RecentActivityCard />
+            <RecentActivityCard activities={activities} />
           </CardContent>
         </Card>
       </div>
 
       {/* Additional Cards */}
       <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
-        <PayrollSummaryCard />
-        {billingEnabled && <InvoiceSummaryCard />}
+        <PayrollSummaryCard
+          nextPayrollDate={payrollSummary.nextPayrollDate}
+          employeesCount={payrollSummary.employeesCount}
+          totalAmount={payrollSummary.totalAmount}
+        />
+        {billingEnabled && 
+          <InvoiceSummaryCard
+            totalOutstanding={invoiceSummary.totalOutstanding}
+            totalPaid={invoiceSummary.totalPaid}
+            percentageComplete={invoiceSummary.percentageComplete}
+          />
+        }
       </div>
     </div>
   );
