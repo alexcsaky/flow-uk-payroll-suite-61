@@ -10,6 +10,7 @@ import Dashboard from "@/pages/Dashboard";
 import Settings from "@/pages/Settings";
 import Employees from "@/pages/Employees";
 import Payroll from "@/pages/Payroll";
+import Timesheets from "@/pages/Timesheets";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,8 +28,8 @@ const App = () => (
               <Route path="settings" element={<Settings />} />
               <Route path="employees" element={<Employees />} />
               <Route path="payroll" element={<Payroll />} />
+              <Route path="timesheets" element={<Timesheets />} />
               {/* Add more routes here as they get implemented */}
-              {/* <Route path="timesheets" element={<Timesheets />} /> */}
               {/* <Route path="approvals" element={<Approvals />} /> */}
               {/* <Route path="reports" element={<Reports />} /> */}
               {/* <Route path="clients" element={<Clients />} /> */}
