@@ -71,7 +71,7 @@ export function SideNavigation({ isOpen, setIsOpen }: SideNavigationProps) {
       <div className="flex items-center h-16 px-4 border-b border-sidebar-border shrink-0">
         <Link to="/" className="flex items-center gap-2">
           <img 
-            src="/lovable-uploads/4c6655f2-ef3e-4920-8b84-456eddec7e90.png" 
+            src="/lovable-uploads/9d2cbd7c-d34a-4a48-a92e-cdecc52b9bfd.png" 
             alt="Flow Payroll Logo" 
             className={cn(
               "h-10 w-10",
