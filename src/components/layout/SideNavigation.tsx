@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -58,7 +57,6 @@ export function SideNavigation({ isOpen, setIsOpen }: SideNavigationProps) {
     { name: "Analytics", href: "/analytics", icon: PieChart },
   ];
 
-  // Filter out billing-related items if billing is not enabled
   const filteredNavigation = navigation.filter(
     (item) => !item.requiresBilling || billingEnabled
   );
@@ -72,12 +70,17 @@ export function SideNavigation({ isOpen, setIsOpen }: SideNavigationProps) {
     >
       <div className="flex items-center h-16 px-4 border-b border-sidebar-border shrink-0">
         <Link to="/" className="flex items-center gap-2">
-          <div className="bg-paycircle rounded-md w-10 h-10 flex items-center justify-center text-white font-bold text-xl">
-            P
-          </div>
+          <img 
+            src="/lovable-uploads/4c6655f2-ef3e-4920-8b84-456eddec7e90.png" 
+            alt="Flow Payroll Logo" 
+            className={cn(
+              "h-10 w-10",
+              !isOpen && "mx-auto"
+            )}
+          />
           {isOpen && (
             <span className="text-xl font-semibold tracking-tight animate-fade-in">
-              PayCircle
+              Flow Payroll
             </span>
           )}
         </Link>
