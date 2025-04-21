@@ -1,4 +1,3 @@
-import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -15,7 +14,6 @@ import {
   Building,
   PieChart,
   Calendar,
-  CheckCircle2,
   LogOut,
   LucideIcon,
 } from "lucide-react";
@@ -48,7 +46,7 @@ export function SideNavigation({ isOpen, setIsOpen }: SideNavigationProps) {
     { name: "Dashboard", href: "/", icon: Home },
     { name: "Employees", href: "/employees", icon: Users },
     { name: "Payroll", href: "/payroll", icon: ClipboardList },
-    //{ name: "Timesheets", href: "/timesheets", icon: Calendar },
+    { name: "Timesheets", href: "/timesheets", icon: Calendar },
     //{ name: "Approvals", href: "/approvals", icon: CheckCircle2 },
     { name: "Reports", href: "/reports", icon: BarChart3 },
     { name: "Clients", href: "/clients", icon: Building, requiresBilling: true },
