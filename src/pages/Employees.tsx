@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
@@ -43,7 +42,6 @@ import {
 import { toast } from "sonner";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
-// Mock employee data
 const employees = [
   {
     id: "EMP001",
@@ -111,15 +109,12 @@ const employees = [
   }
 ];
 
-// Define types for the wizard steps
 type WizardStep = {
   id: string;
   title: string;
 }
 
-// Define employee type based on the specified fields
 type EmployeeFormData = {
-  // Personal Info
   title: string;
   fullName: string;
   email: string;
@@ -129,18 +124,15 @@ type EmployeeFormData = {
   gender: string;
   birthSex: string;
   
-  // Employment Details
   dateOfJoining: string;
   workerType: string;
   engagementType: string;
   
-  // Right-to-Work
   rtwDocumentType: string;
   rtwExpiryDate: string;
   rtwCheckDate: string;
   rtwDocumentAttachment?: File;
   
-  // Tax & Payroll Setup
   nationalInsuranceNumber: string;
   uniqueTaxpayerReference?: string;
   initialTaxCode: string;
@@ -151,13 +143,11 @@ type EmployeeFormData = {
   previousTaxPaidToDate?: number;
   payrollFrequency: string;
   
-  // Pension & Holiday
   autoEnrollPensionScheme: string;
   pensionOptOut: boolean;
   holidayScheme: string;
   holidayAccrualRate?: number;
   
-  // Banking Details
   paymentMethod: string;
   bankName: string;
   bankSortCode: string;
@@ -165,17 +155,23 @@ type EmployeeFormData = {
   bankAddress?: string;
   iban?: string;
   
-  // Preferences & Flags
   payslipDeliveryMethod: string;
   awrEligibilityFlag: boolean;
 };
+
+function generateWorkerId() {
+  return (
+    "WKR" +
+    Math.floor(100000 + Math.random() * 900000).toString()
+  );
+}
 
 const Employees = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddEmployeeDialog, setShowAddEmployeeDialog] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [employeeData, setEmployeeData] = useState<EmployeeFormData>({
-    // Initialize with default values
+    workerId: generateWorkerId(),
     title: "",
     fullName: "",
     email: "",
@@ -215,7 +211,6 @@ const Employees = () => {
   
   const navigate = useNavigate();
   
-  // Define wizard steps
   const wizardSteps: WizardStep[] = [
     { id: "personal", title: "Personal Information" },
     { id: "employment", title: "Employment Details" },
@@ -239,6 +234,45 @@ const Employees = () => {
   };
   
   const handleAddEmployee = () => {
+    setEmployeeData({
+      workerId: generateWorkerId(),
+      title: "",
+      fullName: "",
+      email: "",
+      phoneNumber: "",
+      homeAddress: "",
+      dateOfBirth: "",
+      gender: "",
+      birthSex: "",
+      dateOfJoining: "",
+      workerType: "",
+      engagementType: "",
+      rtwDocumentType: "",
+      rtwExpiryDate: "",
+      rtwCheckDate: "",
+      rtwDocumentAttachment: undefined,
+      nationalInsuranceNumber: "",
+      uniqueTaxpayerReference: "",
+      initialTaxCode: "",
+      starterDeclaration: "",
+      studentLoanIndicator: "None",
+      postgraduateLoanIndicator: false,
+      previousPayToDate: undefined,
+      previousTaxPaidToDate: undefined,
+      payrollFrequency: "",
+      autoEnrollPensionScheme: "",
+      pensionOptOut: false,
+      holidayScheme: "",
+      holidayAccrualRate: undefined,
+      paymentMethod: "",
+      bankName: "",
+      bankSortCode: "",
+      bankAccountNumber: "",
+      bankAddress: "",
+      iban: "",
+      payslipDeliveryMethod: "Portal",
+      awrEligibilityFlag: true,
+    });
     setCurrentStep(0);
     setShowAddEmployeeDialog(true);
   };
@@ -255,17 +289,94 @@ const Employees = () => {
   };
   
   const handleNextStep = () => {
-    // Validate current step
-    if (currentStep === 0 && !employeeData.fullName) {
-      toast.error("Full name is required");
-      return;
+    if (currentStep === 0) {
+      if (!employeeData.fullName || employeeData.fullName.length > 100) {
+        toast.error("Full name is required (max 100 characters)");
+        return;
+      }
+      if (!employeeData.email || !/^[\w-.]+@([\w-]+\.)+[\w-]{2,}$/.test(employeeData.email)) {
+        toast.error("Valid email is required");
+        return;
+      }
+      if (!employeeData.homeAddress) {
+        toast.error("Home Address is required");
+        return;
+      }
+      if (!employeeData.dateOfBirth) {
+        toast.error("Date of Birth is required");
+        return;
+      }
     }
-    
-    if (currentStep === 0 && !employeeData.email) {
-      toast.error("Email is required");
-      return;
+    if (currentStep === 1) {
+      if (!employeeData.dateOfJoining) {
+        toast.error("Date of Joining is required");
+        return;
+      }
+      if (!employeeData.workerType) {
+        toast.error("Worker Type is required");
+        return;
+      }
     }
-    
+    if (currentStep === 2) {
+      if (!employeeData.rtwDocumentType) {
+        toast.error("Right-to-Work Document Type is required");
+        return;
+      }
+      if (!employeeData.rtwCheckDate) {
+        toast.error("RTW Check Date is required");
+        return;
+      }
+    }
+    if (currentStep === 3) {
+      if (!employeeData.nationalInsuranceNumber || !/^[A-CEGHJ-PR-TW-Z]{2}\d{6}[A-D]{1}$/.test(employeeData.nationalInsuranceNumber.trim())) {
+        toast.error("Valid National Insurance Number is required (e.g. QQ123456C)");
+        return;
+      }
+      if (!employeeData.initialTaxCode) {
+        toast.error("Initial Tax Code is required");
+        return;
+      }
+      if (!employeeData.starterDeclaration) {
+        toast.error("Starter Declaration is required");
+        return;
+      }
+      if (!employeeData.studentLoanIndicator) {
+        toast.error("Student Loan selection is required");
+        return;
+      }
+      if (!employeeData.payrollFrequency) {
+        toast.error("Payroll Frequency is required");
+        return;
+      }
+    }
+    if (currentStep === 4) {
+      if (!employeeData.autoEnrollPensionScheme) {
+        toast.error("Auto-Enroll Pension Scheme is required");
+        return;
+      }
+      if (!employeeData.holidayScheme) {
+        toast.error("Holiday Scheme is required");
+        return;
+      }
+    }
+    if (currentStep === 5) {
+      if (!employeeData.paymentMethod) {
+        toast.error("Payment Method is required");
+        return;
+      }
+      if (!employeeData.bankName) {
+        toast.error("Bank Name is required");
+        return;
+      }
+      if (!employeeData.bankSortCode || !/^\d{6}$/.test(employeeData.bankSortCode)) {
+        toast.error("Valid 6-digit Bank Sort Code is required");
+        return;
+      }
+      if (!employeeData.bankAccountNumber || !/^\d{8}$/.test(employeeData.bankAccountNumber)) {
+        toast.error("Valid 8-digit Bank Account Number is required");
+        return;
+      }
+    }
     if (currentStep < wizardSteps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
@@ -280,7 +391,6 @@ const Employees = () => {
   };
   
   const handleSubmitEmployee = () => {
-    // Final validation
     if (!employeeData.fullName || !employeeData.email) {
       toast.error("Full name and email are required");
       return;
@@ -290,12 +400,19 @@ const Employees = () => {
     handleCloseDialog();
   };
 
-  // Render appropriate step content based on current step
   const renderStepContent = () => {
     switch(currentStep) {
       case 0: // Personal Information
         return (
           <div className="grid gap-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label className="text-right">Worker ID</Label>
+              <div className="col-span-3">
+                <Input value={employeeData.workerId} readOnly className="bg-muted" />
+                <p className="text-xs text-muted-foreground mt-1">Internal identifier linking worker records across modules</p>
+              </div>
+            </div>
+            
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="title" className="text-right">Title</Label>
               <div className="col-span-3">
@@ -323,42 +440,12 @@ const Employees = () => {
               <div className="col-span-3">
                 <Input
                   id="fullName"
-                  name="fullName"
+                  maxLength={100}
                   value={employeeData.fullName}
                   onChange={(e) => handleInputChange("fullName", e.target.value)}
+                  required
                 />
                 <p className="text-xs text-muted-foreground mt-1">Worker's full legal name used on contracts and payslips</p>
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="email" className="text-right">
-                Email *
-              </Label>
-              <div className="col-span-3">
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={employeeData.email}
-                  onChange={(e) => handleInputChange("email", e.target.value)}
-                />
-                <p className="text-xs text-muted-foreground mt-1">Used for payslip delivery / portal access</p>
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="phoneNumber" className="text-right">
-                Phone Number
-              </Label>
-              <div className="col-span-3">
-                <Input
-                  id="phoneNumber"
-                  name="phoneNumber"
-                  value={employeeData.phoneNumber}
-                  onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
-                />
-                <p className="text-xs text-muted-foreground mt-1">Contact number for queries or emergencies</p>
               </div>
             </div>
             
@@ -372,8 +459,40 @@ const Employees = () => {
                   className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                   value={employeeData.homeAddress}
                   onChange={(e) => handleInputChange("homeAddress", e.target.value)}
+                  required
                 />
                 <p className="text-xs text-muted-foreground mt-1">Residential address lines, city, postcode, country</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="email" className="text-right">
+                Email *
+              </Label>
+              <div className="col-span-3">
+                <Input
+                  id="email"
+                  type="email"
+                  value={employeeData.email}
+                  onChange={(e) => handleInputChange("email", e.target.value)}
+                  required
+                />
+                <p className="text-xs text-muted-foreground mt-1">Used for payslip delivery / portal access</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="phoneNumber" className="text-right">
+                Phone Number
+              </Label>
+              <div className="col-span-3">
+                <Input
+                  id="phoneNumber"
+                  value={employeeData.phoneNumber}
+                  onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
+                  pattern="^[+]?[\d\s()-]+$"
+                />
+                <p className="text-xs text-muted-foreground mt-1">Contact number for queries or emergencies</p>
               </div>
             </div>
             
@@ -385,10 +504,10 @@ const Employees = () => {
                 <div className="flex items-center">
                   <Input
                     id="dateOfBirth"
-                    name="dateOfBirth"
                     type="date"
                     value={employeeData.dateOfBirth}
                     onChange={(e) => handleInputChange("dateOfBirth", e.target.value)}
+                    required
                   />
                   <Calendar className="ml-2 text-muted-foreground" />
                 </div>
@@ -1098,4 +1217,3 @@ const Employees = () => {
 };
 
 export default Employees;
-
