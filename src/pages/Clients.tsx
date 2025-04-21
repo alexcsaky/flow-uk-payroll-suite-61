@@ -1,22 +1,58 @@
-
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Search, Building, Users, Mail, Phone, MoreHorizontal } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useBillingFeatures } from "@/hooks/use-billing-features";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import ClientDetailsForm from "@/components/clients/ClientDetailsForm";
+
+const initialClients = [
+  {
+    id: "CL001",
+    name: "Acme Corporation",
+    contact: "John Smith",
+    email: "john@acmecorp.com",
+    phone: "(555) 123-4567",
+    projects: 3,
+    agencyDivision: "division-a",
+    regNumber: "12345678",
+    vatNumber: "GB123456789",
+    vatCode: "GB",
+    currency: "GBP",
+    nominalCode: "",
+    awrApplicable: true,
+    billingContactName: "John Smith",
+    billingContactEmail: "billing@acmecorp.com",
+    billingContactPhone: "(555) 123-4567",
+    billingAddress: "123 High St\nLondon",
+    siteAddress: "123 High St\nLondon",
+    eBillingId: "",
+    costCentre: "",
+    invoiceFrequency: "monthly",
+    invoiceDelivery: "email",
+    paymentTerms: 30,
+    rebate: 0,
+  },
+  // ... other initial client data if needed ...
+];
 
 const Clients = () => {
   const { billingEnabled } = useBillingFeatures();
-  
-  // Sample client data
-  const clients = [
-    { id: 1, name: "Acme Corporation", contact: "John Smith", email: "john@acmecorp.com", phone: "(555) 123-4567", projects: 3 },
-    { id: 2, name: "Globex Industries", contact: "Jane Doe", email: "jane@globex.com", phone: "(555) 765-4321", projects: 2 },
-    { id: 3, name: "Stark Enterprises", contact: "Tony Stark", email: "tony@stark.com", phone: "(555) 987-6543", projects: 5 },
-    { id: 4, name: "Wayne Industries", contact: "Bruce Wayne", email: "bruce@wayne.com", phone: "(555) 456-7890", projects: 1 },
-    { id: 5, name: "Umbrella Corporation", contact: "Alice Wong", email: "alice@umbrella.com", phone: "(555) 234-5678", projects: 4 },
-  ];
+  const [clients, setClients] = useState(initialClients);
+  const [sheetOpen, setSheetOpen] = useState(false);
+
+  // Add new client from form
+  const handleAddClient = (clientData: any) => {
+    setClients([
+      ...clients,
+      {
+        ...clientData,
+        id: clientData.clientId || `CL${clients.length + 1}` // fallback
+      }
+    ]);
+    setSheetOpen(false);
+  };
 
   if (!billingEnabled) {
     return (
@@ -40,11 +76,23 @@ const Clients = () => {
             Manage your client relationships and projects
           </p>
         </div>
-        <Button className="flow-gradient">
+        <Button className="flow-gradient" onClick={() => setSheetOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
           Add Client
         </Button>
       </div>
+
+      <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+        <SheetContent side="right" className="w-full max-w-xl sm:max-w-lg">
+          <SheetHeader>
+            <SheetTitle>Add / Edit Client</SheetTitle>
+          </SheetHeader>
+          <ClientDetailsForm
+            onSubmit={handleAddClient}
+            onCancel={() => setSheetOpen(false)}
+          />
+        </SheetContent>
+      </Sheet>
 
       <Card>
         <CardHeader>
@@ -56,26 +104,34 @@ const Clients = () => {
                 type="search"
                 placeholder="Search clients..."
                 className="w-full md:w-[250px] pl-8"
+                // NOTE: Add search functionality if needed
               />
             </div>
           </div>
         </CardHeader>
         <CardContent>
-          <div className="rounded-md border">
+          <div className="rounded-md border overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b bg-muted/50">
+                  <th className="py-3 px-4 text-left font-medium">Client ID</th>
                   <th className="py-3 px-4 text-left font-medium">Company</th>
                   <th className="py-3 px-4 text-left font-medium">Contact Person</th>
                   <th className="py-3 px-4 text-left font-medium">Email</th>
                   <th className="py-3 px-4 text-left font-medium">Phone</th>
-                  <th className="py-3 px-4 text-left font-medium">Projects</th>
+                  <th className="py-3 px-4 text-left font-medium">Currency</th>
+                  <th className="py-3 px-4 text-left font-medium">AWR</th>
+                  <th className="py-3 px-4 text-left font-medium">VAT Code</th>
+                  <th className="py-3 px-4 text-left font-medium">Invoice Freq</th>
+                  <th className="py-3 px-4 text-left font-medium">Delivery Method</th>
+                  <th className="py-3 px-4 text-left font-medium">Payment Terms</th>
                   <th className="py-3 px-4 text-left font-medium">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {clients.map((client) => (
-                  <tr key={client.id} className="border-b">
+                {clients.map((client, idx) => (
+                  <tr key={client.id || idx} className="border-b">
+                    <td className="py-3 px-4">{client.id}</td>
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2">
                         <div className="bg-muted rounded-full h-8 w-8 flex items-center justify-center">
@@ -87,22 +143,27 @@ const Clients = () => {
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2">
                         <Users className="h-4 w-4 text-muted-foreground" />
-                        {client.contact}
+                        {client.billingContactName || client.contact}
                       </div>
                     </td>
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2">
                         <Mail className="h-4 w-4 text-muted-foreground" />
-                        {client.email}
+                        {client.billingContactEmail || client.email}
                       </div>
                     </td>
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2">
                         <Phone className="h-4 w-4 text-muted-foreground" />
-                        {client.phone}
+                        {client.billingContactPhone || client.phone}
                       </div>
                     </td>
-                    <td className="py-3 px-4">{client.projects}</td>
+                    <td className="py-3 px-4">{client.currency}</td>
+                    <td className="py-3 px-4">{client.awrApplicable ? "Yes" : "No"}</td>
+                    <td className="py-3 px-4">{client.vatCode}</td>
+                    <td className="py-3 px-4">{client.invoiceFrequency}</td>
+                    <td className="py-3 px-4">{client.invoiceDelivery}</td>
+                    <td className="py-3 px-4">{client.paymentTerms}</td>
                     <td className="py-3 px-4">
                       <div className="flex gap-2">
                         <Button variant="outline" size="sm">View</Button>
@@ -113,6 +174,9 @@ const Clients = () => {
                     </td>
                   </tr>
                 ))}
+                {clients.length === 0 && (
+                  <tr><td colSpan={12} className="text-center text-muted-foreground py-6">No clients yet.</td></tr>
+                )}
               </tbody>
             </table>
           </div>
