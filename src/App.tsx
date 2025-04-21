@@ -1,3 +1,4 @@
+
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
@@ -17,6 +18,7 @@ import Payslip from "@/pages/Payslip";
 import Reports from "@/pages/Reports";
 import Settings from "@/pages/Settings";
 import Timesheets from "@/pages/Timesheets";
+import UserRoles from "@/pages/UserRoles";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
@@ -44,6 +46,7 @@ const App = () => (
               <Route path="payments" element={<Payments />} />
               <Route path="analytics" element={<Analytics />} />
               <Route path="payslips/:employeeId/:payslipId" element={<Payslip />} />
+              <Route path="user-roles" element={<UserRoles />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             </Route>
             <Route path="*" element={<NotFound />} />

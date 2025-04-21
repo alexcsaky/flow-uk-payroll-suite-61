@@ -19,6 +19,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useBillingFeatures } from "@/hooks/use-billing-features";
 import { toast } from "sonner";
+import GeneralCompanyInfo from "@/components/settings/GeneralCompanyInfo";
+import HmrcCredentials from "@/components/settings/HmrcCredentials";
+import PayRunSettings from "@/components/settings/PayRunSettings";
+import PensionSettings from "@/components/settings/PensionSettings";
+import OpeningBalances from "@/components/settings/OpeningBalances";
+import YearEndSettings from "@/components/settings/YearEndSettings";
+import Departments from "@/components/settings/Departments";
+import UserRoles from "@/components/settings/UserRoles";
 
 export default function Settings() {
   const { billingEnabled, toggleBillingFeatures } = useBillingFeatures();
@@ -58,16 +66,20 @@ export default function Settings() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
         <p className="text-muted-foreground">
-          Manage your application settings
+          Manage your payroll system settings
         </p>
       </div>
 
       <Tabs defaultValue="general" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 lg:w-auto">
+        <TabsList className="grid w-full grid-cols-8 lg:w-auto overflow-x-auto">
           <TabsTrigger value="general">General</TabsTrigger>
-          <TabsTrigger value="features">Features</TabsTrigger>
-          <TabsTrigger value="integrations">Integrations</TabsTrigger>
-          <TabsTrigger value="notifications">Notifications</TabsTrigger>
+          <TabsTrigger value="company">Company Info</TabsTrigger>
+          <TabsTrigger value="hmrc">HMRC</TabsTrigger>
+          <TabsTrigger value="payrun">Pay Run</TabsTrigger>
+          <TabsTrigger value="pension">Pension</TabsTrigger>
+          <TabsTrigger value="balances">Balances</TabsTrigger>
+          <TabsTrigger value="yearend">Year-End</TabsTrigger>
+          <TabsTrigger value="departments">Departments</TabsTrigger>
         </TabsList>
 
         <TabsContent value="general" className="space-y-6 mt-6">
@@ -99,9 +111,7 @@ export default function Settings() {
               <Button onClick={handleSaveGeneral}>Save Changes</Button>
             </CardContent>
           </Card>
-        </TabsContent>
 
-        <TabsContent value="features" className="space-y-6 mt-6">
           <Card>
             <CardHeader>
               <CardTitle>Feature Settings</CardTitle>
@@ -143,14 +153,12 @@ export default function Settings() {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
 
-        <TabsContent value="integrations" className="space-y-6 mt-6">
           <Card>
             <CardHeader>
-              <CardTitle>Accounting Integration</CardTitle>
+              <CardTitle>Integrations</CardTitle>
               <CardDescription>
-                Connect to your accounting software
+                Connect to external services
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -167,17 +175,6 @@ export default function Settings() {
                   <Button onClick={handleConnectXero}>Connect</Button>
                 )}
               </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Workforce Management</CardTitle>
-              <CardDescription>
-                Connect to your CRM or workforce management system
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <h4 className="text-sm font-medium">CRM</h4>
@@ -193,6 +190,34 @@ export default function Settings() {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+        
+        <TabsContent value="company" className="space-y-6 mt-6">
+          <GeneralCompanyInfo />
+        </TabsContent>
+
+        <TabsContent value="hmrc" className="space-y-6 mt-6">
+          <HmrcCredentials />
+        </TabsContent>
+
+        <TabsContent value="payrun" className="space-y-6 mt-6">
+          <PayRunSettings />
+        </TabsContent>
+
+        <TabsContent value="pension" className="space-y-6 mt-6">
+          <PensionSettings />
+        </TabsContent>
+
+        <TabsContent value="balances" className="space-y-6 mt-6">
+          <OpeningBalances />
+        </TabsContent>
+
+        <TabsContent value="yearend" className="space-y-6 mt-6">
+          <YearEndSettings />
+        </TabsContent>
+
+        <TabsContent value="departments" className="space-y-6 mt-6">
+          <Departments />
         </TabsContent>
 
         <TabsContent value="notifications" className="space-y-6 mt-6">
