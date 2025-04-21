@@ -29,6 +29,18 @@ export default function YearEndSettings() {
     toast.success("Year-end settings saved successfully");
   };
 
+  const handleReset = () => {
+    setYearEndSettings({
+      p60DistributionMethod: "Portal",
+      p60TemplateID: "DEFAULT_P60",
+      finalFPSSubmissionIndicatorDefault: true,
+      finalEPSSubmissionIndicatorDefault: true,
+      yearEndProcedureAutomation: true,
+      autoClearYTDFiguresOnRollover: true
+    });
+    toast.success("Settings reset to defaults");
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -188,7 +200,7 @@ export default function YearEndSettings() {
         </div>
 
         <div className="flex justify-end gap-2">
-          <Button variant="outline">Reset to Defaults</Button>
+          <Button variant="outline" onClick={handleReset}>Reset to Defaults</Button>
           <Button onClick={handleSave}>Save Settings</Button>
         </div>
       </CardContent>
