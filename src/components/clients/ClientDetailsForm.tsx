@@ -1,12 +1,10 @@
 
 import React from "react";
 import { useForm } from "react-hook-form";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-
-import ClientProfileFields from "./ClientProfileFields";
-import ClientBillingInfoFields from "./ClientBillingInfoFields";
-import ClientBillingPreferencesFields from "./ClientBillingPreferencesFields";
+import ClientProfileSection from "./ClientProfileSection";
+import ClientBillingInfoSection from "./ClientBillingInfoSection";
+import ClientBillingPreferencesSection from "./ClientBillingPreferencesSection";
+import ClientFormActions from "./ClientFormActions";
 
 type Props = {
   onSubmit: (data: any) => void;
@@ -52,39 +50,17 @@ const ClientDetailsForm = ({ onSubmit, onCancel, defaultValues }: Props) => {
     reset();
   };
 
+  const internalOnCancel = () => {
+    reset();
+    onCancel();
+  };
+
   return (
     <form className="space-y-8" onSubmit={handleSubmit(internalOnSubmit)}>
-      <Card>
-        <CardHeader>
-          <CardTitle>Client Profile</CardTitle>
-          <CardDescription>Details about the client organization</CardDescription>
-        </CardHeader>
-        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <ClientProfileFields register={register} watch={watch} setValue={setValue} errors={errors} />
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle>Billing Information</CardTitle>
-        </CardHeader>
-        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <ClientBillingInfoFields register={register} errors={errors} />
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle>Billing Preferences</CardTitle>
-        </CardHeader>
-        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <ClientBillingPreferencesFields register={register} watch={watch} setValue={setValue} errors={errors} />
-        </CardContent>
-      </Card>
-      <div className="flex gap-2 justify-end">
-        <Button type="button" variant="secondary" onClick={() => { reset(); onCancel(); }}>Cancel</Button>
-        <Button type="submit" className="flow-gradient">
-          Save Client Details
-        </Button>
-      </div>
+      <ClientProfileSection register={register} watch={watch} setValue={setValue} errors={errors} />
+      <ClientBillingInfoSection register={register} errors={errors} />
+      <ClientBillingPreferencesSection register={register} watch={watch} setValue={setValue} errors={errors} />
+      <ClientFormActions onCancel={internalOnCancel} />
     </form>
   );
 };
