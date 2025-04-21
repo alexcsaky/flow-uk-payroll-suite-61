@@ -1,88 +1,275 @@
-import React, { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Plus, Search, User, Mail, Phone, Calendar } from "lucide-react";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
-  TableFooter,
   TableHead,
   TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+  TableRow
+} from "@/components/ui/table";
+import {
+  Download,
+  FileText,
+  MoreHorizontal,
+  Search,
+  UserPlus
+} from "lucide-react";
+import { toast } from "sonner";
 
-interface EmployeeFormData {
-  workerId: string;
-}
+// Mock employee data
+const employees = [
+  {
+    id: "EMP001",
+    name: "John Smith",
+    email: "john.smith@example.com",
+    department: "Operations",
+    role: "Manager",
+    status: "Active"
+  },
+  {
+    id: "EMP002",
+    name: "Sarah Johnson",
+    email: "sarah.johnson@example.com",
+    department: "Human Resources",
+    role: "HR Specialist",
+    status: "Active"
+  },
+  {
+    id: "EMP003",
+    name: "Michael Brown",
+    email: "michael.brown@example.com",
+    department: "Finance",
+    role: "Accountant",
+    status: "Active"
+  },
+  {
+    id: "EMP004",
+    name: "Emma Wilson",
+    email: "emma.wilson@example.com",
+    department: "IT",
+    role: "Developer",
+    status: "Active"
+  },
+  {
+    id: "EMP005",
+    name: "James Taylor",
+    email: "james.taylor@example.com",
+    department: "Sales",
+    role: "Sales Representative",
+    status: "On Leave"
+  },
+  {
+    id: "EMP006",
+    name: "Olivia Davis",
+    email: "olivia.davis@example.com",
+    department: "Marketing",
+    role: "Marketing Coordinator",
+    status: "Active"
+  },
+  {
+    id: "EMP007",
+    name: "Robert Martinez",
+    email: "robert.martinez@example.com",
+    department: "Operations",
+    role: "Supervisor",
+    status: "Active"
+  },
+  {
+    id: "EMP008",
+    name: "Sophia Lee",
+    email: "sophia.lee@example.com",
+    department: "Legal",
+    role: "Legal Advisor",
+    status: "Inactive"
+  }
+];
 
 const Employees = () => {
-  const [formData, setFormData] = useState<EmployeeFormData>({
-    workerId: "",
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showAddEmployeeDialog, setShowAddEmployeeDialog] = useState(false);
+  const [newEmployee, setNewEmployee] = useState({
+    name: "",
+    email: "",
+    department: "",
+    role: "",
   });
-
-  // Sample employee data
-  const employees = [
-    { id: 1, name: "John Smith", email: "john@example.com", phone: "(555) 123-4567", role: "Software Engineer" },
-    { id: 2, name: "Alice Johnson", email: "alice@example.com", phone: "(555) 987-6543", role: "Data Scientist" },
-    { id: 3, name: "Bob Williams", email: "bob@example.com", phone: "(555) 456-7890", role: "Project Manager" },
-    { id: 4, name: "Emily Brown", email: "emily@example.com", phone: "(555) 234-5678", role: "UX Designer" },
-    { id: 5, name: "David Jones", email: "david@example.com", phone: "(555) 876-5432", role: "QA Engineer" },
-  ];
+  const navigate = useNavigate();
+  
+  const filteredEmployees = employees.filter(
+    (employee) =>
+      employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      employee.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      employee.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      employee.role.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  
+  const handleViewDetails = (employeeId) => {
+    navigate(`/employees/${employeeId}`);
+  };
+  
+  const handleAddEmployee = () => {
+    setShowAddEmployeeDialog(true);
+  };
+  
+  const handleCloseDialog = () => {
+    setShowAddEmployeeDialog(false);
+    setNewEmployee({
+      name: "",
+      email: "",
+      department: "",
+      role: "",
+    });
+  };
+  
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewEmployee({
+      ...newEmployee,
+      [name]: value,
+    });
+  };
+  
+  const handleSubmitEmployee = () => {
+    if (!newEmployee.name || !newEmployee.email) {
+      toast.error("Name and email are required");
+      return;
+    }
+    
+    toast.success("Employee added successfully");
+    handleCloseDialog();
+  };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Employees</h1>
+          <h2 className="text-3xl font-bold tracking-tight">Employees</h2>
           <p className="text-muted-foreground">
-            Manage your company employees and their information
+            Manage your employees and their information
           </p>
         </div>
-        <Button className="flow-gradient">
-          <Plus className="mr-2 h-4 w-4" />
-          Add Employee
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button className="flow-gradient" onClick={handleAddEmployee}>
+            <UserPlus className="mr-2 h-4 w-4" />
+            Add Employee
+          </Button>
+        </div>
       </div>
 
       <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>Employee Directory</CardTitle>
-            <div className="relative">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+        <CardHeader className="px-6 pt-6 pb-4">
+          <div className="flex flex-col md:flex-row gap-4 justify-between">
+            <div className="relative w-full md:w-96">
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                type="search"
                 placeholder="Search employees..."
-                className="w-full md:w-[250px] pl-8"
+                className="pl-9"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline">
+                <Download className="mr-2 h-4 w-4" />
+                Export
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline">
+                    <FileText className="mr-2 h-4 w-4" />
+                    Reports
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>Reports</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem>Employee Summary</DropdownMenuItem>
+                  <DropdownMenuItem>Department Breakdown</DropdownMenuItem>
+                  <DropdownMenuItem>Payroll Report</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </CardHeader>
-        <CardContent>
-          <div className="rounded-md border">
+        <CardContent className="px-6">
+          <div className="rounded-md border overflow-hidden">
             <Table>
-              <TableHeader>
+              <TableHeader className="bg-muted">
                 <TableRow>
-                  <TableHead className="w-[100px]">Name</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Phone</TableHead>
+                  <TableHead className="w-[100px]">ID</TableHead>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Department</TableHead>
                   <TableHead>Role</TableHead>
+                  <TableHead>Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {employees.map((employee) => (
-                  <TableRow key={employee.id}>
-                    <TableCell className="font-medium">{employee.name}</TableCell>
-                    <TableCell>{employee.email}</TableCell>
-                    <TableCell>{employee.phone}</TableCell>
+                {filteredEmployees.map((employee) => (
+                  <TableRow key={employee.id} className="cursor-pointer hover:bg-muted/50" onClick={() => handleViewDetails(employee.id)}>
+                    <TableCell className="font-medium">{employee.id}</TableCell>
+                    <TableCell>
+                      <div>
+                        <div className="font-medium">{employee.name}</div>
+                        <div className="text-sm text-muted-foreground">{employee.email}</div>
+                      </div>
+                    </TableCell>
+                    <TableCell>{employee.department}</TableCell>
                     <TableCell>{employee.role}</TableCell>
-                    <TableCell className="text-right">
-                      <Button variant="outline" size="sm">View</Button>
+                    <TableCell>
+                      <Badge
+                        variant={
+                          employee.status === "Active"
+                            ? "default"
+                            : employee.status === "On Leave"
+                            ? "outline"
+                            : "secondary"
+                        }
+                      >
+                        {employee.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem onClick={() => handleViewDetails(employee.id)}>
+                            View Details
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>Edit Employee</DropdownMenuItem>
+                          <DropdownMenuItem>Payroll History</DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem className="text-red-600">Deactivate</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -91,6 +278,77 @@ const Employees = () => {
           </div>
         </CardContent>
       </Card>
+      
+      <Dialog open={showAddEmployeeDialog} onOpenChange={setShowAddEmployeeDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Add New Employee</DialogTitle>
+            <DialogDescription>
+              Enter the employee details below. Click save when you're done.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="name" className="text-right">
+                Name
+              </Label>
+              <Input
+                id="name"
+                name="name"
+                className="col-span-3"
+                value={newEmployee.name}
+                onChange={handleInputChange}
+              />
+            </div>
+            
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="email" className="text-right">
+                Email
+              </Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                className="col-span-3"
+                value={newEmployee.email}
+                onChange={handleInputChange}
+              />
+            </div>
+            
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="department" className="text-right">
+                Department
+              </Label>
+              <Input
+                id="department"
+                name="department"
+                className="col-span-3"
+                value={newEmployee.department}
+                onChange={handleInputChange}
+              />
+            </div>
+            
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="role" className="text-right">
+                Role
+              </Label>
+              <Input
+                id="role"
+                name="role"
+                className="col-span-3"
+                value={newEmployee.role}
+                onChange={handleInputChange}
+              />
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={handleCloseDialog}>Cancel</Button>
+            <Button onClick={handleSubmitEmployee}>Save Employee</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
