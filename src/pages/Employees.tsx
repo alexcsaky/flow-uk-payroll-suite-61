@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
@@ -21,6 +22,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -34,9 +37,11 @@ import {
   FileText,
   MoreHorizontal,
   Search,
-  UserPlus
+  UserPlus,
+  Calendar
 } from "lucide-react";
 import { toast } from "sonner";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
 // Mock employee data
 const employees = [
@@ -106,16 +111,120 @@ const employees = [
   }
 ];
 
+// Define types for the wizard steps
+type WizardStep = {
+  id: string;
+  title: string;
+}
+
+// Define employee type based on the specified fields
+type EmployeeFormData = {
+  // Personal Info
+  title: string;
+  fullName: string;
+  email: string;
+  phoneNumber: string;
+  homeAddress: string;
+  dateOfBirth: string;
+  gender: string;
+  birthSex: string;
+  
+  // Employment Details
+  dateOfJoining: string;
+  workerType: string;
+  engagementType: string;
+  
+  // Right-to-Work
+  rtwDocumentType: string;
+  rtwExpiryDate: string;
+  rtwCheckDate: string;
+  rtwDocumentAttachment?: File;
+  
+  // Tax & Payroll Setup
+  nationalInsuranceNumber: string;
+  uniqueTaxpayerReference?: string;
+  initialTaxCode: string;
+  starterDeclaration: string;
+  studentLoanIndicator: string;
+  postgraduateLoanIndicator: boolean;
+  previousPayToDate?: number;
+  previousTaxPaidToDate?: number;
+  payrollFrequency: string;
+  
+  // Pension & Holiday
+  autoEnrollPensionScheme: string;
+  pensionOptOut: boolean;
+  holidayScheme: string;
+  holidayAccrualRate?: number;
+  
+  // Banking Details
+  paymentMethod: string;
+  bankName: string;
+  bankSortCode: string;
+  bankAccountNumber: string;
+  bankAddress?: string;
+  iban?: string;
+  
+  // Preferences & Flags
+  payslipDeliveryMethod: string;
+  awrEligibilityFlag: boolean;
+};
+
 const Employees = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddEmployeeDialog, setShowAddEmployeeDialog] = useState(false);
-  const [newEmployee, setNewEmployee] = useState({
-    name: "",
+  const [currentStep, setCurrentStep] = useState(0);
+  const [employeeData, setEmployeeData] = useState<EmployeeFormData>({
+    // Initialize with default values
+    title: "",
+    fullName: "",
     email: "",
-    department: "",
-    role: "",
+    phoneNumber: "",
+    homeAddress: "",
+    dateOfBirth: "",
+    gender: "",
+    birthSex: "",
+    
+    dateOfJoining: "",
+    workerType: "",
+    engagementType: "",
+    
+    rtwDocumentType: "",
+    rtwExpiryDate: "",
+    rtwCheckDate: "",
+    
+    nationalInsuranceNumber: "",
+    initialTaxCode: "",
+    starterDeclaration: "",
+    studentLoanIndicator: "None",
+    postgraduateLoanIndicator: false,
+    payrollFrequency: "",
+    
+    autoEnrollPensionScheme: "",
+    pensionOptOut: false,
+    holidayScheme: "",
+    
+    paymentMethod: "",
+    bankName: "",
+    bankSortCode: "",
+    bankAccountNumber: "",
+    
+    payslipDeliveryMethod: "Portal",
+    awrEligibilityFlag: true,
   });
+  
   const navigate = useNavigate();
+  
+  // Define wizard steps
+  const wizardSteps: WizardStep[] = [
+    { id: "personal", title: "Personal Information" },
+    { id: "employment", title: "Employment Details" },
+    { id: "rtw", title: "Right-to-Work" },
+    { id: "tax", title: "Tax & Payroll Setup" },
+    { id: "pension", title: "Pension & Holiday" },
+    { id: "banking", title: "Banking Details" },
+    { id: "preferences", title: "Preferences & Flags" },
+  ];
   
   const filteredEmployees = employees.filter(
     (employee) =>
@@ -130,35 +239,708 @@ const Employees = () => {
   };
   
   const handleAddEmployee = () => {
+    setCurrentStep(0);
     setShowAddEmployeeDialog(true);
   };
   
   const handleCloseDialog = () => {
     setShowAddEmployeeDialog(false);
-    setNewEmployee({
-      name: "",
-      email: "",
-      department: "",
-      role: "",
-    });
   };
   
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewEmployee({
-      ...newEmployee,
-      [name]: value,
-    });
+  const handleInputChange = (field, value) => {
+    setEmployeeData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+  
+  const handleNextStep = () => {
+    // Validate current step
+    if (currentStep === 0 && !employeeData.fullName) {
+      toast.error("Full name is required");
+      return;
+    }
+    
+    if (currentStep === 0 && !employeeData.email) {
+      toast.error("Email is required");
+      return;
+    }
+    
+    if (currentStep < wizardSteps.length - 1) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      handleSubmitEmployee();
+    }
+  };
+  
+  const handlePrevStep = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
   };
   
   const handleSubmitEmployee = () => {
-    if (!newEmployee.name || !newEmployee.email) {
-      toast.error("Name and email are required");
+    // Final validation
+    if (!employeeData.fullName || !employeeData.email) {
+      toast.error("Full name and email are required");
       return;
     }
     
     toast.success("Employee added successfully");
     handleCloseDialog();
+  };
+
+  // Render appropriate step content based on current step
+  const renderStepContent = () => {
+    switch(currentStep) {
+      case 0: // Personal Information
+        return (
+          <div className="grid gap-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="title" className="text-right">Title</Label>
+              <div className="col-span-3">
+                <Select value={employeeData.title} onValueChange={(value) => handleInputChange("title", value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a title" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Mr">Mr</SelectItem>
+                    <SelectItem value="Mrs">Mrs</SelectItem>
+                    <SelectItem value="Ms">Ms</SelectItem>
+                    <SelectItem value="Dr">Dr</SelectItem>
+                    <SelectItem value="Miss">Miss</SelectItem>
+                    <SelectItem value="Prof">Prof</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground mt-1">Personal title for correspondence</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="fullName" className="text-right">
+                Full Name *
+              </Label>
+              <div className="col-span-3">
+                <Input
+                  id="fullName"
+                  name="fullName"
+                  value={employeeData.fullName}
+                  onChange={(e) => handleInputChange("fullName", e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground mt-1">Worker's full legal name used on contracts and payslips</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="email" className="text-right">
+                Email *
+              </Label>
+              <div className="col-span-3">
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={employeeData.email}
+                  onChange={(e) => handleInputChange("email", e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground mt-1">Used for payslip delivery / portal access</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="phoneNumber" className="text-right">
+                Phone Number
+              </Label>
+              <div className="col-span-3">
+                <Input
+                  id="phoneNumber"
+                  name="phoneNumber"
+                  value={employeeData.phoneNumber}
+                  onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground mt-1">Contact number for queries or emergencies</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-4 items-start gap-4">
+              <Label htmlFor="homeAddress" className="text-right pt-2">
+                Home Address *
+              </Label>
+              <div className="col-span-3">
+                <textarea 
+                  id="homeAddress"
+                  className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  value={employeeData.homeAddress}
+                  onChange={(e) => handleInputChange("homeAddress", e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground mt-1">Residential address lines, city, postcode, country</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="dateOfBirth" className="text-right">
+                Date of Birth *
+              </Label>
+              <div className="col-span-3">
+                <div className="flex items-center">
+                  <Input
+                    id="dateOfBirth"
+                    name="dateOfBirth"
+                    type="date"
+                    value={employeeData.dateOfBirth}
+                    onChange={(e) => handleInputChange("dateOfBirth", e.target.value)}
+                  />
+                  <Calendar className="ml-2 text-muted-foreground" />
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">Used for age-based rules (NMW, NI cat under 21)</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="gender" className="text-right">Gender</Label>
+              <div className="col-span-3">
+                <Select value={employeeData.gender} onValueChange={(value) => handleInputChange("gender", value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select gender" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="male">Male</SelectItem>
+                    <SelectItem value="female">Female</SelectItem>
+                    <SelectItem value="non-binary">Non-binary</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                    <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground mt-1">For equality monitoring</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="birthSex" className="text-right">Birth Sex</Label>
+              <div className="col-span-3">
+                <Select value={employeeData.birthSex} onValueChange={(value) => handleInputChange("birthSex", value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select birth sex" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="male">Male</SelectItem>
+                    <SelectItem value="female">Female</SelectItem>
+                    <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground mt-1">If captured separately for compliance</p>
+              </div>
+            </div>
+          </div>
+        );
+      
+      case 1: // Employment Details
+        return (
+          <div className="grid gap-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="dateOfJoining" className="text-right">
+                Date of Joining *
+              </Label>
+              <div className="col-span-3">
+                <div className="flex items-center">
+                  <Input
+                    id="dateOfJoining"
+                    name="dateOfJoining"
+                    type="date"
+                    value={employeeData.dateOfJoining}
+                    onChange={(e) => handleInputChange("dateOfJoining", e.target.value)}
+                  />
+                  <Calendar className="ml-2 text-muted-foreground" />
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">Date registered/onboarded with agency</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="workerType" className="text-right">Worker Type *</Label>
+              <div className="col-span-3">
+                <Select value={employeeData.workerType} onValueChange={(value) => handleInputChange("workerType", value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select worker type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="temp">Temp</SelectItem>
+                    <SelectItem value="contractor">Contractor</SelectItem>
+                    <SelectItem value="ltd">Ltd</SelectItem>
+                    <SelectItem value="umbrella">Umbrella</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground mt-1">Drives payroll flow (PAYE vs invoice)</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="engagementType" className="text-right">Engagement Type</Label>
+              <div className="col-span-3">
+                <Select value={employeeData.engagementType} onValueChange={(value) => handleInputChange("engagementType", value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select engagement type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="full-time">Full-time</SelectItem>
+                    <SelectItem value="part-time">Part-time</SelectItem>
+                    <SelectItem value="temporary">Temporary</SelectItem>
+                    <SelectItem value="seasonal">Seasonal</SelectItem>
+                    <SelectItem value="zero-hours">Zero-hours</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground mt-1">Nature of engagement for HR reporting</p>
+              </div>
+            </div>
+          </div>
+        );
+      
+      case 2: // Right-to-Work
+        return (
+          <div className="grid gap-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="rtwDocumentType" className="text-right">RTW Document Type *</Label>
+              <div className="col-span-3">
+                <Select value={employeeData.rtwDocumentType} onValueChange={(value) => handleInputChange("rtwDocumentType", value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select document type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="passport">Passport</SelectItem>
+                    <SelectItem value="brp">BRP</SelectItem>
+                    <SelectItem value="visa">Visa</SelectItem>
+                    <SelectItem value="settled-status">Settled Status</SelectItem>
+                    <SelectItem value="birth-certificate">Birth Certificate</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground mt-1">Passport, BRP, Visa, Settled Status, etc.</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="rtwExpiryDate" className="text-right">
+                RTW Expiry Date *
+              </Label>
+              <div className="col-span-3">
+                <div className="flex items-center">
+                  <Input
+                    id="rtwExpiryDate"
+                    name="rtwExpiryDate"
+                    type="date"
+                    value={employeeData.rtwExpiryDate}
+                    onChange={(e) => handleInputChange("rtwExpiryDate", e.target.value)}
+                  />
+                  <Calendar className="ml-2 text-muted-foreground" />
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">Triggers compliance alerts before expiry</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="rtwCheckDate" className="text-right">
+                RTW Check Date *
+              </Label>
+              <div className="col-span-3">
+                <div className="flex items-center">
+                  <Input
+                    id="rtwCheckDate"
+                    name="rtwCheckDate"
+                    type="date"
+                    value={employeeData.rtwCheckDate}
+                    onChange={(e) => handleInputChange("rtwCheckDate", e.target.value)}
+                  />
+                  <Calendar className="ml-2 text-muted-foreground" />
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">Date RTW was verified</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="rtwDocumentAttachment" className="text-right">RTW Document</Label>
+              <div className="col-span-3">
+                <Input
+                  id="rtwDocumentAttachment"
+                  name="rtwDocumentAttachment"
+                  type="file"
+                  onChange={(e) => handleInputChange("rtwDocumentAttachment", e.target.files?.[0])}
+                />
+                <p className="text-xs text-muted-foreground mt-1">Scan of proof stored for audit</p>
+              </div>
+            </div>
+          </div>
+        );
+      
+      case 3: // Tax & Payroll Setup
+        return (
+          <div className="grid gap-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="nationalInsuranceNumber" className="text-right">
+                National Insurance Number *
+              </Label>
+              <div className="col-span-3">
+                <Input
+                  id="nationalInsuranceNumber"
+                  name="nationalInsuranceNumber"
+                  value={employeeData.nationalInsuranceNumber}
+                  onChange={(e) => handleInputChange("nationalInsuranceNumber", e.target.value)}
+                  placeholder="AA123456A"
+                />
+                <p className="text-xs text-muted-foreground mt-1">Unique NI for PAYE and NI contributions</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="uniqueTaxpayerReference" className="text-right">UTR</Label>
+              <div className="col-span-3">
+                <Input
+                  id="uniqueTaxpayerReference"
+                  name="uniqueTaxpayerReference"
+                  value={employeeData.uniqueTaxpayerReference || ""}
+                  onChange={(e) => handleInputChange("uniqueTaxpayerReference", e.target.value)}
+                  placeholder="1234567890"
+                />
+                <p className="text-xs text-muted-foreground mt-1">Unique Taxpayer Reference - Required for CIS/Ltd (10 digits)</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="initialTaxCode" className="text-right">
+                Initial Tax Code *
+              </Label>
+              <div className="col-span-3">
+                <Input
+                  id="initialTaxCode"
+                  name="initialTaxCode"
+                  value={employeeData.initialTaxCode}
+                  onChange={(e) => handleInputChange("initialTaxCode", e.target.value)}
+                  placeholder="1257L"
+                />
+                <p className="text-xs text-muted-foreground mt-1">Starter tax code for PAYE calculation</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="starterDeclaration" className="text-right">Starter Declaration *</Label>
+              <div className="col-span-3">
+                <Select value={employeeData.starterDeclaration} onValueChange={(value) => handleInputChange("starterDeclaration", value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select declaration" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="first-job">This is my first job</SelectItem>
+                    <SelectItem value="only-job">This is my only job</SelectItem>
+                    <SelectItem value="additional-job">This is an additional job</SelectItem>
+                    <SelectItem value="pension">I receive a pension</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground mt-1">Sets cumulative or BR tax basis</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="studentLoanIndicator" className="text-right">Student Loan *</Label>
+              <div className="col-span-3">
+                <Select value={employeeData.studentLoanIndicator} onValueChange={(value) => handleInputChange("studentLoanIndicator", value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select plan" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">None</SelectItem>
+                    <SelectItem value="plan1">Plan 1</SelectItem>
+                    <SelectItem value="plan2">Plan 2</SelectItem>
+                    <SelectItem value="plan4">Plan 4</SelectItem>
+                    <SelectItem value="plan5">Plan 5</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground mt-1">Triggers loan deductions above threshold</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="postgraduateLoanIndicator" className="text-right">Postgraduate Loan</Label>
+              <div className="col-span-3 flex items-center space-x-2">
+                <Checkbox
+                  id="postgraduateLoanIndicator"
+                  checked={employeeData.postgraduateLoanIndicator}
+                  onCheckedChange={(checked) => handleInputChange("postgraduateLoanIndicator", Boolean(checked))}
+                />
+                <label
+                  htmlFor="postgraduateLoanIndicator"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Has postgraduate loan
+                </label>
+                <p className="text-xs text-muted-foreground ml-2">Adds postgraduate loan deduction</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="previousPayToDate" className="text-right">Previous Pay to Date</Label>
+              <div className="col-span-3">
+                <Input
+                  id="previousPayToDate"
+                  name="previousPayToDate"
+                  type="number"
+                  value={employeeData.previousPayToDate || ""}
+                  onChange={(e) => handleInputChange("previousPayToDate", parseFloat(e.target.value))}
+                  placeholder="0.00"
+                />
+                <p className="text-xs text-muted-foreground mt-1">YTD taxable pay imported from P45</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="previousTaxPaidToDate" className="text-right">Previous Tax Paid to Date</Label>
+              <div className="col-span-3">
+                <Input
+                  id="previousTaxPaidToDate"
+                  name="previousTaxPaidToDate"
+                  type="number"
+                  value={employeeData.previousTaxPaidToDate || ""}
+                  onChange={(e) => handleInputChange("previousTaxPaidToDate", parseFloat(e.target.value))}
+                  placeholder="0.00"
+                />
+                <p className="text-xs text-muted-foreground mt-1">YTD tax deducted imported from P45</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="payrollFrequency" className="text-right">Payroll Frequency *</Label>
+              <div className="col-span-3">
+                <Select value={employeeData.payrollFrequency} onValueChange={(value) => handleInputChange("payrollFrequency", value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select frequency" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="weekly">Weekly</SelectItem>
+                    <SelectItem value="fortnightly">Fortnightly</SelectItem>
+                    <SelectItem value="monthly">Monthly</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground mt-1">Determines pay schedule and cut-offs</p>
+              </div>
+            </div>
+          </div>
+        );
+      
+      case 4: // Pension & Holiday
+        return (
+          <div className="grid gap-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="autoEnrollPensionScheme" className="text-right">Auto-Enroll Pension Scheme</Label>
+              <div className="col-span-3">
+                <Select value={employeeData.autoEnrollPensionScheme} onValueChange={(value) => handleInputChange("autoEnrollPensionScheme", value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select scheme" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">None</SelectItem>
+                    <SelectItem value="nest">NEST</SelectItem>
+                    <SelectItem value="peoples-pension">The People's Pension</SelectItem>
+                    <SelectItem value="smart-pension">Smart Pension</SelectItem>
+                    <SelectItem value="now-pension">NOW: Pension</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground mt-1">Scheme used for workplace pension assessment</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="pensionOptOut" className="text-right">Pension Opt-Out</Label>
+              <div className="col-span-3 flex items-center space-x-2">
+                <Checkbox
+                  id="pensionOptOut"
+                  checked={employeeData.pensionOptOut}
+                  onCheckedChange={(checked) => handleInputChange("pensionOptOut", Boolean(checked))}
+                />
+                <label
+                  htmlFor="pensionOptOut"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Opted out of pension
+                </label>
+                <p className="text-xs text-muted-foreground ml-2">Stops pension deductions if ticked</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="holidayScheme" className="text-right">Holiday Scheme *</Label>
+              <div className="col-span-3">
+                <Select value={employeeData.holidayScheme} onValueChange={(value) => handleInputChange("holidayScheme", value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select scheme" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="accrual">12.07% Accrual</SelectItem>
+                    <SelectItem value="rolled-up">Rolled-up</SelectItem>
+                    <SelectItem value="statutory">Statutory</SelectItem>
+                    <SelectItem value="enhanced">Enhanced</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground mt-1">How holiday is accrued or rolled-up</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="holidayAccrualRate" className="text-right">Holiday Accrual Rate (Override)</Label>
+              <div className="col-span-3">
+                <Input
+                  id="holidayAccrualRate"
+                  name="holidayAccrualRate"
+                  type="number"
+                  value={employeeData.holidayAccrualRate || ""}
+                  onChange={(e) => handleInputChange("holidayAccrualRate", parseFloat(e.target.value))}
+                  step="0.01"
+                  placeholder="12.07"
+                />
+                <p className="text-xs text-muted-foreground mt-1">Custom accrual % overriding scheme default</p>
+              </div>
+            </div>
+          </div>
+        );
+      
+      case 5: // Banking Details
+        return (
+          <div className="grid gap-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="paymentMethod" className="text-right">Payment Method *</Label>
+              <div className="col-span-3">
+                <Select value={employeeData.paymentMethod} onValueChange={(value) => handleInputChange("paymentMethod", value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select method" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="bacs">BACS</SelectItem>
+                    <SelectItem value="cheque">Cheque</SelectItem>
+                    <SelectItem value="faster-payment">Faster Payment</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground mt-1">Preferred payment channel</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="bankName" className="text-right">
+                Bank Name *
+              </Label>
+              <div className="col-span-3">
+                <Input
+                  id="bankName"
+                  name="bankName"
+                  value={employeeData.bankName}
+                  onChange={(e) => handleInputChange("bankName", e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground mt-1">Name of bank (reference)</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="bankSortCode" className="text-right">
+                Bank Sort Code *
+              </Label>
+              <div className="col-span-3">
+                <Input
+                  id="bankSortCode"
+                  name="bankSortCode"
+                  value={employeeData.bankSortCode}
+                  onChange={(e) => handleInputChange("bankSortCode", e.target.value)}
+                  placeholder="123456"
+                />
+                <p className="text-xs text-muted-foreground mt-1">UK sort code for BACS file (6 digits)</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="bankAccountNumber" className="text-right">
+                Bank Account Number *
+              </Label>
+              <div className="col-span-3">
+                <Input
+                  id="bankAccountNumber"
+                  name="bankAccountNumber"
+                  value={employeeData.bankAccountNumber}
+                  onChange={(e) => handleInputChange("bankAccountNumber", e.target.value)}
+                  placeholder="12345678"
+                />
+                <p className="text-xs text-muted-foreground mt-1">Account number for salary payment (8 digits)</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-4 items-start gap-4">
+              <Label htmlFor="bankAddress" className="text-right pt-2">
+                Bank Address
+              </Label>
+              <div className="col-span-3">
+                <textarea 
+                  id="bankAddress"
+                  className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  value={employeeData.bankAddress || ""}
+                  onChange={(e) => handleInputChange("bankAddress", e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground mt-1">Branch address for record</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="iban" className="text-right">
+                IBAN
+              </Label>
+              <div className="col-span-3">
+                <Input
+                  id="iban"
+                  name="iban"
+                  value={employeeData.iban || ""}
+                  onChange={(e) => handleInputChange("iban", e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground mt-1">Used if paying non-UK account</p>
+              </div>
+            </div>
+          </div>
+        );
+      
+      case 6: // Preferences & Flags
+        return (
+          <div className="grid gap-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="payslipDeliveryMethod" className="text-right">Payslip Delivery Method *</Label>
+              <div className="col-span-3">
+                <Select value={employeeData.payslipDeliveryMethod} onValueChange={(value) => handleInputChange("payslipDeliveryMethod", value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select method" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="portal">Portal</SelectItem>
+                    <SelectItem value="email">Email</SelectItem>
+                    <SelectItem value="post">Post</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground mt-1">Controls payslip distribution</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="awrEligibilityFlag" className="text-right">AWR Eligibility</Label>
+              <div className="col-span-3 flex items-center space-x-2">
+                <Checkbox
+                  id="awrEligibilityFlag"
+                  checked={employeeData.awrEligibilityFlag}
+                  onCheckedChange={(checked) => handleInputChange("awrEligibilityFlag", Boolean(checked))}
+                />
+                <label
+                  htmlFor="awrEligibilityFlag"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Worker in scope for AWR
+                </label>
+                <p className="text-xs text-muted-foreground ml-2">Marks worker in scope for Agency Workers Regulations</p>
+              </div>
+            </div>
+          </div>
+        );
+      
+      default:
+        return null;
+    }
   };
 
   return (
@@ -280,72 +1062,34 @@ const Employees = () => {
       </Card>
       
       <Dialog open={showAddEmployeeDialog} onOpenChange={setShowAddEmployeeDialog}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[800px] max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Add New Employee</DialogTitle>
             <DialogDescription>
-              Enter the employee details below. Click save when you're done.
+              Step {currentStep + 1} of {wizardSteps.length}: {wizardSteps[currentStep].title}
             </DialogDescription>
           </DialogHeader>
           
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
-                Name
-              </Label>
-              <Input
-                id="name"
-                name="name"
-                className="col-span-3"
-                value={newEmployee.name}
-                onChange={handleInputChange}
-              />
-            </div>
-            
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="email" className="text-right">
-                Email
-              </Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                className="col-span-3"
-                value={newEmployee.email}
-                onChange={handleInputChange}
-              />
-            </div>
-            
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="department" className="text-right">
-                Department
-              </Label>
-              <Input
-                id="department"
-                name="department"
-                className="col-span-3"
-                value={newEmployee.department}
-                onChange={handleInputChange}
-              />
-            </div>
-            
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="role" className="text-right">
-                Role
-              </Label>
-              <Input
-                id="role"
-                name="role"
-                className="col-span-3"
-                value={newEmployee.role}
-                onChange={handleInputChange}
-              />
-            </div>
+          <div className="py-4">
+            {renderStepContent()}
           </div>
           
           <DialogFooter>
-            <Button variant="outline" onClick={handleCloseDialog}>Cancel</Button>
-            <Button onClick={handleSubmitEmployee}>Save Employee</Button>
+            <div className="w-full flex justify-between">
+              <Button 
+                variant="outline" 
+                onClick={handlePrevStep}
+                disabled={currentStep === 0}
+              >
+                Previous
+              </Button>
+              <div>
+                <Button variant="outline" onClick={handleCloseDialog} className="mr-2">Cancel</Button>
+                <Button onClick={handleNextStep}>
+                  {currentStep < wizardSteps.length - 1 ? "Next" : "Save Employee"}
+                </Button>
+              </div>
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -354,3 +1098,4 @@ const Employees = () => {
 };
 
 export default Employees;
+
