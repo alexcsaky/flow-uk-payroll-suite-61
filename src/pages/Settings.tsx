@@ -1,17 +1,17 @@
 
 import { useState } from "react";
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
 } from "@/components/ui/card";
-import { 
-  Tabs, 
-  TabsContent, 
-  TabsList, 
-  TabsTrigger 
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger
 } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -69,7 +69,7 @@ export default function Settings() {
           <TabsTrigger value="integrations">Integrations</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="general" className="space-y-6 mt-6">
           <Card>
             <CardHeader>
@@ -81,17 +81,17 @@ export default function Settings() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="org-name">Organisation Name</Label>
-                <Input 
-                  id="org-name" 
+                <Input
+                  id="org-name"
                   value={orgName}
                   onChange={(e) => setOrgName(e.target.value)}
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="org-email">Email Address</Label>
-                <Input 
-                  id="org-email" 
-                  type="email" 
+                <Input
+                  id="org-email"
+                  type="email"
                   value={orgEmail}
                   onChange={(e) => setOrgEmail(e.target.value)}
                 />
@@ -100,7 +100,7 @@ export default function Settings() {
             </CardContent>
           </Card>
         </TabsContent>
-        
+
         <TabsContent value="features" className="space-y-6 mt-6">
           <Card>
             <CardHeader>
@@ -117,8 +117,8 @@ export default function Settings() {
                     Enable client and invoice management
                   </p>
                 </div>
-                <Switch 
-                  id="billing-features" 
+                <Switch
+                  id="billing-features"
                   checked={billingEnabled}
                   onCheckedChange={toggleBillingFeatures}
                 />
@@ -144,7 +144,7 @@ export default function Settings() {
             </CardContent>
           </Card>
         </TabsContent>
-        
+
         <TabsContent value="integrations" className="space-y-6 mt-6">
           <Card>
             <CardHeader>
@@ -169,7 +169,7 @@ export default function Settings() {
               </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader>
               <CardTitle>Workforce Management</CardTitle>
@@ -180,7 +180,7 @@ export default function Settings() {
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <h4 className="text-sm font-medium">Host Staffing CRM</h4>
+                  <h4 className="text-sm font-medium">CRM</h4>
                   <p className="text-sm text-muted-foreground">
                     {crmConnected ? "Connected" : "Not connected"}
                   </p>
@@ -194,7 +194,7 @@ export default function Settings() {
             </CardContent>
           </Card>
         </TabsContent>
-        
+
         <TabsContent value="notifications" className="space-y-6 mt-6">
           <Card>
             <CardHeader>

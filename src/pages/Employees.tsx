@@ -1,33 +1,32 @@
-
-import React, { useState } from "react";
-import { 
-  Table, 
-  TableHeader, 
-  TableBody, 
-  TableRow, 
-  TableHead, 
-  TableCell 
-} from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import {
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuItem
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import {
-  Search,
-  PlusCircle,
-  MoreHorizontal,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from "@/components/ui/table";
+import {
   Download,
   FileText,
-  UserPlus,
+  MoreHorizontal,
+  Search,
+  UserPlus
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 // Mock employee data
 const employees = [
@@ -99,6 +98,7 @@ const employees = [
 
 const Employees = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
   
   const filteredEmployees = employees.filter(
     (employee) =>
@@ -107,6 +107,10 @@ const Employees = () => {
       employee.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
       employee.role.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  
+  const handleViewDetails = (employeeId) => {
+    navigate(`/employees/${employeeId}`);
+  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -175,7 +179,7 @@ const Employees = () => {
               </TableHeader>
               <TableBody>
                 {filteredEmployees.map((employee) => (
-                  <TableRow key={employee.id}>
+                  <TableRow key={employee.id} className="cursor-pointer hover:bg-muted/50" onClick={() => handleViewDetails(employee.id)}>
                     <TableCell className="font-medium">{employee.id}</TableCell>
                     <TableCell>
                       <div>
@@ -198,7 +202,7 @@ const Employees = () => {
                         {employee.status}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" className="h-8 w-8 p-0">
@@ -208,7 +212,9 @@ const Employees = () => {
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem>View Details</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleViewDetails(employee.id)}>
+                            View Details
+                          </DropdownMenuItem>
                           <DropdownMenuItem>Edit Employee</DropdownMenuItem>
                           <DropdownMenuItem>Payroll History</DropdownMenuItem>
                           <DropdownMenuSeparator />
