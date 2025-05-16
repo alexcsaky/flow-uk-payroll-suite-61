@@ -180,26 +180,27 @@ const Dashboard = () => {
         </Card>
       </div>
 
-      {/* Earnings Chart */}
-      <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-1">
-        <EarningsChart data={earningsData} className="max-w-5xl mx-auto" />
-      </div>
-
-      {/* Additional Cards */}
-      <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
+      {/* Earnings Chart and Next Payroll Side by Side */}
+      <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-7">
+        <EarningsChart data={earningsData} className="lg:col-span-4" />
         <PayrollSummaryCard
           nextPayrollDate={payrollSummary.nextPayrollDate}
           employeesCount={payrollSummary.employeesCount}
           totalAmount={payrollSummary.totalAmount}
+          className="lg:col-span-3"
         />
-        {billingEnabled && 
+      </div>
+
+      {/* Only show Invoice Summary if billing is enabled */}
+      {billingEnabled && (
+        <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-1">
           <InvoiceSummaryCard
             totalOutstanding={invoiceSummary.totalOutstanding}
             totalPaid={invoiceSummary.totalPaid}
             percentageComplete={invoiceSummary.percentageComplete}
           />
-        }
-      </div>
+        </div>
+      )}
     </div>
   );
 };
