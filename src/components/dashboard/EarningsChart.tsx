@@ -65,23 +65,23 @@ export function EarningsChart({ data, className }: EarningsChartProps) {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div className="bg-slate-50 p-4 rounded-lg">
+        <div className="mb-5">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div className="bg-slate-50 p-3 rounded-lg">
               <div className="text-sm text-muted-foreground mb-1">Gross Earnings</div>
-              <div className="text-2xl font-bold">{formatCurrency(totalGross)}</div>
+              <div className="text-xl font-bold">{formatCurrency(totalGross)}</div>
               <div className="text-xs text-muted-foreground mt-1">Latest month</div>
             </div>
-            <div className="bg-slate-50 p-4 rounded-lg">
+            <div className="bg-slate-50 p-3 rounded-lg">
               <div className="text-sm text-muted-foreground mb-1">Net Earnings</div>
-              <div className="text-2xl font-bold">{formatCurrency(totalNet)}</div>
+              <div className="text-xl font-bold">{formatCurrency(totalNet)}</div>
               <div className="text-xs text-muted-foreground mt-1">
                 {netPercentage}% of gross
               </div>
             </div>
-            <div className="bg-slate-50 p-4 rounded-lg">
+            <div className="bg-slate-50 p-3 rounded-lg">
               <div className="text-sm text-muted-foreground mb-1">Tax & Deductions</div>
-              <div className="text-2xl font-bold">{formatCurrency(taxAndDeductions)}</div>
+              <div className="text-xl font-bold">{formatCurrency(taxAndDeductions)}</div>
               <div className="text-xs text-muted-foreground mt-1">
                 {taxPercentage}% of gross
               </div>
@@ -89,7 +89,7 @@ export function EarningsChart({ data, className }: EarningsChartProps) {
           </div>
         </div>
         
-        <div className="h-[300px]">
+        <div className="h-[250px]">
           <ChartContainer
             config={{
               gross: {
@@ -107,10 +107,11 @@ export function EarningsChart({ data, className }: EarningsChartProps) {
                 data={data}
                 margin={{
                   top: 5,
-                  right: 30,
-                  left: 20,
+                  right: 20,
+                  left: 15,
                   bottom: 5,
                 }}
+                barSize={25}
               >
                 <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
                 <XAxis 
@@ -126,6 +127,7 @@ export function EarningsChart({ data, className }: EarningsChartProps) {
                   fontSize={12}
                   tickMargin={8}
                   tickFormatter={(value) => `£${(value / 1000).toFixed(0)}k`}
+                  width={50}
                 />
                 <ChartTooltip
                   content={({ active, payload }) => {

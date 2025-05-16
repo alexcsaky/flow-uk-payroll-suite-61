@@ -182,7 +182,7 @@ const Dashboard = () => {
 
       {/* Earnings Chart */}
       <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-1">
-        <EarningsChart data={earningsData} />
+        <EarningsChart data={earningsData} className="max-w-5xl mx-auto" />
       </div>
 
       {/* Additional Cards */}
