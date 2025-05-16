@@ -38,6 +38,7 @@ import {
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { generatePayslipPDF } from "../lib/pdf/payslip-pdf";
+import ExceptionBanner, { Exception } from "../components/employees/ExceptionBanner";
 
 // Mock employee data (extended version of what's in Employees.tsx)
 const employeesData = [
@@ -546,6 +547,8 @@ const EmployeeDetails = () => {
   const [employee, setEmployee] = useState(null);
   const [payslips, setPayslips] = useState([]);
   const [currentTab, setCurrentTab] = useState("details");
+  const [exceptions, setExceptions] = useState<Exception[]>([]);
+  const [loadingExceptions, setLoadingExceptions] = useState(true);
   
   useEffect(() => {
     // In a real application, we would fetch this data from an API
@@ -556,7 +559,76 @@ const EmployeeDetails = () => {
     
     const employeePayslips = payslipsData[employeeId] || [];
     setPayslips(employeePayslips);
+    
+    // Fetch exceptions for the employee
+    fetchExceptions();
   }, [employeeId]);
+  
+  const fetchExceptions = async () => {
+    setLoadingExceptions(true);
+    try {
+      // In a real application, this would be a real API call
+      // For demo purposes, we'll simulate an API call
+      await simulateFetch();
+      
+      // Generate mock exceptions for specific employees to demonstrate functionality
+      let mockExceptions: Exception[] = [];
+      
+      if (employeeId === "EMP001") {
+        mockExceptions = [
+          {
+            id: "EXC001",
+            type: "National Insurance Code Invalid",
+            description: "The NI code AB123456C format is incorrect for HMRC submissions.",
+            suggestedAction: "Update to valid format (2 letters, 6 digits, 1 letter).",
+            severity: "high"
+          }
+        ];
+      } else if (employeeId === "EMP003") {
+        mockExceptions = [
+          {
+            id: "EXC002",
+            type: "Missing Pension Enrollment",
+            description: "Employee is eligible for auto-enrollment but no pension scheme is assigned.",
+            suggestedAction: "Set up pension enrollment in Payroll > Pension settings.",
+            severity: "medium"
+          },
+          {
+            id: "EXC003",
+            type: "Tax Code Requires Verification",
+            description: "Current tax code may be outdated based on latest HMRC data.",
+            suggestedAction: "Verify tax code with HMRC and update if necessary.",
+            severity: "low"
+          }
+        ];
+      }
+      
+      setExceptions(mockExceptions);
+    } catch (error) {
+      console.error("Error fetching exceptions:", error);
+    } finally {
+      setLoadingExceptions(false);
+    }
+  };
+  
+  // Simulate API fetch delay
+  const simulateFetch = () => {
+    return new Promise(resolve => setTimeout(resolve, 1000));
+  };
+  
+  const resolveException = async (exceptionId: string) => {
+    try {
+      // In a real application, this would be a real API call to resolve the exception
+      // POST /api/employees/{id}/exceptions/{exceptionId}/resolve
+      await simulateFetch();
+      
+      // Remove the resolved exception from state
+      setExceptions(exceptions.filter(exc => exc.id !== exceptionId));
+    } catch (error) {
+      console.error("Error resolving exception:", error);
+      throw error;
+    }
+  };
   
   if (!employee) {
     return (
@@ -584,6 +656,14 @@ const EmployeeDetails = () => {
         </Button>
         <h2 className="text-3xl font-bold tracking-tight">Employee Details</h2>
       </div>
+      
+      {/* Exception Banner */}
+      <ExceptionBanner
+        employeeId={employeeId}
+        exceptions={exceptions}
+        isLoading={loadingExceptions}
+        onResolve={resolveException}
+      />
       
       <div className="flex flex-col md:flex-row gap-6">
         {/* Left column - Employee info */}
