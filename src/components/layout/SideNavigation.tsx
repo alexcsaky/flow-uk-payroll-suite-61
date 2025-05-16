@@ -1,3 +1,4 @@
+
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -45,8 +46,8 @@ export function SideNavigation({ isOpen, setIsOpen }: SideNavigationProps) {
   const navigation: NavigationItem[] = [
     { name: "Dashboard", href: "/", icon: Home },
     { name: "Employees", href: "/employees", icon: Users },
-    { name: "Payroll", href: "/payroll", icon: ClipboardList },
     { name: "Timesheets", href: "/timesheets", icon: Calendar },
+    { name: "Payroll", href: "/payroll", icon: ClipboardList },
     //{ name: "Approvals", href: "/approvals", icon: CheckCircle2 },
     { name: "Reports", href: "/reports", icon: BarChart3 },
     { name: "Clients", href: "/clients", icon: Building, requiresBilling: true },
