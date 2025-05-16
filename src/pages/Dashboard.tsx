@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -8,6 +7,7 @@ import { StatCard } from "@/components/dashboard/StatCard";
 import { RecentActivityCard } from "@/components/dashboard/RecentActivityCard";
 import { PayrollChart } from "@/components/dashboard/PayrollChart";
 import { EarningsChart } from "@/components/dashboard/EarningsChart";
+import { OpenPayRunWidget } from "@/components/dashboard/OpenPayRunWidget"; // Import the new component
 import { useBillingFeatures } from "@/hooks/use-billing-features";
 import { Users, FileText, Building, CheckCircle2, Clock, Calendar } from "lucide-react";
 
@@ -87,6 +87,25 @@ const Dashboard = () => {
     percentageComplete: 69
   };
 
+  // Mock data for the OpenPayRunWidget
+  const currentPayRun = {
+    payRunName: "April 2025 Monthly Pay Run",
+    payRunDate: new Date(2025, 3, 25), // April 25, 2025
+    status: "blocked" as const,
+    issues: [
+      {
+        id: "issue-1",
+        message: "3 employees missing tax codes",
+        severity: "warning" as const,
+      },
+      {
+        id: "issue-2",
+        message: "Approval required from Finance Manager",
+        severity: "error" as const,
+      },
+    ],
+  };
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
@@ -101,6 +120,14 @@ const Dashboard = () => {
           </Tabs>
         </div>
       </div>
+
+      {/* Open Pay Run Widget - New Addition */}
+      <OpenPayRunWidget
+        payRunName={currentPayRun.payRunName}
+        payRunDate={currentPayRun.payRunDate}
+        status={currentPayRun.status}
+        issues={currentPayRun.issues}
+      />
 
       {/* Summary Cards */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
