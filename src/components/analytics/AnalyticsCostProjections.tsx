@@ -186,7 +186,7 @@ export const AnalyticsCostProjections: React.FC = () => {
           </div>
         </div>
         
-        <div className="h-[400px] mt-8">
+        <div className="h-[400px] mt-8 p-2">
           <ChartContainer 
             config={{
               current: {
@@ -203,11 +203,11 @@ export const AnalyticsCostProjections: React.FC = () => {
               },
             }}
           >
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="99%" height="99%">
               {projectionType === "monthly" ? (
                 <AreaChart
                   data={projectionData}
-                  margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                  margin={{ top: 10, right: 20, left: 5, bottom: 10 }}
                 >
                   <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
                   <XAxis dataKey="month" />
@@ -235,7 +235,7 @@ export const AnalyticsCostProjections: React.FC = () => {
               ) : (
                 <LineChart
                   data={projectionData}
-                  margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                  margin={{ top: 10, right: 20, left: 5, bottom: 10 }}
                 >
                   <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
                   <XAxis dataKey="year" />

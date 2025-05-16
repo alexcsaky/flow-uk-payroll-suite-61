@@ -61,7 +61,7 @@ export const AnalyticsPerformanceMetrics: React.FC<AnalyticsPerformanceMetricsPr
             <TabsTrigger value="projects">Projects</TabsTrigger>
           </TabsList>
           <TabsContent value="revenue" className="mt-4">
-            <div className="h-[300px]">
+            <div className="h-[300px] p-2">
               <ChartContainer 
                 config={{
                   value: {
@@ -70,10 +70,10 @@ export const AnalyticsPerformanceMetrics: React.FC<AnalyticsPerformanceMetricsPr
                   }
                 }}
               >
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="99%" height="99%">
                   <AreaChart
                     data={revenueData}
-                    margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                    margin={{ top: 10, right: 20, left: 5, bottom: 10 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
                     <XAxis dataKey="name" />
@@ -106,7 +106,7 @@ export const AnalyticsPerformanceMetrics: React.FC<AnalyticsPerformanceMetricsPr
             </div>
           </TabsContent>
           <TabsContent value="expenses" className="mt-4">
-            <div className="h-[300px]">
+            <div className="h-[300px] p-2">
               <ChartContainer 
                 config={{
                   value: {
@@ -115,10 +115,10 @@ export const AnalyticsPerformanceMetrics: React.FC<AnalyticsPerformanceMetricsPr
                   }
                 }}
               >
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="99%" height="99%">
                   <BarChart
                     data={expensesData}
-                    margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                    margin={{ top: 10, right: 20, left: 5, bottom: 10 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
                     <XAxis dataKey="name" />
@@ -145,7 +145,7 @@ export const AnalyticsPerformanceMetrics: React.FC<AnalyticsPerformanceMetricsPr
             </div>
           </TabsContent>
           <TabsContent value="profit" className="mt-4">
-            <div className="h-[300px]">
+            <div className="h-[300px] p-2">
               <ChartContainer 
                 config={{
                   value: {
@@ -154,10 +154,10 @@ export const AnalyticsPerformanceMetrics: React.FC<AnalyticsPerformanceMetricsPr
                   }
                 }}
               >
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="99%" height="99%">
                   <LineChart
                     data={profitData}
-                    margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                    margin={{ top: 10, right: 20, left: 5, bottom: 10 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
                     <XAxis dataKey="name" />
@@ -192,7 +192,7 @@ export const AnalyticsPerformanceMetrics: React.FC<AnalyticsPerformanceMetricsPr
             </div>
           </TabsContent>
           <TabsContent value="projects" className="mt-4">
-            <div className="h-[300px]">
+            <div className="h-[300px] p-2">
               <ChartContainer 
                 config={{
                   completed: {
@@ -209,10 +209,10 @@ export const AnalyticsPerformanceMetrics: React.FC<AnalyticsPerformanceMetricsPr
                   }
                 }}
               >
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="99%" height="99%">
                   <BarChart
                     data={projectData}
-                    margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                    margin={{ top: 10, right: 20, left: 5, bottom: 10 }}
                     barGap={0}
                   >
                     <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
