@@ -7,6 +7,7 @@ import { InvoiceSummaryCard } from "@/components/dashboard/InvoiceSummaryCard";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { RecentActivityCard } from "@/components/dashboard/RecentActivityCard";
 import { PayrollChart } from "@/components/dashboard/PayrollChart";
+import { EarningsChart } from "@/components/dashboard/EarningsChart";
 import { useBillingFeatures } from "@/hooks/use-billing-features";
 import { Users, FileText, Building, CheckCircle2, Clock, Calendar } from "lucide-react";
 
@@ -21,6 +22,16 @@ const Dashboard = () => {
     { name: "Apr", value: 26200 },
     { name: "May", value: 28900 },
     { name: "Jun", value: 29100 },
+  ];
+
+  // Earnings data for the Net vs Gross chart
+  const earningsData = [
+    { name: "Jan", gross: 32000, net: 24500 },
+    { name: "Feb", gross: 33500, net: 25300 },
+    { name: "Mar", gross: 35800, net: 27100 },
+    { name: "Apr", gross: 34500, net: 26200 },
+    { name: "May", gross: 38000, net: 28900 },
+    { name: "Jun", gross: 38400, net: 29100 },
   ];
 
   // Mock data for the RecentActivityCard - ensuring types are correct
@@ -167,6 +178,11 @@ const Dashboard = () => {
             <RecentActivityCard activities={activities} />
           </CardContent>
         </Card>
+      </div>
+
+      {/* Earnings Chart */}
+      <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-1">
+        <EarningsChart data={earningsData} />
       </div>
 
       {/* Additional Cards */}
