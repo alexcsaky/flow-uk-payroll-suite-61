@@ -1,10 +1,35 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BarChart, LineChart, PieChart } from "recharts";
-import { BarChart as BarChartIcon, Calendar, PieChart as PieChartIcon, TrendingUp } from "lucide-react";
+import { 
+  LineChart, 
+  Line, 
+  BarChart as RechartsBarChart, 
+  Bar, 
+  PieChart as RechartsPieChart, 
+  Pie, 
+  Cell, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  Legend, 
+  ResponsiveContainer,
+  AreaChart,
+  Area
+} from "recharts";
+import { Calendar, TrendingUp, ArrowDown, ArrowUp } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { 
+  ChartContainer, 
+  ChartTooltip, 
+  ChartTooltipContent 
+} from "@/components/ui/chart";
+import { AnalyticsCostProjections } from "@/components/analytics/AnalyticsCostProjections";
+import { AnalyticsEmployeeDistribution } from "@/components/analytics/AnalyticsEmployeeDistribution";
+import { AnalyticsRevenueExpenseChart } from "@/components/analytics/AnalyticsRevenueExpenseChart";
+import { AnalyticsPerformanceMetrics } from "@/components/analytics/AnalyticsPerformanceMetrics";
 
 // Sample data for charts
 const revenueData = [
@@ -33,6 +58,26 @@ const employeeData = [
 ];
 
 const Analytics = () => {
+  const [timeframe, setTimeframe] = useState("6m");
+  const [chartType, setChartType] = useState("bar");
+  
+  // Calculate metrics for cards
+  const currentRevenue = revenueData[revenueData.length - 1].value;
+  const previousRevenue = revenueData[revenueData.length - 2].value;
+  const revenueChange = ((currentRevenue - previousRevenue) / previousRevenue) * 100;
+
+  const currentExpenses = expensesData[expensesData.length - 1].value;
+  const previousExpenses = expensesData[expensesData.length - 2].value;
+  const expensesChange = ((currentExpenses - previousExpenses) / previousExpenses) * 100;
+
+  // Profit calculation
+  const currentProfit = currentRevenue - currentExpenses;
+  const previousProfit = previousRevenue - previousExpenses;
+  const profitChange = ((currentProfit - previousProfit) / previousProfit) * 100;
+  const profitMargin = (currentProfit / currentRevenue) * 100;
+  const previousProfitMargin = (previousProfit / previousRevenue) * 100;
+  const profitMarginChange = profitMargin - previousProfitMargin;
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -42,7 +87,7 @@ const Analytics = () => {
             Visualize and analyze business performance metrics
           </p>
         </div>
-        <Select defaultValue="6m">
+        <Select defaultValue={timeframe} onValueChange={setTimeframe}>
           <SelectTrigger className="w-[160px]">
             <SelectValue placeholder="Select timeframe" />
           </SelectTrigger>
@@ -62,12 +107,25 @@ const Analytics = () => {
               <CardTitle className="text-sm text-muted-foreground font-medium">
                 Total Revenue
               </CardTitle>
-              <TrendingUp className="h-4 w-4 text-green-500" />
+              {revenueChange > 0 ? (
+                <TrendingUp className="h-4 w-4 text-green-500" />
+              ) : (
+                <ArrowDown className="h-4 w-4 text-red-500" />
+              )}
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$28,000</div>
-            <p className="text-xs text-green-500">+12% from last month</p>
+            <div className="text-2xl font-bold">${currentRevenue.toLocaleString()}</div>
+            <div className="flex items-center gap-1">
+              {revenueChange > 0 ? (
+                <ArrowUp className="h-3 w-3 text-green-500" />
+              ) : (
+                <ArrowDown className="h-3 w-3 text-red-500" />
+              )}
+              <p className={revenueChange > 0 ? "text-xs text-green-500" : "text-xs text-red-500"}>
+                {Math.abs(revenueChange).toFixed(1)}% from last month
+              </p>
+            </div>
           </CardContent>
         </Card>
         
@@ -77,12 +135,25 @@ const Analytics = () => {
               <CardTitle className="text-sm text-muted-foreground font-medium">
                 Total Expenses
               </CardTitle>
-              <TrendingUp className="h-4 w-4 text-amber-500" />
+              {expensesChange > 0 ? (
+                <TrendingUp className="h-4 w-4 text-amber-500" />
+              ) : (
+                <ArrowDown className="h-4 w-4 text-green-500" />
+              )}
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$17,400</div>
-            <p className="text-xs text-amber-500">+5% from last month</p>
+            <div className="text-2xl font-bold">${currentExpenses.toLocaleString()}</div>
+            <div className="flex items-center gap-1">
+              {expensesChange > 0 ? (
+                <ArrowUp className="h-3 w-3 text-amber-500" />
+              ) : (
+                <ArrowDown className="h-3 w-3 text-green-500" />
+              )}
+              <p className={expensesChange > 0 ? "text-xs text-amber-500" : "text-xs text-green-500"}>
+                {Math.abs(expensesChange).toFixed(1)}% from last month
+              </p>
+            </div>
           </CardContent>
         </Card>
         
@@ -107,108 +178,45 @@ const Analytics = () => {
               <CardTitle className="text-sm text-muted-foreground font-medium">
                 Profit Margin
               </CardTitle>
-              <PieChartIcon className="h-4 w-4 text-purple-500" />
+              {profitMarginChange > 0 ? (
+                <TrendingUp className="h-4 w-4 text-purple-500" />
+              ) : (
+                <ArrowDown className="h-4 w-4 text-red-500" />
+              )}
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">38%</div>
-            <p className="text-xs text-purple-500">+2% from last month</p>
+            <div className="text-2xl font-bold">{profitMargin.toFixed(1)}%</div>
+            <div className="flex items-center gap-1">
+              {profitMarginChange > 0 ? (
+                <ArrowUp className="h-3 w-3 text-purple-500" />
+              ) : (
+                <ArrowDown className="h-3 w-3 text-red-500" />
+              )}
+              <p className={profitMarginChange > 0 ? "text-xs text-purple-500" : "text-xs text-red-500"}>
+                {Math.abs(profitMarginChange).toFixed(1)}% from last month
+              </p>
+            </div>
           </CardContent>
         </Card>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="flex items-center gap-2">
-                  <BarChartIcon className="h-5 w-5" />
-                  Revenue vs. Expenses
-                </CardTitle>
-                <CardDescription>6 month comparison</CardDescription>
-              </div>
-              <Select defaultValue="bar">
-                <SelectTrigger className="w-[120px]">
-                  <SelectValue placeholder="Chart type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="bar">Bar Chart</SelectItem>
-                  <SelectItem value="line">Line Chart</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </CardHeader>
-          <CardContent className="h-[300px]">
-            <div className="flex items-center justify-center h-full text-muted-foreground">
-              Interactive chart would be displayed here
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="flex items-center gap-2">
-                  <PieChartIcon className="h-5 w-5" />
-                  Employee Distribution
-                </CardTitle>
-                <CardDescription>By department</CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="h-[300px]">
-            <div className="flex items-center justify-center h-full text-muted-foreground">
-              Interactive chart would be displayed here
-            </div>
-          </CardContent>
-        </Card>
+        <AnalyticsRevenueExpenseChart 
+          revenueData={revenueData} 
+          expensesData={expensesData} 
+          chartType={chartType} 
+          setChartType={setChartType} 
+        />
+        <AnalyticsEmployeeDistribution data={employeeData} />
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Performance Metrics</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="revenue">
-            <TabsList>
-              <TabsTrigger value="revenue">Revenue</TabsTrigger>
-              <TabsTrigger value="expenses">Expenses</TabsTrigger>
-              <TabsTrigger value="profit">Profit</TabsTrigger>
-              <TabsTrigger value="projects">Projects</TabsTrigger>
-            </TabsList>
-            <TabsContent value="revenue" className="mt-4">
-              <div className="h-[300px]">
-                <div className="flex items-center justify-center h-full text-muted-foreground">
-                  Revenue metrics would be displayed here
-                </div>
-              </div>
-            </TabsContent>
-            <TabsContent value="expenses" className="mt-4">
-              <div className="h-[300px]">
-                <div className="flex items-center justify-center h-full text-muted-foreground">
-                  Expense metrics would be displayed here
-                </div>
-              </div>
-            </TabsContent>
-            <TabsContent value="profit" className="mt-4">
-              <div className="h-[300px]">
-                <div className="flex items-center justify-center h-full text-muted-foreground">
-                  Profit metrics would be displayed here
-                </div>
-              </div>
-            </TabsContent>
-            <TabsContent value="projects" className="mt-4">
-              <div className="h-[300px]">
-                <div className="flex items-center justify-center h-full text-muted-foreground">
-                  Project metrics would be displayed here
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
+      <AnalyticsCostProjections />
+
+      <AnalyticsPerformanceMetrics 
+        revenueData={revenueData} 
+        expensesData={expensesData} 
+      />
     </div>
   );
 };
