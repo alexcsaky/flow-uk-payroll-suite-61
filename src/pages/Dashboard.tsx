@@ -1,15 +1,12 @@
+
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PayrollSummaryCard } from "@/components/dashboard/PayrollSummaryCard";
-import { InvoiceSummaryCard } from "@/components/dashboard/InvoiceSummaryCard";
-import { StatCard } from "@/components/dashboard/StatCard";
-import { RecentActivityCard } from "@/components/dashboard/RecentActivityCard";
-import { PayrollChart } from "@/components/dashboard/PayrollChart";
-import { EarningsChart } from "@/components/dashboard/EarningsChart";
-import { OpenPayRunWidget } from "@/components/dashboard/OpenPayRunWidget"; // Import the new component
+import { DashboardStats } from "@/components/dashboard/DashboardStats";
+import { DashboardMainContent } from "@/components/dashboard/DashboardMainContent";
+import { EarningsPayrollSection } from "@/components/dashboard/EarningsPayrollSection";
+import { InvoiceSummarySection } from "@/components/dashboard/InvoiceSummarySection";
+import { DashboardTabs } from "@/components/dashboard/DashboardTabs";
+import { OpenPayRunWidget } from "@/components/dashboard/OpenPayRunWidget";
 import { useBillingFeatures } from "@/hooks/use-billing-features";
-import { Users, FileText, Building, CheckCircle2, Clock, Calendar } from "lucide-react";
 
 const Dashboard = () => {
   const { billingEnabled } = useBillingFeatures();
@@ -111,17 +108,11 @@ const Dashboard = () => {
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
         <div className="flex items-center gap-2">
-          <Tabs defaultValue="week" className="w-[250px]">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="week">Week</TabsTrigger>
-              <TabsTrigger value="month">Month</TabsTrigger>
-              <TabsTrigger value="year">Year</TabsTrigger>
-            </TabsList>
-          </Tabs>
+          <DashboardTabs />
         </div>
       </div>
 
-      {/* Open Pay Run Widget - New Addition */}
+      {/* Open Pay Run Widget */}
       <OpenPayRunWidget
         payRunName={currentPayRun.payRunName}
         payRunDate={currentPayRun.payRunDate}
@@ -130,103 +121,23 @@ const Dashboard = () => {
       />
 
       {/* Summary Cards */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          title="Total Employees"
-          value="146"
-          icon={Users}
-          trend={{ value: 2.5, isPositive: true }}
-          description="from last month"
-        />
-        {billingEnabled ? (
-          <>
-            <StatCard
-              title="Open Invoices"
-              value="12"
-              icon={FileText}
-              trend={{ value: 4, isPositive: false }}
-              description="from last week"
-            />
-            <StatCard
-              title="Clients"
-              value="38"
-              icon={Building}
-              trend={{ value: 2, isPositive: true }}
-              description="new this month"
-            />
-          </>
-        ) : (
-          <>
-            <StatCard
-              title="Pending Approvals"
-              value="23"
-              icon={CheckCircle2}
-              trend={{ value: 5, isPositive: false }}
-              description="from last week"
-            />
-            <StatCard
-              title="Hours Logged"
-              value="1,248"
-              icon={Clock}
-              trend={{ value: 12.5, isPositive: true }}
-              description="from last month"
-            />
-          </>
-        )}
-        <StatCard
-          title="Next Pay Run"
-          value="Apr 25"
-          icon={Calendar}
-          trend={{ value: 5, isPositive: true }}
-          description="until processing"
-        />
-      </div>
+      <DashboardStats billingEnabled={billingEnabled} />
 
       {/* Main Content */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="md:col-span-2 lg:col-span-4">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-lg font-medium">
-              Payroll Overview
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <PayrollChart data={payrollData} />
-          </CardContent>
-        </Card>
-
-        <Card className="md:col-span-1 lg:col-span-3">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-lg font-medium">
-              Recent Activity
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <RecentActivityCard activities={activities} />
-          </CardContent>
-        </Card>
-      </div>
+      <DashboardMainContent 
+        payrollData={payrollData}
+        activities={activities}
+      />
 
       {/* Earnings Chart and Next Payroll Side by Side */}
-      <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-7">
-        <EarningsChart data={earningsData} className="lg:col-span-4" />
-        <PayrollSummaryCard
-          nextPayrollDate={payrollSummary.nextPayrollDate}
-          employeesCount={payrollSummary.employeesCount}
-          totalAmount={payrollSummary.totalAmount}
-          className="lg:col-span-3"
-        />
-      </div>
+      <EarningsPayrollSection 
+        earningsData={earningsData}
+        payrollSummary={payrollSummary}
+      />
 
       {/* Only show Invoice Summary if billing is enabled */}
       {billingEnabled && (
-        <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-1">
-          <InvoiceSummaryCard
-            totalOutstanding={invoiceSummary.totalOutstanding}
-            totalPaid={invoiceSummary.totalPaid}
-            percentageComplete={invoiceSummary.percentageComplete}
-          />
-        </div>
+        <InvoiceSummarySection invoiceSummary={invoiceSummary} />
       )}
     </div>
   );
