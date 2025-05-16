@@ -22,7 +22,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { ChartBarStacked } from "lucide-react";
+import { ChartColumnStacked } from "lucide-react";
 
 interface EarningsData {
   name: string;
@@ -30,12 +30,24 @@ interface EarningsData {
   net: number;
 }
 
+// Transform data for stacked chart representation
+const transformDataForStackedChart = (data: EarningsData[]) => {
+  return data.map(item => ({
+    name: item.name,
+    net: item.net,
+    deductions: item.gross - item.net,
+  }));
+};
+
 interface EarningsChartProps {
   data: EarningsData[];
   className?: string;
 }
 
 export function EarningsChart({ data, className }: EarningsChartProps) {
+  // Transform data for stacked representation
+  const stackedData = transformDataForStackedChart(data);
+  
   // Format currency values for display
   const formatCurrency = (value: number) => {
     return `£${value.toLocaleString()}`;
@@ -56,11 +68,11 @@ export function EarningsChart({ data, className }: EarningsChartProps) {
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <div>
           <CardTitle className="text-lg font-medium flex items-center gap-2">
-            <ChartBarStacked className="h-5 w-5 text-muted-foreground" />
+            <ChartColumnStacked className="h-5 w-5 text-muted-foreground" />
             Net vs Gross Earnings
           </CardTitle>
           <CardDescription>
-            Monthly comparison of net and gross earnings
+            Monthly breakdown of earnings and deductions
           </CardDescription>
         </div>
       </CardHeader>
@@ -92,26 +104,26 @@ export function EarningsChart({ data, className }: EarningsChartProps) {
         <div className="h-[250px]">
           <ChartContainer
             config={{
-              gross: {
-                label: "Gross Earnings",
-                color: "#1F67B9",
-              },
               net: {
                 label: "Net Earnings",
                 color: "#4E96FF",
+              },
+              deductions: {
+                label: "Tax & Deductions",
+                color: "#94A3B8",
               },
             }}
           >
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
-                data={data}
+                data={stackedData}
                 margin={{
                   top: 5,
                   right: 20,
                   left: 15,
                   bottom: 5,
                 }}
-                barSize={25}
+                barSize={40}
               >
                 <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
                 <XAxis 
@@ -143,8 +155,8 @@ export function EarningsChart({ data, className }: EarningsChartProps) {
                   }}
                 />
                 <Legend />
-                <Bar dataKey="gross" name="Gross Earnings" fill="#1F67B9" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="net" name="Net Earnings" fill="#4E96FF" radius={[4, 4, 0, 0]} />
+                <Bar stackId="a" dataKey="net" name="Net Earnings" fill="#4E96FF" radius={[4, 4, 0, 0]} />
+                <Bar stackId="a" dataKey="deductions" name="Tax & Deductions" fill="#94A3B8" radius={[0, 0, 4, 4]} />
               </BarChart>
             </ResponsiveContainer>
           </ChartContainer>
