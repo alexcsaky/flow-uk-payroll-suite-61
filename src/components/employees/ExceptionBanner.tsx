@@ -1,8 +1,8 @@
-
 import React, { useState } from "react";
 import { X, AlertTriangle, ArrowDown } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 export interface Exception {
   id: string;
@@ -86,6 +86,46 @@ const ExceptionBanner: React.FC<ExceptionBannerProps> = ({
     }, 100);
   };
 
+  // Helper function to get badge color based on severity
+  const getSeverityBadge = (severity: "high" | "medium" | "low") => {
+    switch (severity) {
+      case "high":
+        return (
+          <Badge className="bg-red-500 hover:bg-red-600 text-white">
+            High Priority
+          </Badge>
+        );
+      case "medium":
+        return (
+          <Badge className="bg-amber-500 hover:bg-amber-600 text-white">
+            Medium Priority
+          </Badge>
+        );
+      case "low":
+        return (
+          <Badge className="bg-emerald-500 hover:bg-emerald-600 text-white">
+            Low Priority
+          </Badge>
+        );
+      default:
+        return null;
+    }
+  };
+
+  // Helper function to get border color based on severity
+  const getSeverityBorderColor = (severity: "high" | "medium" | "low") => {
+    switch (severity) {
+      case "high":
+        return "border-red-400";
+      case "medium":
+        return "border-amber-400";
+      case "low":
+        return "border-emerald-400";
+      default:
+        return "border-orange-200";
+    }
+  };
+
   return (
     <Alert
       variant="destructive"
@@ -103,10 +143,15 @@ const ExceptionBanner: React.FC<ExceptionBannerProps> = ({
               {exceptions.map((exception) => (
                 <li
                   key={exception.id}
-                  className="flex items-start justify-between bg-orange-50 border border-orange-200 rounded-md p-4"
+                  className={`flex items-start justify-between bg-orange-50 border rounded-md p-4 ${getSeverityBorderColor(
+                    exception.severity
+                  )}`}
                 >
                   <div className="space-y-1 pr-4">
-                    <p className="font-medium">⚠️ {exception.type}</p>
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="font-medium">⚠️ {exception.type}</p>
+                      {getSeverityBadge(exception.severity)}
+                    </div>
                     <p className="text-sm">{exception.description}</p>
                     <p className="text-sm font-medium text-orange-700">
                       Suggested action: {exception.suggestedAction}
