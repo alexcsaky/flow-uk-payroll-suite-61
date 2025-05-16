@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { X, AlertTriangle } from "lucide-react";
+import { X, AlertTriangle, ArrowDown } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 
@@ -27,22 +27,8 @@ const ExceptionBanner: React.FC<ExceptionBannerProps> = ({
 }) => {
   const [dismissing, setDismissing] = useState<Record<string, boolean>>({});
 
-  if (isLoading) {
-    return (
-      <Alert
-        variant="destructive"
-        className="bg-orange-50 border-orange-200 text-orange-800 mb-6 p-4"
-        role="alert"
-      >
-        <div className="flex items-center justify-center">
-          <div className="animate-spin h-5 w-5 border-2 border-orange-500 border-t-transparent rounded-full mr-2"></div>
-          <p>Loading exceptions...</p>
-        </div>
-      </Alert>
-    );
-  }
-
-  if (!exceptions || exceptions.length === 0) {
+  // Don't show anything while loading or when there are no exceptions
+  if (isLoading || !exceptions || exceptions.length === 0) {
     return null;
   }
 
@@ -55,6 +41,49 @@ const ExceptionBanner: React.FC<ExceptionBannerProps> = ({
     } finally {
       setDismissing((prev) => ({ ...prev, [exceptionId]: false }));
     }
+  };
+
+  // Helper function to navigate to relevant section based on exception type
+  const navigateToSection = (exceptionType: string) => {
+    let targetTabId = "";
+    let targetElementId = "";
+
+    // Determine which tab and section to navigate to based on exception type
+    if (exceptionType.toLowerCase().includes("national insurance") || 
+        exceptionType.toLowerCase().includes("ni code")) {
+      targetTabId = "payroll";
+      targetElementId = "national-insurance";
+    } else if (exceptionType.toLowerCase().includes("pension")) {
+      targetTabId = "payroll";
+      targetElementId = "pension-scheme";
+    } else if (exceptionType.toLowerCase().includes("tax code")) {
+      targetTabId = "payroll";
+      targetElementId = "tax-code";
+    } else {
+      // Default to details tab if no specific match
+      targetTabId = "details";
+    }
+
+    // Click on the target tab first
+    const tabElement = document.querySelector(`[value="${targetTabId}"]`);
+    if (tabElement) {
+      (tabElement as HTMLElement).click();
+    }
+
+    // Small delay to allow tab content to render before scrolling
+    setTimeout(() => {
+      // Find and scroll to the specific element if available
+      if (targetElementId) {
+        const targetElement = document.querySelector(`[data-id="${targetElementId}"]`);
+        if (targetElement) {
+          targetElement.scrollIntoView({ behavior: "smooth", block: "center" });
+          targetElement.classList.add("bg-orange-50");
+          setTimeout(() => {
+            targetElement.classList.remove("bg-orange-50");
+          }, 2000);
+        }
+      }
+    }, 100);
   };
 
   return (
@@ -83,21 +112,33 @@ const ExceptionBanner: React.FC<ExceptionBannerProps> = ({
                       Suggested action: {exception.suggestedAction}
                     </p>
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="shrink-0 border-orange-300 hover:bg-orange-200 hover:text-orange-900"
-                    onClick={() => handleDismiss(exception.id)}
-                    disabled={dismissing[exception.id]}
-                    aria-label={`Dismiss ${exception.type} exception`}
-                  >
-                    {dismissing[exception.id] ? (
-                      <div className="animate-spin h-4 w-4 border-2 border-orange-500 border-t-transparent rounded-full"></div>
-                    ) : (
-                      <X className="h-4 w-4" />
-                    )}
-                    <span className="ml-1">Dismiss</span>
-                  </Button>
+                  <div className="flex flex-col gap-2 shrink-0">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-orange-300 hover:bg-orange-200 hover:text-orange-900"
+                      onClick={() => navigateToSection(exception.type)}
+                      aria-label={`Navigate to ${exception.type} location`}
+                    >
+                      <ArrowDown className="h-4 w-4" />
+                      <span className="ml-1">Go to Location</span>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-orange-300 hover:bg-orange-200 hover:text-orange-900"
+                      onClick={() => handleDismiss(exception.id)}
+                      disabled={dismissing[exception.id]}
+                      aria-label={`Dismiss ${exception.type} exception`}
+                    >
+                      {dismissing[exception.id] ? (
+                        <div className="animate-spin h-4 w-4 border-2 border-orange-500 border-t-transparent rounded-full"></div>
+                      ) : (
+                        <X className="h-4 w-4" />
+                      )}
+                      <span className="ml-1">Dismiss</span>
+                    </Button>
+                  </div>
                 </li>
               ))}
             </ul>

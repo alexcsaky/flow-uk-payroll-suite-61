@@ -827,11 +827,11 @@ const EmployeeDetails = () => {
                       <h4 className="text-sm font-medium text-muted-foreground mb-1">Annual Salary</h4>
                       <p>£{employee.salary.toLocaleString()}</p>
                     </div>
-                    <div>
+                    <div data-id="tax-code">
                       <h4 className="text-sm font-medium text-muted-foreground mb-1">Tax Code</h4>
                       <p>{employee.taxCode}</p>
                     </div>
-                    <div>
+                    <div data-id="national-insurance">
                       <h4 className="text-sm font-medium text-muted-foreground mb-1">National Insurance Number</h4>
                       <p>{employee.nationalInsurance}</p>
                     </div>
@@ -857,7 +857,7 @@ const EmployeeDetails = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
+                    <div data-id="pension-scheme">
                       <h4 className="text-sm font-medium text-muted-foreground mb-1">Pension Scheme</h4>
                       <p>Company Pension (5%)</p>
                     </div>
