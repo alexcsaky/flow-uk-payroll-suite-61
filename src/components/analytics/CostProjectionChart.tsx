@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ResponsiveContainer, ComposedChart, Line, Area, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ReferenceArea, ReferenceLine, Brush } from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -55,7 +54,7 @@ export function CostProjectionChart() {
       const variance = mainValue - entry.budget;
       // Set color based on variance
       const varianceColor = variance > 0 ? "#EF4444" : "#10B981"; // Red for over budget, green for under
-      
+
       return {
         ...entry,
         variance,
@@ -63,7 +62,6 @@ export function CostProjectionChart() {
       };
     });
   }, [data]);
-
   return <Card className="mb-6">
       <CardHeader className="px-6">
         <div className="flex items-center justify-between flex-wrap gap-2">
@@ -171,7 +169,7 @@ export function CostProjectionChart() {
         </div>
         
         {/* Main Chart Area */}
-        <div className="h-[450px] p-4 border border-border px-[110px] py-[16px] rounded">
+        <div className="h-[450px] p-4 border border-border py-[16px] rounded px-[131px]">
           <ChartContainer config={{
           actual: {
             label: "Actual",
