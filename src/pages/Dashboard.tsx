@@ -1,4 +1,3 @@
-
 import React from "react";
 import { DashboardStats } from "@/components/dashboard/DashboardStats";
 import { DashboardMainContent } from "@/components/dashboard/DashboardMainContent";
@@ -122,10 +121,10 @@ const Dashboard = () => {
   };
   
   // Calculate days until next payroll
-  const daysUntilPayroll = differenceInDays(currentPayRun.payRunDate, new Date());
+  const daysUntilPayroll = 8; // Updated to 8 days
   
-  // Mock user data - in a real app this would come from authentication
-  const userName = "Sarah";
+  // Mock user data - changed from Sarah to John
+  const userName = "John";
 
   return (
     <div className="flex flex-col gap-6">

@@ -73,15 +73,24 @@ export function PayrollDashboardHeader({
                       />
                     </span>
                   </TooltipTrigger>
-                  <TooltipContent className="max-w-xs">
-                    <div className="font-medium mb-1">Attention Required</div>
-                    <ul className="text-sm list-disc pl-4 space-y-1">
+                  <TooltipContent className="w-80 p-3">
+                    <div className="font-medium mb-2">Required Changes Before Processing</div>
+                    <ul className="text-sm space-y-2">
                       {issues.map((issue) => (
-                        <li key={issue.id}>
-                          {issue.message}
-                          {issue.severity === "error" && (
-                            <span className="ml-1 text-xs font-medium text-destructive">(Critical)</span>
-                          )}
+                        <li key={issue.id} className={`p-2 rounded ${
+                          issue.severity === "error" ? "bg-red-50 border border-red-200" : "bg-amber-50 border border-amber-200"
+                        }`}>
+                          <div className="flex items-start gap-2">
+                            <AlertTriangle className={`h-4 w-4 mt-0.5 flex-shrink-0 ${
+                              issue.severity === "error" ? "text-destructive" : "text-amber-500"
+                            }`} />
+                            <div>
+                              <p className="font-medium">{issue.message}</p>
+                              {issue.severity === "error" && (
+                                <p className="text-xs text-destructive font-medium mt-1">Must be resolved before proceeding</p>
+                              )}
+                            </div>
+                          </div>
                         </li>
                       ))}
                     </ul>
