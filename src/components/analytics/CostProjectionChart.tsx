@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { ResponsiveContainer, ComposedChart, Line, Area, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ReferenceArea, ReferenceLine, Brush } from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -47,32 +48,22 @@ export function CostProjectionChart() {
     }));
   };
 
-  // Calculate variance for the variance chart view
-  const getVarianceData = (entry: any) => {
-    const mainValue = entry.actual || entry.forecast || 0;
-    const variance = mainValue - entry.budget;
-    return variance;
-  };
-
-  // Get color for variance bars
-  const getVarianceColor = (entry: any) => {
-    const mainValue = entry.actual || entry.forecast || 0;
-    const variance = mainValue - entry.budget;
-    return variance > 0 ? "#EF4444" : "#10B981"; // Red for over budget, green for under
-  };
-
-  // Create variance data for all entries
+  // Pre-calculate variance data and colors for all entries
   const varianceData = React.useMemo(() => {
     return data.map(entry => {
       const mainValue = entry.actual || entry.forecast || 0;
       const variance = mainValue - entry.budget;
+      // Set color based on variance
+      const varianceColor = variance > 0 ? "#EF4444" : "#10B981"; // Red for over budget, green for under
+      
       return {
         ...entry,
         variance,
-        varianceColor: variance > 0 ? "#EF4444" : "#10B981"
+        varianceColor // Store the color as a string property
       };
     });
   }, [data]);
+
   return <Card className="mb-6">
       <CardHeader className="px-6">
         <div className="flex items-center justify-between flex-wrap gap-2">
@@ -357,9 +348,9 @@ export function CostProjectionChart() {
                 }} yAxisId="right" />
                   </>}
                 
-                {/* Variance View */}
+                {/* Variance View - Fixed to use pre-calculated color string instead of function */}
                 {chartType === 'variance' && <>
-                    <Bar dataKey="variance" name="Variance" fill={entry => entry.varianceColor} yAxisId="left" />
+                    <Bar dataKey="variance" name="Variance" fill="#6366F1" yAxisId="left" />
                     <Line type="monotone" dataKey="budget" name="Budget" stroke="#F59E0B" strokeWidth={2} dot={false} yAxisId="left" />
                   </>}
                 
