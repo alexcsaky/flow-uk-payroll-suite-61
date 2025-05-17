@@ -6,7 +6,6 @@ import { EarningsPayrollSection } from "@/components/dashboard/EarningsPayrollSe
 import { InvoiceSummarySection } from "@/components/dashboard/InvoiceSummarySection";
 import { DashboardTabs } from "@/components/dashboard/DashboardTabs";
 import { PayrollDashboardHeader } from "@/components/dashboard/PayrollDashboardHeader";
-import { PayrollInsights } from "@/components/dashboard/PayrollInsights";
 import { useBillingFeatures } from "@/hooks/use-billing-features";
 
 const Dashboard = () => {
@@ -145,12 +144,9 @@ const Dashboard = () => {
         issues={currentPayRun.issues}
       />
 
-      {/* Summary Cards */}
+      {/* Consolidated Summary Cards */}
       <DashboardStats billingEnabled={billingEnabled} />
       
-      {/* New Payroll Insights & Anomaly Detection Panel */}
-      <PayrollInsights />
-
       {/* Main Content */}
       <DashboardMainContent 
         payrollData={payrollData}
