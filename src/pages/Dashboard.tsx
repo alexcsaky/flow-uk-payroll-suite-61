@@ -1,3 +1,4 @@
+
 import React from "react";
 import { DashboardStats } from "@/components/dashboard/DashboardStats";
 import { DashboardMainContent } from "@/components/dashboard/DashboardMainContent";
@@ -5,8 +6,8 @@ import { EarningsPayrollSection } from "@/components/dashboard/EarningsPayrollSe
 import { InvoiceSummarySection } from "@/components/dashboard/InvoiceSummarySection";
 import { DashboardTabs } from "@/components/dashboard/DashboardTabs";
 import { PayrollDashboardHeader } from "@/components/dashboard/PayrollDashboardHeader";
+import { PayrollInsights } from "@/components/dashboard/PayrollInsights";
 import { useBillingFeatures } from "@/hooks/use-billing-features";
-import { differenceInDays } from "date-fns";
 
 const Dashboard = () => {
   const { billingEnabled } = useBillingFeatures();
@@ -146,6 +147,9 @@ const Dashboard = () => {
 
       {/* Summary Cards */}
       <DashboardStats billingEnabled={billingEnabled} />
+      
+      {/* New Payroll Insights & Anomaly Detection Panel */}
+      <PayrollInsights />
 
       {/* Main Content */}
       <DashboardMainContent 
