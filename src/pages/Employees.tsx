@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
@@ -26,8 +25,10 @@ import {
   FileText,
   MoreHorizontal,
   Search,
+  Upload,
   UserPlus
 } from "lucide-react";
+import { BulkOnboardDialog } from "@/components/employees/BulkOnboardDialog";
 
 // Mock employee data
 const employees = [
@@ -99,6 +100,7 @@ const employees = [
 
 const Employees = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [bulkOnboardOpen, setBulkOnboardOpen] = useState(false);
   const navigate = useNavigate();
   
   const filteredEmployees = employees.filter(
@@ -131,8 +133,18 @@ const Employees = () => {
             <UserPlus className="mr-2 h-4 w-4" />
             Add Employee
           </Button>
+          <Button variant="outline" onClick={() => setBulkOnboardOpen(true)}>
+            <Upload className="mr-2 h-4 w-4" />
+            Bulk Onboard
+          </Button>
         </div>
       </div>
+
+      {/* Bulk Onboarding Dialog */}
+      <BulkOnboardDialog 
+        open={bulkOnboardOpen} 
+        onOpenChange={setBulkOnboardOpen} 
+      />
 
       <Card>
         <CardHeader className="px-6 pt-6 pb-4">
