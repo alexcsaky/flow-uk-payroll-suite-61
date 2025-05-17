@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,10 +10,11 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { HelpCircle, PiggyBank, Calendar, FileText, Building } from "lucide-react";
+import { HelpCircle, PiggyBank, Calendar as CalendarIcon, FileText, Building } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { validateTaxCode, isFreeportOrInvestmentZoneCategory, validatePostcode } from "@/utils/hmrc-validation";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 
 interface PayrollTaxFormProps {
@@ -504,7 +504,7 @@ export const PayrollTaxForm = ({
 
           <div className="space-y-2">
             <Label htmlFor="niCategoryStartDate" className="flex items-center gap-1">
-              <Calendar className="h-4 w-4 text-muted-foreground" />
+              <CalendarIcon className="h-4 w-4 text-muted-foreground" />
               NI Category Start Date
               <TooltipProvider>
                 <Tooltip>
@@ -523,7 +523,7 @@ export const PayrollTaxForm = ({
                   variant="outline"
                   className="w-full justify-start text-left font-normal"
                 >
-                  <Calendar className="mr-2 h-4 w-4" />
+                  <CalendarIcon className="mr-2 h-4 w-4" />
                   {data.niCategoryStartDate ? (
                     format(new Date(data.niCategoryStartDate), "PPP")
                   ) : (
@@ -537,6 +537,7 @@ export const PayrollTaxForm = ({
                   selected={data.niCategoryStartDate ? new Date(data.niCategoryStartDate) : undefined}
                   onSelect={(date) => handleDateChange(date, "niCategoryStartDate")}
                   initialFocus
+                  className="pointer-events-auto"
                 />
               </PopoverContent>
             </Popover>

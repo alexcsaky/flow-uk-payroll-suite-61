@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,6 +30,7 @@ interface PersonalInfoFormProps {
       city: string;
       county: string;
       postcode: string;
+      country: string; // Added missing country property
     };
     niNumber: string;
     isComplete: boolean;

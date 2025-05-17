@@ -93,6 +93,8 @@ const initialEmployeeState = {
     pensionContribution: "",
     p45Provided: false,
     previousEmployer: "",
+    previousTaxPaid: "", // Added missing field
+    previousEarnings: "", // Added missing field
     isComplete: false,
   },
 

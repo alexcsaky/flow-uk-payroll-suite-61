@@ -1,4 +1,3 @@
-
 /**
  * Validates a UK National Insurance number
  * Format: 2 letters, 6 numbers, 1 letter (e.g., AB123456C)
