@@ -7,6 +7,9 @@ import { InvoiceSummarySection } from "@/components/dashboard/InvoiceSummarySect
 import { DashboardTabs } from "@/components/dashboard/DashboardTabs";
 import { PayrollDashboardHeader } from "@/components/dashboard/PayrollDashboardHeader";
 import { useBillingFeatures } from "@/hooks/use-billing-features";
+import { PayrollChart } from "@/components/dashboard/PayrollChart";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { RecentActivityCard } from "@/components/dashboard/RecentActivityCard";
 
 const Dashboard = () => {
   const { billingEnabled } = useBillingFeatures();
@@ -147,17 +150,30 @@ const Dashboard = () => {
       {/* Consolidated Summary Cards */}
       <DashboardStats billingEnabled={billingEnabled} />
       
-      {/* Main Content */}
-      <DashboardMainContent 
-        payrollData={payrollData}
-        activities={activities}
-      />
-
-      {/* Earnings Chart and Next Payroll Side by Side */}
+      {/* Switched: EarningsPayrollSection first */}
       <EarningsPayrollSection 
         earningsData={earningsData}
         payrollSummary={payrollSummary}
       />
+
+      {/* Main Content - Changed to directly include Payroll Chart and Recent Activity */}
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
+        {/* Payroll Chart with no card wrapper */}
+        <div className="md:col-span-2 lg:col-span-4">
+          <PayrollChart data={payrollData} />
+        </div>
+
+        <Card className="md:col-span-1 lg:col-span-3">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-lg font-medium">
+              Recent Activity
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <RecentActivityCard activities={activities} />
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Only show Invoice Summary if billing is enabled */}
       {billingEnabled && (

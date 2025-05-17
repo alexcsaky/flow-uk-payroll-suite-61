@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AnalyticsMetricsCards } from "@/components/analytics/AnalyticsMetricsCards";
-import { AnalyticsEmployeeDistribution } from "@/components/analytics/AnalyticsEmployeeDistribution";
+import { AnomalyDetectionFeed } from "@/components/analytics/AnomalyDetectionFeed";
 import { AnalyticsRevenueExpenseChart } from "@/components/analytics/AnalyticsRevenueExpenseChart";
 import { AnalyticsPerformanceMetrics } from "@/components/analytics/AnalyticsPerformanceMetrics";
 import { CostProjectionChart } from "@/components/analytics/CostProjectionChart";
@@ -24,13 +24,6 @@ const expensesData = [
   { name: "Apr", value: 2800 },
   { name: "May", value: 3500 },
   { name: "Jun", value: 3300 },
-];
-
-const employeeData = [
-  { name: "Engineering", value: 40 },
-  { name: "Marketing", value: 25 },
-  { name: "Support", value: 15 },
-  { name: "Sales", value: 20 },
 ];
 
 const Analytics = () => {
@@ -94,7 +87,8 @@ const Analytics = () => {
           chartType={chartType} 
           setChartType={setChartType} 
         />
-        <AnalyticsEmployeeDistribution data={employeeData} />
+        {/* Replace AnalyticsEmployeeDistribution with AnomalyDetectionFeed */}
+        <AnomalyDetectionFeed />
       </div>
 
       {/* Replacing AnalyticsCostProjections with our new CostProjectionChart */}

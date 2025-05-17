@@ -2,12 +2,19 @@
 import React from "react";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { Users, UserCheck, Clock, Bell, ShieldCheck } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface DashboardStatsProps {
   billingEnabled: boolean;
 }
 
 export function DashboardStats({ billingEnabled }: DashboardStatsProps) {
+  const navigate = useNavigate();
+
+  const handleAnomalyClick = () => {
+    navigate("/analytics");
+  };
+
   return (
     <div className="grid gap-6 md:grid-cols-3 lg:grid-cols-5">
       <StatCard
@@ -37,6 +44,8 @@ export function DashboardStats({ billingEnabled }: DashboardStatsProps) {
         icon={Bell}
         trend={{ value: 4, isPositive: false }}
         description="+1 from last month"
+        onClick={handleAnomalyClick}
+        clickable={true}
       />
       <StatCard
         title="Compliance Score"

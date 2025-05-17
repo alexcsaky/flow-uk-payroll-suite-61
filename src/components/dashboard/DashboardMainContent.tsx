@@ -15,19 +15,13 @@ interface DashboardMainContentProps {
   }>;
 }
 
+// This component is not currently in use, but kept for future reference
 export function DashboardMainContent({ payrollData, activities }: DashboardMainContentProps) {
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
-      <Card className="md:col-span-2 lg:col-span-4">
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-lg font-medium">
-            Payroll Overview
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <PayrollChart data={payrollData} />
-        </CardContent>
-      </Card>
+      <div className="md:col-span-2 lg:col-span-4">
+        <PayrollChart data={payrollData} />
+      </div>
 
       <Card className="md:col-span-1 lg:col-span-3">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
