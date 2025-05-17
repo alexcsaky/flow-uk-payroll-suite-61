@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   ResponsiveContainer, ComposedChart, Line, Area, Bar, XAxis, YAxis, 
@@ -53,6 +52,33 @@ export function CostProjectionChart() {
   const handleFilterChange = (key: keyof FilterState, value: any) => {
     setFilters(prev => ({ ...prev, [key]: value }));
   };
+
+  // Calculate variance for the variance chart view
+  const getVarianceData = (entry: any) => {
+    const mainValue = entry.actual || entry.forecast || 0;
+    const variance = mainValue - entry.budget;
+    return variance;
+  };
+
+  // Get color for variance bars
+  const getVarianceColor = (entry: any) => {
+    const mainValue = entry.actual || entry.forecast || 0;
+    const variance = mainValue - entry.budget;
+    return variance > 0 ? "#EF4444" : "#10B981"; // Red for over budget, green for under
+  };
+  
+  // Create variance data for all entries
+  const varianceData = React.useMemo(() => {
+    return data.map(entry => {
+      const mainValue = entry.actual || entry.forecast || 0;
+      const variance = mainValue - entry.budget;
+      return {
+        ...entry,
+        variance,
+        varianceColor: variance > 0 ? "#EF4444" : "#10B981"
+      };
+    });
+  }, [data]);
 
   return (
     <Card className="mb-6">
@@ -256,7 +282,7 @@ export function CostProjectionChart() {
           >
             <ResponsiveContainer width="99%" height="99%">
               <ComposedChart
-                data={data}
+                data={chartType === 'variance' ? varianceData : data}
                 margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
               >
                 <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
@@ -519,19 +545,9 @@ export function CostProjectionChart() {
                 {chartType === 'variance' && (
                   <>
                     <Bar
-                      dataKey={(entry) => {
-                        // Variance: Actual/Forecast - Budget
-                        const mainValue = entry.actual || entry.forecast || 0;
-                        const variance = mainValue - entry.budget;
-                        return variance;
-                      }}
+                      dataKey="variance"
                       name="Variance"
-                      fill={(entry) => {
-                        const mainValue = entry.actual || entry.forecast || 0;
-                        const variance = mainValue - entry.budget;
-                        // Fix the error by returning a string instead of a function
-                        return variance > 0 ? "#EF4444" : "#10B981"; // Red for over budget, green for under
-                      }}
+                      fill={(entry) => entry.varianceColor}
                       yAxisId="left"
                     />
                     <Line
