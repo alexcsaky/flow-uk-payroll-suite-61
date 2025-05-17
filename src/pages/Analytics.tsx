@@ -2,10 +2,10 @@
 import React, { useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AnalyticsMetricsCards } from "@/components/analytics/AnalyticsMetricsCards";
-import { AnalyticsCostProjections } from "@/components/analytics/AnalyticsCostProjections";
 import { AnalyticsEmployeeDistribution } from "@/components/analytics/AnalyticsEmployeeDistribution";
 import { AnalyticsRevenueExpenseChart } from "@/components/analytics/AnalyticsRevenueExpenseChart";
 import { AnalyticsPerformanceMetrics } from "@/components/analytics/AnalyticsPerformanceMetrics";
+import { CostProjectionChart } from "@/components/analytics/CostProjectionChart";
 
 // Sample data for charts
 const revenueData = [
@@ -97,7 +97,8 @@ const Analytics = () => {
         <AnalyticsEmployeeDistribution data={employeeData} />
       </div>
 
-      <AnalyticsCostProjections />
+      {/* Replacing AnalyticsCostProjections with our new CostProjectionChart */}
+      <CostProjectionChart />
 
       <AnalyticsPerformanceMetrics 
         revenueData={revenueData} 
