@@ -28,13 +28,13 @@ export function EarningsPayrollSection({
   payrollSummary
 }: EarningsPayrollSectionProps) {
   return (
-    <div className="grid gap-6 md:grid-cols-7">
+    <div className="grid gap-6 md:grid-cols-7 h-full">
       <EarningsChart 
         data={earningsData}
-        className="col-span-5"
+        className="col-span-5 h-full"
       />
       <PayrollSummaryCard
-        className="md:col-span-2"
+        className="md:col-span-2 h-full"
         nextPayrollDate={payrollSummary.nextPayrollDate}
         employeesCount={payrollSummary.employeesCount}
         totalAmount={payrollSummary.totalAmount}
@@ -43,3 +43,4 @@ export function EarningsPayrollSection({
     </div>
   );
 }
+
