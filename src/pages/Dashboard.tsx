@@ -1,11 +1,13 @@
+
 import React from "react";
 import { DashboardStats } from "@/components/dashboard/DashboardStats";
 import { DashboardMainContent } from "@/components/dashboard/DashboardMainContent";
 import { EarningsPayrollSection } from "@/components/dashboard/EarningsPayrollSection";
 import { InvoiceSummarySection } from "@/components/dashboard/InvoiceSummarySection";
 import { DashboardTabs } from "@/components/dashboard/DashboardTabs";
-import { OpenPayRunWidget } from "@/components/dashboard/OpenPayRunWidget";
+import { PayrollDashboardHeader } from "@/components/dashboard/PayrollDashboardHeader";
 import { useBillingFeatures } from "@/hooks/use-billing-features";
+import { differenceInDays } from "date-fns";
 
 const Dashboard = () => {
   const { billingEnabled } = useBillingFeatures();
@@ -100,7 +102,7 @@ const Dashboard = () => {
     percentageComplete: 69
   };
 
-  // Mock data for the OpenPayRunWidget
+  // Mock data for the OpenPayRunWidget (now used for PayrollDashboardHeader)
   const currentPayRun = {
     payRunName: "April 2025 Monthly Pay Run",
     payRunDate: new Date(2025, 3, 25), // April 25, 2025
@@ -118,6 +120,12 @@ const Dashboard = () => {
       },
     ],
   };
+  
+  // Calculate days until next payroll
+  const daysUntilPayroll = differenceInDays(currentPayRun.payRunDate, new Date());
+  
+  // Mock user data - in a real app this would come from authentication
+  const userName = "Sarah";
 
   return (
     <div className="flex flex-col gap-6">
@@ -128,11 +136,12 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Open Pay Run Widget */}
-      <OpenPayRunWidget
-        payRunName={currentPayRun.payRunName}
+      {/* New Payroll Dashboard Header */}
+      <PayrollDashboardHeader
+        userName={userName}
+        employeesNeedingUpdates={3}
+        daysUntilPayroll={daysUntilPayroll}
         payRunDate={currentPayRun.payRunDate}
-        status={currentPayRun.status}
         issues={currentPayRun.issues}
       />
 
