@@ -180,7 +180,7 @@ export function CostProjectionChart() {
         </div>
         
         {/* Main Chart Area */}
-        <div className="h-[450px] p-4 border border-border rounded-full px-[110px] py-[16px]">
+        <div className="h-[450px] p-4 border border-border px-[110px] py-[16px] rounded">
           <ChartContainer config={{
           actual: {
             label: "Actual",
