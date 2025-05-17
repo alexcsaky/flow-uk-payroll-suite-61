@@ -1,16 +1,9 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,7 +13,6 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Table,
   TableBody,
@@ -36,7 +28,6 @@ import {
   Search,
   UserPlus
 } from "lucide-react";
-import { toast } from "sonner";
 
 // Mock employee data
 const employees = [
@@ -108,13 +99,6 @@ const employees = [
 
 const Employees = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [showAddEmployeeDialog, setShowAddEmployeeDialog] = useState(false);
-  const [newEmployee, setNewEmployee] = useState({
-    name: "",
-    email: "",
-    department: "",
-    role: "",
-  });
   const navigate = useNavigate();
   
   const filteredEmployees = employees.filter(
@@ -130,35 +114,7 @@ const Employees = () => {
   };
   
   const handleAddEmployee = () => {
-    setShowAddEmployeeDialog(true);
-  };
-  
-  const handleCloseDialog = () => {
-    setShowAddEmployeeDialog(false);
-    setNewEmployee({
-      name: "",
-      email: "",
-      department: "",
-      role: "",
-    });
-  };
-  
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewEmployee({
-      ...newEmployee,
-      [name]: value,
-    });
-  };
-  
-  const handleSubmitEmployee = () => {
-    if (!newEmployee.name || !newEmployee.email) {
-      toast.error("Name and email are required");
-      return;
-    }
-    
-    toast.success("Employee added successfully");
-    handleCloseDialog();
+    navigate('/employees/onboarding');
   };
 
   return (
@@ -278,77 +234,6 @@ const Employees = () => {
           </div>
         </CardContent>
       </Card>
-      
-      <Dialog open={showAddEmployeeDialog} onOpenChange={setShowAddEmployeeDialog}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Add New Employee</DialogTitle>
-            <DialogDescription>
-              Enter the employee details below. Click save when you're done.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
-                Name
-              </Label>
-              <Input
-                id="name"
-                name="name"
-                className="col-span-3"
-                value={newEmployee.name}
-                onChange={handleInputChange}
-              />
-            </div>
-            
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="email" className="text-right">
-                Email
-              </Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                className="col-span-3"
-                value={newEmployee.email}
-                onChange={handleInputChange}
-              />
-            </div>
-            
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="department" className="text-right">
-                Department
-              </Label>
-              <Input
-                id="department"
-                name="department"
-                className="col-span-3"
-                value={newEmployee.department}
-                onChange={handleInputChange}
-              />
-            </div>
-            
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="role" className="text-right">
-                Role
-              </Label>
-              <Input
-                id="role"
-                name="role"
-                className="col-span-3"
-                value={newEmployee.role}
-                onChange={handleInputChange}
-              />
-            </div>
-          </div>
-          
-          <DialogFooter>
-            <Button variant="outline" onClick={handleCloseDialog}>Cancel</Button>
-            <Button onClick={handleSubmitEmployee}>Save Employee</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };

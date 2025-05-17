@@ -9,6 +9,7 @@ import Approvals from "@/pages/Approvals";
 import Clients from "@/pages/Clients";
 import Dashboard from "@/pages/Dashboard";
 import EmployeeDetails from "@/pages/EmployeeDetails";
+import EmployeeOnboarding from "@/pages/EmployeeOnboarding";
 import Employees from "@/pages/Employees";
 import Invoices from "@/pages/Invoices";
 import NotFound from "@/pages/NotFound";
@@ -36,6 +37,7 @@ const App = () => (
               <Route index element={<Dashboard />} />
               <Route path="settings" element={<Settings />} />
               <Route path="employees" element={<Employees />} />
+              <Route path="employees/onboarding" element={<EmployeeOnboarding />} />
               <Route path="employees/:employeeId" element={<EmployeeDetails />} />
               <Route path="payroll" element={<Payroll />} />
               <Route path="timesheets" element={<Timesheets />} />
