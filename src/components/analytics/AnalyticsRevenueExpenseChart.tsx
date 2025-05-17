@@ -1,36 +1,24 @@
-
 import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { 
-  BarChart as RechartsBarChart, 
-  Bar, 
-  LineChart, 
-  Line, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  Legend, 
-  ResponsiveContainer 
-} from "recharts";
+import { BarChart as RechartsBarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { ChartBar } from "lucide-react";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent
-} from "@/components/ui/chart";
-
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 interface AnalyticsRevenueExpenseChartProps {
-  revenueData: { name: string; value: number }[];
-  expensesData: { name: string; value: number }[];
+  revenueData: {
+    name: string;
+    value: number;
+  }[];
+  expensesData: {
+    name: string;
+    value: number;
+  }[];
   chartType: string;
   setChartType: (type: string) => void;
 }
-
-export const AnalyticsRevenueExpenseChart: React.FC<AnalyticsRevenueExpenseChartProps> = ({ 
-  revenueData, 
-  expensesData, 
+export const AnalyticsRevenueExpenseChart: React.FC<AnalyticsRevenueExpenseChartProps> = ({
+  revenueData,
+  expensesData,
   chartType,
   setChartType
 }) => {
@@ -41,9 +29,7 @@ export const AnalyticsRevenueExpenseChart: React.FC<AnalyticsRevenueExpenseChart
     expenses: expensesData[index].value,
     profit: item.value - expensesData[index].value
   }));
-
-  return (
-    <Card>
+  return <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
@@ -64,99 +50,87 @@ export const AnalyticsRevenueExpenseChart: React.FC<AnalyticsRevenueExpenseChart
           </Select>
         </div>
       </CardHeader>
-      <CardContent className="h-[300px]">
-        <ChartContainer
-          config={{
-            revenue: {
-              label: "Revenue",
-              color: "#4F46E5",
-            },
-            expenses: {
-              label: "Expenses",
-              color: "#F97316",
-            },
-            profit: {
-              label: "Profit",
-              color: "#10B981",
-            },
-          }}
-        >
+      <CardContent className="h-[300px] px-[32px]">
+        <ChartContainer config={{
+        revenue: {
+          label: "Revenue",
+          color: "#4F46E5"
+        },
+        expenses: {
+          label: "Expenses",
+          color: "#F97316"
+        },
+        profit: {
+          label: "Profit",
+          color: "#10B981"
+        }
+      }}>
           <ResponsiveContainer width="100%" height="100%">
-            {chartType === "bar" ? (
-              <RechartsBarChart data={combinedData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+            {chartType === "bar" ? <RechartsBarChart data={combinedData} margin={{
+            top: 10,
+            right: 30,
+            left: 0,
+            bottom: 0
+          }}>
                 <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
                 <XAxis dataKey="name" />
-                <YAxis 
-                  tickFormatter={(value) => `$${value / 1000}k`}
-                />
-                <ChartTooltip
-                  content={({ active, payload }) => {
-                    if (active && payload && payload.length) {
-                      return (
-                        <ChartTooltipContent
-                          className="bg-background border border-border/50 shadow-md"
-                          indicator="dot"
-                        />
-                      );
-                    }
-                    return null;
-                  }}
-                />
+                <YAxis tickFormatter={value => `$${value / 1000}k`} />
+                <ChartTooltip content={({
+              active,
+              payload
+            }) => {
+              if (active && payload && payload.length) {
+                return <ChartTooltipContent className="bg-background border border-border/50 shadow-md" indicator="dot" />;
+              }
+              return null;
+            }} />
                 <Legend />
                 <Bar dataKey="revenue" name="Revenue" fill="#4F46E5" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="expenses" name="Expenses" fill="#F97316" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="profit" name="Profit" fill="#10B981" radius={[4, 4, 0, 0]} />
-              </RechartsBarChart>
-            ) : (
-              <LineChart data={combinedData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+              </RechartsBarChart> : <LineChart data={combinedData} margin={{
+            top: 10,
+            right: 30,
+            left: 0,
+            bottom: 0
+          }}>
                 <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
                 <XAxis dataKey="name" />
-                <YAxis 
-                  tickFormatter={(value) => `$${value / 1000}k`}
-                />
-                <ChartTooltip
-                  content={({ active, payload }) => {
-                    if (active && payload && payload.length) {
-                      return (
-                        <ChartTooltipContent
-                          className="bg-background border border-border/50 shadow-md"
-                          indicator="dot"
-                        />
-                      );
-                    }
-                    return null;
-                  }}
-                />
+                <YAxis tickFormatter={value => `$${value / 1000}k`} />
+                <ChartTooltip content={({
+              active,
+              payload
+            }) => {
+              if (active && payload && payload.length) {
+                return <ChartTooltipContent className="bg-background border border-border/50 shadow-md" indicator="dot" />;
+              }
+              return null;
+            }} />
                 <Legend />
-                <Line 
-                  type="monotone" 
-                  dataKey="revenue" 
-                  stroke="#4F46E5" 
-                  activeDot={{ r: 8 }} 
-                  strokeWidth={2}
-                  dot={{ stroke: '#4F46E5', strokeWidth: 2, r: 4 }}
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="expenses" 
-                  stroke="#F97316" 
-                  activeDot={{ r: 8 }} 
-                  strokeWidth={2}
-                  dot={{ stroke: '#F97316', strokeWidth: 2, r: 4 }}
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="profit" 
-                  stroke="#10B981" 
-                  activeDot={{ r: 8 }} 
-                  strokeWidth={2}
-                  dot={{ stroke: '#10B981', strokeWidth: 2, r: 4 }}
-                />
-              </LineChart>
-            )}
+                <Line type="monotone" dataKey="revenue" stroke="#4F46E5" activeDot={{
+              r: 8
+            }} strokeWidth={2} dot={{
+              stroke: '#4F46E5',
+              strokeWidth: 2,
+              r: 4
+            }} />
+                <Line type="monotone" dataKey="expenses" stroke="#F97316" activeDot={{
+              r: 8
+            }} strokeWidth={2} dot={{
+              stroke: '#F97316',
+              strokeWidth: 2,
+              r: 4
+            }} />
+                <Line type="monotone" dataKey="profit" stroke="#10B981" activeDot={{
+              r: 8
+            }} strokeWidth={2} dot={{
+              stroke: '#10B981',
+              strokeWidth: 2,
+              r: 4
+            }} />
+              </LineChart>}
           </ResponsiveContainer>
         </ChartContainer>
       </CardContent>
-    </Card>
-  );
+    </Card>;
 };
