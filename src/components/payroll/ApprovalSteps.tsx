@@ -1,15 +1,8 @@
 
 import React from "react";
-import { 
-  User, 
-  Users, 
-  Banknote, 
-  Briefcase,
-  Check,
-  X,
-  Clock
-} from "lucide-react";
-import { PayrollApproval } from "./PayrollApprovalHub";
+import { Check, X, Clock } from "lucide-react";
+import { PayrollApproval } from "@/types/payroll";
+import { getRoleIcon, formatRoleName } from "@/utils/payrollApprovalHelpers";
 
 interface ApprovalStepsProps {
   payroll: PayrollApproval;
@@ -19,26 +12,22 @@ export const ApprovalSteps: React.FC<ApprovalStepsProps> = ({ payroll }) => {
   const steps = [
     { 
       role: "payroll_manager", 
-      icon: User, 
-      label: "Payroll Manager",
+      label: formatRoleName("payroll_manager"),
       status: payroll.approvers.find(a => a.role === "payroll_manager")?.status || "not_started"
     },
     { 
       role: "hr", 
-      icon: Users, 
-      label: "HR",
+      label: formatRoleName("hr"),
       status: payroll.approvers.find(a => a.role === "hr")?.status || "not_started"
     },
     { 
       role: "finance_manager", 
-      icon: Banknote, 
-      label: "Finance Manager",
+      label: formatRoleName("finance_manager"),
       status: payroll.approvers.find(a => a.role === "finance_manager")?.status || "not_started"
     },
     { 
       role: "managing_director", 
-      icon: Briefcase, 
-      label: "Managing Director",
+      label: formatRoleName("managing_director"),
       status: payroll.approvers.find(a => a.role === "managing_director")?.status || "not_started"
     }
   ];
@@ -85,7 +74,7 @@ export const ApprovalSteps: React.FC<ApprovalStepsProps> = ({ payroll }) => {
                   getStepColor(step.status, payroll.currentApprover === step.role)
                 }`}
               >
-                {getStatusIcon(step.status) || <step.icon className="h-4 w-4" />}
+                {getStatusIcon(step.status) || getRoleIcon(step.role as any)}
               </div>
               <span className="text-xs font-medium text-center">{step.label}</span>
             </div>
