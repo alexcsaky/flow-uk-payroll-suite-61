@@ -1,4 +1,3 @@
-
 import React from "react";
 import { DashboardStats } from "@/components/dashboard/DashboardStats";
 import { DashboardMainContent } from "@/components/dashboard/DashboardMainContent";
@@ -70,11 +69,28 @@ const Dashboard = () => {
     }
   ];
 
-  // Mock data for PayrollSummaryCard
+  // Mock data for PayrollSummaryCard with upcoming deadlines
   const payrollSummary = {
     nextPayrollDate: new Date(2025, 3, 25), // Using numeric constructor for stability
     employeesCount: 146,
-    totalAmount: 287500
+    totalAmount: 287500,
+    upcomingDeadlines: [
+      {
+        name: "RTI Submission",
+        date: new Date(2025, 3, 26), // April 26, 2025
+        type: "normal" as const
+      },
+      {
+        name: "Auto-enrollment Review",
+        date: new Date(2025, 4, 5), // May 5, 2025
+        type: "warning" as const
+      },
+      {
+        name: "P60 Distribution",
+        date: new Date(2025, 4, 31), // May 31, 2025
+        type: "urgent" as const
+      }
+    ]
   };
 
   // Mock data for InvoiceSummaryCard
