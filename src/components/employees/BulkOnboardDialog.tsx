@@ -1,7 +1,6 @@
-
 import { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
-import { AlertCircle, FileSpreadsheet, Upload } from "lucide-react";
+import { AlertCircle, FileSpreadsheet, Upload, Download } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
