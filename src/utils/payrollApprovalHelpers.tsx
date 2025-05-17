@@ -1,4 +1,5 @@
 
+import React from "react";
 import { ApproverRole, PayrollApproval } from "@/types/payroll";
 import { Badge } from "@/components/ui/badge";
 import { User, Users, Banknote, Briefcase } from "lucide-react";
@@ -7,17 +8,17 @@ import { User, Users, Banknote, Briefcase } from "lucide-react";
 export const getStatusBadge = (status: PayrollApproval['status']) => {
   switch (status) {
     case "draft":
-      return <Badge variant="gray">Draft</Badge>;
+      return <Badge variant="outline" className="bg-gray-100 text-gray-800">Draft</Badge>;
     case "in_approval":
-      return <Badge variant="info">In Approval</Badge>;
+      return <Badge variant="outline" className="bg-blue-100 text-blue-800">In Approval</Badge>;
     case "approved":
-      return <Badge variant="success">Approved</Badge>;
+      return <Badge variant="outline" className="bg-green-100 text-green-800">Approved</Badge>;
     case "rejected":
-      return <Badge variant="error">Rejected</Badge>;
+      return <Badge variant="outline" className="bg-red-100 text-red-800">Rejected</Badge>;
     case "processing":
-      return <Badge variant="pending">Processing</Badge>;
+      return <Badge variant="outline" className="bg-amber-100 text-amber-800">Processing</Badge>;
     case "completed":
-      return <Badge variant="success">Completed</Badge>;
+      return <Badge variant="outline" className="bg-green-100 text-green-800">Completed</Badge>;
     default:
       return <Badge variant="outline">Unknown</Badge>;
   }
