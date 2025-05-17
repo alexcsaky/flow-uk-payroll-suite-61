@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -10,7 +9,16 @@ import {
   CardHeader,
   CardTitle 
 } from "@/components/ui/card";
-import { AlertTriangle, FileCheck, FilePlus2, HelpCircle, Upload, X } from "lucide-react";
+import { 
+  AlertTriangle, 
+  FileCheck, 
+  FilePlus2, 
+  HelpCircle, 
+  Upload, 
+  X, 
+  Paperclip,
+  FileText
+} from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -25,6 +33,7 @@ interface AttachmentsFormProps {
       name: string;
       type: string;
       uploadedAt: string;
+      status: string;
     }>;
     isComplete: boolean;
   };
@@ -102,6 +111,7 @@ export const AttachmentsForm = ({
           name: file.name,
           type: file.type,
           uploadedAt: new Date().toISOString(),
+          status: "pending_review"
         };
         const updatedDocs = [...data.otherDocuments, newDoc];
         updateData({ otherDocuments: updatedDocs });
@@ -180,6 +190,8 @@ export const AttachmentsForm = ({
           onUpload={() => handleFileUpload("p45")}
           onRemove={() => handleRemoveDocument("p45")}
           isSelected={selectedDocType === "p45"}
+          icon={<FileText className="h-4 w-4 mr-1 text-muted-foreground" />}
+          tooltipContent="A P45 shows tax code, previous earnings and tax paid this tax year"
         />
         
         {/* Right to Work Document */}
@@ -191,6 +203,8 @@ export const AttachmentsForm = ({
           onUpload={() => handleFileUpload("rtw")}
           onRemove={() => handleRemoveDocument("rtw")}
           isSelected={selectedDocType === "rtw"}
+          icon={<FileText className="h-4 w-4 mr-1 text-muted-foreground" />}
+          tooltipContent="Legal requirement to prove employee's right to work in UK (passport, visa, etc.)"
         />
         
         {/* Contract Document */}
@@ -202,6 +216,8 @@ export const AttachmentsForm = ({
           onUpload={() => handleFileUpload("contract")}
           onRemove={() => handleRemoveDocument("contract")}
           isSelected={selectedDocType === "contract"}
+          icon={<FileText className="h-4 w-4 mr-1 text-muted-foreground" />}
+          tooltipContent="Formal agreement between employee and employer outlining terms of employment"
         />
         
         {/* Other Documents */}
@@ -215,6 +231,8 @@ export const AttachmentsForm = ({
           isSelected={selectedDocType === "other"}
           multipleUploads={true}
           uploadCount={data.otherDocuments.length}
+          icon={<Paperclip className="h-4 w-4 mr-1 text-muted-foreground" />}
+          tooltipContent="Any additional documentation relevant to employment (certifications, qualifications, etc.)"
         />
       </div>
       
@@ -234,14 +252,30 @@ export const AttachmentsForm = ({
                     </p>
                   </div>
                 </div>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleRemoveDocument("other", doc.id)}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Badge 
+                    variant="outline" 
+                    className={cn(
+                      doc.status === "pending_review" && "bg-yellow-100 text-yellow-800 border-yellow-200",
+                      doc.status === "approved" && "bg-green-100 text-green-800 border-green-200",
+                      doc.status === "rejected" && "bg-red-100 text-red-800 border-red-200",
+                      doc.status === "expired" && "bg-gray-100 text-gray-800 border-gray-200"
+                    )}
+                  >
+                    {doc.status === "pending_review" && "Pending Review"}
+                    {doc.status === "approved" && "Approved"}
+                    {doc.status === "rejected" && "Rejected"}
+                    {doc.status === "expired" && "Expired"}
+                  </Badge>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleRemoveDocument("other", doc.id)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             ))}
           </div>
@@ -280,6 +314,8 @@ interface DocumentCardProps {
   onUpload: () => void;
   onRemove: () => void;
   isSelected: boolean;
+  icon?: React.ReactNode;
+  tooltipContent?: string;
   multipleUploads?: boolean;
   uploadCount?: number;
 }
@@ -292,6 +328,8 @@ const DocumentCard = ({
   onUpload,
   onRemove,
   isSelected,
+  icon,
+  tooltipContent,
   multipleUploads = false,
   uploadCount = 0,
 }: DocumentCardProps) => {
@@ -305,8 +343,21 @@ const DocumentCard = ({
         <div className="flex justify-between items-start">
           <div className="space-y-1">
             <CardTitle className="text-base flex items-center gap-1">
+              {icon}
               {title}
               {isRequired && <span className="text-red-500">*</span>}
+              {tooltipContent && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <HelpCircle className="h-4 w-4 text-muted-foreground ml-1" />
+                    </TooltipTrigger>
+                    <TooltipContent side="right" className="max-w-xs">
+                      <p>{tooltipContent}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
               {isUploaded && (
                 <Badge variant="outline" className="ml-2 bg-green-100 text-green-800 border-green-200">
                   Uploaded

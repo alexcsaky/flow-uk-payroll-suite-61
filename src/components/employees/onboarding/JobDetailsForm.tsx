@@ -13,8 +13,16 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
-import { CalendarIcon, HelpCircle } from "lucide-react";
+import { 
+  CalendarIcon, 
+  HelpCircle,
+  Briefcase,
+  Building,
+  UserCheck,
+  MapPin
+} from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface JobDetailsFormProps {
   data: {
@@ -24,6 +32,10 @@ interface JobDetailsFormProps {
     employmentType: string;
     managerName: string;
     location: string;
+    normalHours: string;
+    irregularPayment: boolean;
+    offPayrollWorker: boolean;
+    secondedFromAbroad: boolean;
     isComplete: boolean;
   };
   updateData: (data: any) => void;
@@ -41,17 +53,26 @@ export const JobDetailsForm = ({
 
   const validateField = (field: string, value: string): string => {
     switch (field) {
-      case "title":
-      case "department":
-        return value.trim() === "" ? "This field is required" : "";
       case "startDate":
         return value === "" ? "Start date is required" : "";
+      case "normalHours":
+        if (value === "") return "Working hours are required";
+        const hours = parseFloat(value);
+        if (isNaN(hours) || hours <= 0 || hours > 168) {
+          return "Please enter valid working hours (0-168)";
+        }
+        return "";
       default:
         return "";
     }
   };
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: string, value: string | boolean) => {
+    if (typeof value === "boolean") {
+      updateData({ [field]: value });
+      return;
+    }
+    
     const error = validateField(field, value);
     
     setFormErrors((prev) => ({
@@ -78,9 +99,8 @@ export const JobDetailsForm = ({
     const newErrors: Record<string, string> = {};
     
     // Required fields
-    newErrors.title = validateField("title", data.title);
-    newErrors.department = validateField("department", data.department);
     newErrors.startDate = validateField("startDate", data.startDate);
+    newErrors.normalHours = validateField("normalHours", data.normalHours || "");
     
     setFormErrors(newErrors);
     
@@ -110,29 +130,47 @@ export const JobDetailsForm = ({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
-          <Label htmlFor="title" className="flex items-center">
-            Job Title <span className="text-red-500 ml-1">*</span>
+          <Label htmlFor="title" className="flex items-center gap-1">
+            <Briefcase className="h-4 w-4 text-muted-foreground" />
+            Job Title
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-4 w-4 text-muted-foreground ml-1" />
+                </TooltipTrigger>
+                <TooltipContent side="right" className="max-w-xs">
+                  <p>Employee's official job title</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </Label>
           <Input
             id="title"
             value={data.title}
             onChange={(e) => handleInputChange("title", e.target.value)}
-            className={formErrors.title ? "border-red-500" : ""}
           />
-          {formErrors.title && (
-            <p className="text-red-500 text-sm">{formErrors.title}</p>
-          )}
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="department" className="flex items-center">
-            Department <span className="text-red-500 ml-1">*</span>
+          <Label htmlFor="department" className="flex items-center gap-1">
+            <Building className="h-4 w-4 text-muted-foreground" />
+            Department
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-4 w-4 text-muted-foreground ml-1" />
+                </TooltipTrigger>
+                <TooltipContent side="right" className="max-w-xs">
+                  <p>Department or business unit the employee works in</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </Label>
           <Select
             value={data.department}
             onValueChange={(value) => handleInputChange("department", value)}
           >
-            <SelectTrigger className={formErrors.department ? "border-red-500" : ""}>
+            <SelectTrigger>
               <SelectValue placeholder="Select department" />
             </SelectTrigger>
             <SelectContent>
@@ -146,14 +184,22 @@ export const JobDetailsForm = ({
               <SelectItem value="Executive">Executive</SelectItem>
             </SelectContent>
           </Select>
-          {formErrors.department && (
-            <p className="text-red-500 text-sm">{formErrors.department}</p>
-          )}
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="startDate" className="flex items-center">
+          <Label htmlFor="startDate" className="flex items-center gap-1">
+            <CalendarIcon className="h-4 w-4 text-muted-foreground" />
             Start Date <span className="text-red-500 ml-1">*</span>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-4 w-4 text-muted-foreground ml-1" />
+                </TooltipTrigger>
+                <TooltipContent side="right" className="max-w-xs">
+                  <p>First day of employment - required for HMRC reporting</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </Label>
           <Popover>
             <PopoverTrigger asChild>
@@ -187,20 +233,19 @@ export const JobDetailsForm = ({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="employmentType">
-            <div className="flex items-center gap-1">
-              Employment Type
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger>
-                    <HelpCircle className="h-4 w-4 text-muted-foreground" />
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>This will affect tax and NI calculations</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
+          <Label htmlFor="employmentType" className="flex items-center gap-1">
+            <Briefcase className="h-4 w-4 text-muted-foreground" />
+            Employment Type <span className="text-red-500 ml-1">*</span>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-4 w-4 text-muted-foreground ml-1" />
+                </TooltipTrigger>
+                <TooltipContent side="right" className="max-w-xs">
+                  <p>Determines tax and NI calculations and employment rights</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </Label>
           <Select
             value={data.employmentType}
@@ -213,43 +258,155 @@ export const JobDetailsForm = ({
               <SelectItem value="full-time">Full Time</SelectItem>
               <SelectItem value="part-time">Part Time</SelectItem>
               <SelectItem value="contractor">Contractor</SelectItem>
-              <SelectItem value="temporary">Temporary</SelectItem>
-              <SelectItem value="intern">Intern</SelectItem>
+              <SelectItem value="director">Director</SelectItem>
+              <SelectItem value="ir35-worker">IR35 Off-Payroll Worker</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="managerName">Manager's Name</Label>
+          <Label htmlFor="normalHours" className="flex items-center gap-1">
+            <Briefcase className="h-4 w-4 text-muted-foreground" />
+            Normal Working Hours <span className="text-red-500 ml-1">*</span>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-4 w-4 text-muted-foreground ml-1" />
+                </TooltipTrigger>
+                <TooltipContent side="right" className="max-w-xs">
+                  <p>Standard weekly working hours (required for HMRC reporting)</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </Label>
+          <div className="flex gap-2 items-center">
+            <Input
+              id="normalHours"
+              type="number"
+              min="0"
+              max="168"
+              step="0.5"
+              value={data.normalHours || ""}
+              onChange={(e) => handleInputChange("normalHours", e.target.value)}
+              className={formErrors.normalHours ? "border-red-500" : ""}
+            />
+            <span className="text-sm text-muted-foreground">hours/week</span>
+          </div>
+          {formErrors.normalHours && (
+            <p className="text-red-500 text-sm">{formErrors.normalHours}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="managerName" className="flex items-center gap-1">
+            <UserCheck className="h-4 w-4 text-muted-foreground" />
+            Manager's Name
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-4 w-4 text-muted-foreground ml-1" />
+                </TooltipTrigger>
+                <TooltipContent side="right" className="max-w-xs">
+                  <p>Employee's direct manager or supervisor</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </Label>
           <Input
             id="managerName"
-            value={data.managerName}
+            value={data.managerName || ""}
             onChange={(e) => handleInputChange("managerName", e.target.value)}
           />
         </div>
 
         <div className="space-y-2">
-          <div className="flex items-center gap-1">
-            <Label htmlFor="location">Work Location</Label>
+          <Label htmlFor="location" className="flex items-center gap-1">
+            <MapPin className="h-4 w-4 text-muted-foreground" />
+            Work Location
             <TooltipProvider>
               <Tooltip>
-                <TooltipTrigger>
-                  <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-4 w-4 text-muted-foreground ml-1" />
                 </TooltipTrigger>
-                <TooltipContent>
-                  <p>
-                    Where the employee will primarily work (office location, remote, etc.)
-                  </p>
+                <TooltipContent side="right" className="max-w-xs">
+                  <p>Primary workplace location (office, remote, etc.)</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
-          </div>
+          </Label>
           <Input
             id="location"
-            value={data.location}
+            value={data.location || ""}
             onChange={(e) => handleInputChange("location", e.target.value)}
             placeholder="e.g. London Office, Remote"
           />
+        </div>
+      </div>
+      
+      <div className="space-y-4 pt-4 border-t">
+        <h4 className="text-md font-medium">Additional Employment Information</h4>
+        
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            id="irregularPayment"
+            checked={data.irregularPayment || false}
+            onCheckedChange={(checked) => handleInputChange("irregularPayment", Boolean(checked))}
+          />
+          <Label htmlFor="irregularPayment" className="flex items-center gap-1">
+            Irregular Payment Pattern
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-4 w-4 text-muted-foreground ml-1" />
+                </TooltipTrigger>
+                <TooltipContent side="right" className="max-w-xs">
+                  <p>Check if employee is paid irregularly, not on a fixed schedule</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </Label>
+        </div>
+        
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            id="offPayrollWorker"
+            checked={data.offPayrollWorker || false}
+            onCheckedChange={(checked) => handleInputChange("offPayrollWorker", Boolean(checked))}
+          />
+          <Label htmlFor="offPayrollWorker" className="flex items-center gap-1">
+            Off-Payroll Worker
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-4 w-4 text-muted-foreground ml-1" />
+                </TooltipTrigger>
+                <TooltipContent side="right" className="max-w-xs">
+                  <p>Check if worker falls under IR35 off-payroll working rules</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </Label>
+        </div>
+        
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            id="secondedFromAbroad" 
+            checked={data.secondedFromAbroad || false}
+            onCheckedChange={(checked) => handleInputChange("secondedFromAbroad", Boolean(checked))}
+          />
+          <Label htmlFor="secondedFromAbroad" className="flex items-center gap-1">
+            Seconded from Abroad
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-4 w-4 text-muted-foreground ml-1" />
+                </TooltipTrigger>
+                <TooltipContent side="right" className="max-w-xs">
+                  <p>Check if employee is temporarily transferred from overseas company</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </Label>
         </div>
       </div>
 

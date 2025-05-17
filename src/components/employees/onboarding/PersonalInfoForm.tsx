@@ -13,8 +13,8 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
-import { CalendarIcon, HelpCircle } from "lucide-react";
-import { validateNINumber } from "@/utils/hmrc-validation";
+import { CalendarIcon, HelpCircle, User, Phone, Mail, FileText, Home, Globe } from "lucide-react";
+import { validateNINumber, validatePostcode } from "@/utils/hmrc-validation";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface PersonalInfoFormProps {
@@ -75,6 +75,10 @@ export const PersonalInfoForm = ({
         const now = new Date();
         const age = now.getFullYear() - dob.getFullYear();
         return age < 16 || age > 100 ? "Employee must be between 16 and 100 years old" : "";
+      case "address.postcode":
+        return value.trim() !== "" && !validatePostcode(value)
+          ? "Please enter a valid UK postcode"
+          : "";
       default:
         return "";
     }
@@ -160,8 +164,19 @@ export const PersonalInfoForm = ({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
-          <Label htmlFor="firstName" className="flex items-center">
+          <Label htmlFor="firstName" className="flex items-center gap-1">
+            <User className="h-4 w-4 text-muted-foreground" />
             First Name <span className="text-red-500 ml-1">*</span>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-4 w-4 text-muted-foreground ml-1" />
+                </TooltipTrigger>
+                <TooltipContent side="right" className="max-w-xs">
+                  <p>Legal first name as it appears on official ID documents</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </Label>
           <Input
             id="firstName"
@@ -175,8 +190,19 @@ export const PersonalInfoForm = ({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="lastName" className="flex items-center">
+          <Label htmlFor="lastName" className="flex items-center gap-1">
+            <User className="h-4 w-4 text-muted-foreground" />
             Last Name <span className="text-red-500 ml-1">*</span>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-4 w-4 text-muted-foreground ml-1" />
+                </TooltipTrigger>
+                <TooltipContent side="right" className="max-w-xs">
+                  <p>Legal surname as it appears on official ID documents</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </Label>
           <Input
             id="lastName"
@@ -190,8 +216,19 @@ export const PersonalInfoForm = ({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="email" className="flex items-center">
+          <Label htmlFor="email" className="flex items-center gap-1">
+            <Mail className="h-4 w-4 text-muted-foreground" />
             Email Address <span className="text-red-500 ml-1">*</span>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-4 w-4 text-muted-foreground ml-1" />
+                </TooltipTrigger>
+                <TooltipContent side="right" className="max-w-xs">
+                  <p>Primary contact email for payslips and HR communications</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </Label>
           <Input
             id="email"
@@ -206,7 +243,20 @@ export const PersonalInfoForm = ({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="phone">Phone Number</Label>
+          <Label htmlFor="phone" className="flex items-center gap-1">
+            <Phone className="h-4 w-4 text-muted-foreground" />
+            Phone Number
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-4 w-4 text-muted-foreground ml-1" />
+                </TooltipTrigger>
+                <TooltipContent side="right" className="max-w-xs">
+                  <p>Primary contact phone number for HR communications</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </Label>
           <Input
             id="phone"
             value={data.phone}
@@ -219,8 +269,19 @@ export const PersonalInfoForm = ({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="dateOfBirth" className="flex items-center">
+          <Label htmlFor="dateOfBirth" className="flex items-center gap-1">
+            <CalendarIcon className="h-4 w-4 text-muted-foreground" />
             Date of Birth <span className="text-red-500 ml-1">*</span>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-4 w-4 text-muted-foreground ml-1" />
+                </TooltipTrigger>
+                <TooltipContent side="right" className="max-w-xs">
+                  <p>Required for HMRC reporting and pension auto-enrollment</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </Label>
           <Popover>
             <PopoverTrigger asChild>
@@ -261,7 +322,20 @@ export const PersonalInfoForm = ({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="gender">Gender</Label>
+          <Label htmlFor="gender" className="flex items-center gap-1">
+            <User className="h-4 w-4 text-muted-foreground" />
+            Gender <span className="text-red-500 ml-1">*</span>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-4 w-4 text-muted-foreground ml-1" />
+                </TooltipTrigger>
+                <TooltipContent side="right" className="max-w-xs">
+                  <p>Required for HMRC and pension reporting</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </Label>
           <Select
             value={data.gender}
             onValueChange={(value) => handleInputChange("gender", value)}
@@ -280,20 +354,20 @@ export const PersonalInfoForm = ({
 
         <div className="space-y-2">
           <div className="flex items-center gap-1">
-            <Label htmlFor="niNumber">
+            <Label htmlFor="niNumber" className="flex items-center gap-1">
+              <FileText className="h-4 w-4 text-muted-foreground" />
               National Insurance Number
               {!showAddressFields && <span className="text-red-500 ml-1">*</span>}
             </Label>
             <TooltipProvider>
               <Tooltip>
-                <TooltipTrigger>
+                <TooltipTrigger asChild>
                   <HelpCircle className="h-4 w-4 text-muted-foreground" />
                 </TooltipTrigger>
-                <TooltipContent>
-                  <p className="w-80">
-                    Format example: AA123456C. If the employee doesn't have a
-                    National Insurance number yet, leave this field empty and
-                    provide their full address below.
+                <TooltipContent side="right" className="max-w-xs">
+                  <p>
+                    Format: two letters, six numbers, and one letter (e.g., AB123456C). 
+                    Required for HMRC reporting. If not available, complete address section.
                   </p>
                 </TooltipContent>
               </Tooltip>
@@ -326,8 +400,19 @@ export const PersonalInfoForm = ({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <Label htmlFor="addressLine1" className="flex items-center">
+              <Label htmlFor="addressLine1" className="flex items-center gap-1">
+                <Home className="h-4 w-4 text-muted-foreground" />
                 Address Line 1 <span className="text-red-500 ml-1">*</span>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <HelpCircle className="h-4 w-4 text-muted-foreground ml-1" />
+                    </TooltipTrigger>
+                    <TooltipContent side="right" className="max-w-xs">
+                      <p>Building number/name and street name (required when no NI number)</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </Label>
               <Input
                 id="addressLine1"
@@ -341,7 +426,20 @@ export const PersonalInfoForm = ({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="addressLine2">Address Line 2</Label>
+              <Label htmlFor="addressLine2" className="flex items-center gap-1">
+                <Home className="h-4 w-4 text-muted-foreground" />
+                Address Line 2
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <HelpCircle className="h-4 w-4 text-muted-foreground ml-1" />
+                    </TooltipTrigger>
+                    <TooltipContent side="right" className="max-w-xs">
+                      <p>Additional address information if needed</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </Label>
               <Input
                 id="addressLine2"
                 value={data.address.line2}
@@ -350,8 +448,19 @@ export const PersonalInfoForm = ({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="city" className="flex items-center">
+              <Label htmlFor="city" className="flex items-center gap-1">
+                <Home className="h-4 w-4 text-muted-foreground" />
                 City <span className="text-red-500 ml-1">*</span>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <HelpCircle className="h-4 w-4 text-muted-foreground ml-1" />
+                    </TooltipTrigger>
+                    <TooltipContent side="right" className="max-w-xs">
+                      <p>City or town name (required when no NI number)</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </Label>
               <Input
                 id="city"
@@ -365,7 +474,20 @@ export const PersonalInfoForm = ({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="county">County</Label>
+              <Label htmlFor="county" className="flex items-center gap-1">
+                <Home className="h-4 w-4 text-muted-foreground" />
+                County
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <HelpCircle className="h-4 w-4 text-muted-foreground ml-1" />
+                    </TooltipTrigger>
+                    <TooltipContent side="right" className="max-w-xs">
+                      <p>County name (optional)</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </Label>
               <Input
                 id="county"
                 value={data.address.county}
@@ -374,8 +496,19 @@ export const PersonalInfoForm = ({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="postcode" className="flex items-center">
+              <Label htmlFor="postcode" className="flex items-center gap-1">
+                <Home className="h-4 w-4 text-muted-foreground" />
                 Postcode <span className="text-red-500 ml-1">*</span>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <HelpCircle className="h-4 w-4 text-muted-foreground ml-1" />
+                    </TooltipTrigger>
+                    <TooltipContent side="right" className="max-w-xs">
+                      <p>UK postcode in valid format (required when no NI number)</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </Label>
               <Input
                 id="postcode"
@@ -386,6 +519,41 @@ export const PersonalInfoForm = ({
               {formErrors["address.postcode"] && (
                 <p className="text-red-500 text-sm">{formErrors["address.postcode"]}</p>
               )}
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="country" className="flex items-center gap-1">
+                <Globe className="h-4 w-4 text-muted-foreground" />
+                Country <span className="text-red-500 ml-1">*</span>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <HelpCircle className="h-4 w-4 text-muted-foreground ml-1" />
+                    </TooltipTrigger>
+                    <TooltipContent side="right" className="max-w-xs">
+                      <p>Country of residence (required when no NI number)</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </Label>
+              <Select
+                value={data.address.country || "GB"}
+                onValueChange={(value) => handleInputChange("address.country", value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select country" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="GB">United Kingdom</SelectItem>
+                  <SelectItem value="US">United States</SelectItem>
+                  <SelectItem value="FR">France</SelectItem>
+                  <SelectItem value="DE">Germany</SelectItem>
+                  <SelectItem value="IE">Ireland</SelectItem>
+                  <SelectItem value="ES">Spain</SelectItem>
+                  <SelectItem value="IT">Italy</SelectItem>
+                  <SelectItem value="Other">Other</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </>

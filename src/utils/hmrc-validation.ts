@@ -87,3 +87,85 @@ export const validatePostcode = (postcode: string): boolean => {
   
   return postcodeRegex.test(cleanPostcode);
 };
+
+/**
+ * Validates a UK bank account number
+ * Format: 8 digits (e.g., 12345678)
+ */
+export const validateBankAccount = (accountNumber: string): boolean => {
+  // Remove any spaces or hyphens
+  const cleanAccount = accountNumber.replace(/[\s-]/g, "");
+  
+  // UK bank account numbers are 8 digits
+  return /^\d{8}$/.test(cleanAccount);
+};
+
+/**
+ * Validates a UK sort code
+ * Format: 6 digits, often displayed as XX-XX-XX (e.g., 12-34-56)
+ */
+export const validateSortCode = (sortCode: string): boolean => {
+  // Remove any spaces or hyphens
+  const cleanSortCode = sortCode.replace(/[\s-]/g, "");
+  
+  // UK sort codes are 6 digits
+  return /^\d{6}$/.test(cleanSortCode);
+};
+
+/**
+ * Determines if a National Insurance category is for Freeport/Investment Zone
+ * (Categories F, I, L, S, V indicate special treatment)
+ */
+export const isFreeportOrInvestmentZoneCategory = (niCategory: string): boolean => {
+  const specialCategories = ["F", "I", "L", "S", "V"];
+  return specialCategories.includes(niCategory);
+};
+
+/**
+ * Validates that all required fields are present based on conditional logic
+ */
+export const validateEmployeeData = (employeeData: any): {isValid: boolean, errors: Record<string, string>} => {
+  const errors: Record<string, string> = {};
+  
+  // Check conditional requirements
+  
+  // 1. If National Insurance Number is blank, home address is required
+  if (!employeeData.personal.niNumber || employeeData.personal.niNumber === "") {
+    if (!employeeData.personal.address.line1 || employeeData.personal.address.line1 === "") {
+      errors["address.line1"] = "Address is required when NI number is not provided";
+    }
+    if (!employeeData.personal.address.postcode || employeeData.personal.address.postcode === "") {
+      errors["address.postcode"] = "Postcode is required when NI number is not provided";
+    }
+  }
+  
+  // 2. If student loan is true, student loan plan is required
+  if (employeeData.payroll.hasStudentLoan && 
+      (!employeeData.payroll.studentLoanPlan || employeeData.payroll.studentLoanPlan === "")) {
+    errors["studentLoanPlan"] = "Student loan plan is required when student loan is selected";
+  }
+  
+  // 3. If NI category is Freeport/IZ, workplace postcode is required
+  if (isFreeportOrInvestmentZoneCategory(employeeData.payroll.niCategory) && 
+      (!employeeData.payroll.workplacePostcode || employeeData.payroll.workplacePostcode === "")) {
+    errors["workplacePostcode"] = "Workplace postcode is required for this NI category";
+  }
+  
+  // 4. If payment method is bacs, bank details are required
+  if (employeeData.bankInfo.paymentMethod === "bank-transfer") {
+    if (!employeeData.bankInfo.accountName || employeeData.bankInfo.accountName === "") {
+      errors["accountName"] = "Account name is required for bank transfers";
+    }
+    if (!employeeData.bankInfo.accountNumber || employeeData.bankInfo.accountNumber === "") {
+      errors["accountNumber"] = "Account number is required for bank transfers";
+    }
+    if (!employeeData.bankInfo.sortCode || employeeData.bankInfo.sortCode === "") {
+      errors["sortCode"] = "Sort code is required for bank transfers";
+    }
+  }
+  
+  return {
+    isValid: Object.keys(errors).length === 0,
+    errors
+  };
+};
