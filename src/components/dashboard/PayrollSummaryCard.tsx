@@ -62,16 +62,16 @@ export function PayrollSummaryCard({
           </div>
         </div>
         
-        {upcomingDeadlines.length > 0 && <div className="border-t pt-3 flex-grow">
+        {upcomingDeadlines.length > 0 && <div className="border-t pt-3 flex-grow py-[92px]">
             <h4 className="text-sm font-medium mb-3 flex items-center gap-1">
               <Clock className="h-3.5 w-3.5" />
-              <span>Upcoming Deadlines</span>
+              <span className="text-xl">Upcoming Deadlines</span>
             </h4>
             <ul className="space-y-3">
               {upcomingDeadlines.map((deadline, index) => {
             const daysUntil = differenceInDays(deadline.date, new Date());
             return <li key={index} className="flex justify-between items-center text-xs">
-                    <span className="font-large">{deadline.name}</span>
+                    <span className="font-large text-lg">{deadline.name}</span>
                     <div>
                       <span className={getDeadlineStyle(deadline)}>
                         {format(deadline.date, "d MMM")}
