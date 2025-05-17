@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -348,7 +349,7 @@ const DocumentCard = ({
       <CardFooter>
         <Button
           type="button"
-          variant={isUploaded ? "outline" : "secondary"},
+          variant={isUploaded ? "outline" : "secondary"}
           size="sm"
           className="w-full"
           onClick={onUpload}
