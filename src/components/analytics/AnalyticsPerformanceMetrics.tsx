@@ -48,11 +48,11 @@ export const AnalyticsPerformanceMetrics: React.FC<AnalyticsPerformanceMetricsPr
   ];
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="overflow-hidden">
+      <CardHeader className="px-6">
         <CardTitle>Performance Metrics</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-6">
         <Tabs defaultValue="revenue">
           <TabsList>
             <TabsTrigger value="revenue">Revenue</TabsTrigger>
@@ -61,7 +61,7 @@ export const AnalyticsPerformanceMetrics: React.FC<AnalyticsPerformanceMetricsPr
             <TabsTrigger value="projects">Projects</TabsTrigger>
           </TabsList>
           <TabsContent value="revenue" className="mt-4">
-            <div className="h-[300px] p-2">
+            <div className="h-[300px] p-4 border border-border rounded-md">
               <ChartContainer 
                 config={{
                   value: {
@@ -73,10 +73,10 @@ export const AnalyticsPerformanceMetrics: React.FC<AnalyticsPerformanceMetricsPr
                 <ResponsiveContainer width="99%" height="99%">
                   <AreaChart
                     data={revenueData}
-                    margin={{ top: 10, right: 20, left: 5, bottom: 10 }}
+                    margin={{ top: 10, right: 20, left: 5, bottom: 30 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-                    <XAxis dataKey="name" />
+                    <XAxis dataKey="name" dy={10} />
                     <YAxis 
                       tickFormatter={(value) => `$${value / 1000}k`}
                     />
@@ -106,7 +106,7 @@ export const AnalyticsPerformanceMetrics: React.FC<AnalyticsPerformanceMetricsPr
             </div>
           </TabsContent>
           <TabsContent value="expenses" className="mt-4">
-            <div className="h-[300px] p-2">
+            <div className="h-[300px] p-4 border border-border rounded-md">
               <ChartContainer 
                 config={{
                   value: {
@@ -118,10 +118,10 @@ export const AnalyticsPerformanceMetrics: React.FC<AnalyticsPerformanceMetricsPr
                 <ResponsiveContainer width="99%" height="99%">
                   <BarChart
                     data={expensesData}
-                    margin={{ top: 10, right: 20, left: 5, bottom: 10 }}
+                    margin={{ top: 10, right: 20, left: 5, bottom: 30 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-                    <XAxis dataKey="name" />
+                    <XAxis dataKey="name" dy={10} />
                     <YAxis 
                       tickFormatter={(value) => `$${value / 1000}k`}
                     />
@@ -145,7 +145,7 @@ export const AnalyticsPerformanceMetrics: React.FC<AnalyticsPerformanceMetricsPr
             </div>
           </TabsContent>
           <TabsContent value="profit" className="mt-4">
-            <div className="h-[300px] p-2">
+            <div className="h-[300px] p-4 border border-border rounded-md">
               <ChartContainer 
                 config={{
                   value: {
@@ -157,10 +157,10 @@ export const AnalyticsPerformanceMetrics: React.FC<AnalyticsPerformanceMetricsPr
                 <ResponsiveContainer width="99%" height="99%">
                   <LineChart
                     data={profitData}
-                    margin={{ top: 10, right: 20, left: 5, bottom: 10 }}
+                    margin={{ top: 10, right: 20, left: 5, bottom: 30 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-                    <XAxis dataKey="name" />
+                    <XAxis dataKey="name" dy={10} />
                     <YAxis 
                       tickFormatter={(value) => `$${value / 1000}k`}
                     />
@@ -192,7 +192,7 @@ export const AnalyticsPerformanceMetrics: React.FC<AnalyticsPerformanceMetricsPr
             </div>
           </TabsContent>
           <TabsContent value="projects" className="mt-4">
-            <div className="h-[300px] p-2">
+            <div className="h-[300px] p-4 border border-border rounded-md">
               <ChartContainer 
                 config={{
                   completed: {
@@ -212,11 +212,11 @@ export const AnalyticsPerformanceMetrics: React.FC<AnalyticsPerformanceMetricsPr
                 <ResponsiveContainer width="99%" height="99%">
                   <BarChart
                     data={projectData}
-                    margin={{ top: 10, right: 20, left: 5, bottom: 10 }}
+                    margin={{ top: 10, right: 20, left: 5, bottom: 30 }}
                     barGap={0}
                   >
                     <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-                    <XAxis dataKey="name" />
+                    <XAxis dataKey="name" dy={10} />
                     <YAxis />
                     <ChartTooltip
                       content={({ active, payload }) => {
@@ -231,7 +231,7 @@ export const AnalyticsPerformanceMetrics: React.FC<AnalyticsPerformanceMetricsPr
                         return null;
                       }}
                     />
-                    <Legend />
+                    <Legend wrapperStyle={{ paddingTop: 10 }} />
                     <Bar dataKey="completed" name="Completed" fill="#22C55E" radius={[4, 4, 0, 0]} />
                     <Bar dataKey="ongoing" name="Ongoing" fill="#3B82F6" radius={[4, 4, 0, 0]} />
                     <Bar dataKey="new" name="New" fill="#A855F7" radius={[4, 4, 0, 0]} />

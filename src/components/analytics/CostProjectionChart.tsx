@@ -56,7 +56,7 @@ export function CostProjectionChart() {
 
   return (
     <Card className="mb-6">
-      <CardHeader>
+      <CardHeader className="px-6">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <div>
             <CardTitle className="flex items-center gap-2">
@@ -92,7 +92,7 @@ export function CostProjectionChart() {
         </div>
       </CardHeader>
       
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-6 px-6">
         {/* Filters */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="space-y-2">
@@ -193,7 +193,7 @@ export function CostProjectionChart() {
         </div>
         
         {/* Main Chart Area */}
-        <div className="h-[450px] mt-4 p-2">
+        <div className="h-[450px] p-4 border border-border rounded-md">
           <ChartContainer 
             config={{
               actual: {
@@ -257,17 +257,17 @@ export function CostProjectionChart() {
             <ResponsiveContainer width="99%" height="99%">
               <ComposedChart
                 data={data}
-                margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+                margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
               >
                 <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-                <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+                <XAxis dataKey="month" tick={{ fontSize: 12 }} dy={10} />
                 
                 {/* Primary Y Axis for monetary values */}
                 <YAxis 
                   yAxisId="left"
                   tickFormatter={(value) => `$${value/1000}k`}
                   domain={['auto', 'auto']}
-                  label={{ value: 'Cost ($)', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle' } }}
+                  label={{ value: 'Cost ($)', angle: -90, position: 'insideLeft', dx: -10, style: { textAnchor: 'middle' } }}
                   tick={{ fontSize: 12 }}
                 />
                 
@@ -276,7 +276,7 @@ export function CostProjectionChart() {
                   <YAxis
                     yAxisId="right"
                     orientation="right"
-                    label={{ value: 'FTE Count', angle: 90, position: 'insideRight', style: { textAnchor: 'middle' } }}
+                    label={{ value: 'FTE Count', angle: 90, position: 'insideRight', dx: 10, style: { textAnchor: 'middle' } }}
                     tick={{ fontSize: 12 }}
                   />
                 )}
@@ -529,7 +529,8 @@ export function CostProjectionChart() {
                       fill={(entry) => {
                         const mainValue = entry.actual || entry.forecast || 0;
                         const variance = mainValue - entry.budget;
-                        return variance > 0 ? '#EF4444' : '#10B981'; // Red for over budget, green for under
+                        // Fix the error by returning a string instead of a function
+                        return variance > 0 ? "#EF4444" : "#10B981"; // Red for over budget, green for under
                       }}
                       yAxisId="left"
                     />
@@ -557,8 +558,8 @@ export function CostProjectionChart() {
           </ChartContainer>
         </div>
         
-        {/* Chart Type Selector */}
-        <div className="flex justify-center">
+        {/* Chart Type Selector - moved to be higher up for better spacing */}
+        <div className="flex justify-center mt-10 pt-4">
           <Tabs 
             value={chartType} 
             onValueChange={(value) => setChartType(value as any)} 
