@@ -17,7 +17,7 @@ export function PayrollChart({ data }: PayrollChartProps) {
         <CardDescription>Monthly payroll totals for the last 6 months</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="h-[300px]">
+        <div className="h-[350px]">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={data}>
               <XAxis 

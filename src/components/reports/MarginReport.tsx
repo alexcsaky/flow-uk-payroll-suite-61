@@ -166,8 +166,8 @@ export const MarginReport: React.FC = () => {
           </div>
         </div>
         
-        {/* Bar Chart */}
-        <div className="h-80">
+        {/* Bar Chart - Increased height for better readability */}
+        <div className="h-96">
           <ChartContainer 
             config={{
               revenue: { color: "#8B5CF6" },

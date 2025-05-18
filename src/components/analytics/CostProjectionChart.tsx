@@ -168,8 +168,8 @@ export function CostProjectionChart() {
           </div>
         </div>
         
-        {/* Main Chart Area */}
-        <div className="h-[450px] p-4 border border-border py-[16px] rounded px-[131px]">
+        {/* Main Chart Area - Adjusted padding */}
+        <div className="h-[450px] p-4 border border-border py-4 rounded px-4">
           <ChartContainer config={{
           actual: {
             label: "Actual",
@@ -228,7 +228,7 @@ export function CostProjectionChart() {
             color: "#6366F1"
           }
         }}>
-            <ResponsiveContainer width="99%" height="99%">
+            <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={chartType === 'variance' ? varianceData : data} margin={{
               top: 20,
               right: 30,

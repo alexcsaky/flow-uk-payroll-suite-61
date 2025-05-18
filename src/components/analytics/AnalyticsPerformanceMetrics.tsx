@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -61,7 +60,7 @@ export const AnalyticsPerformanceMetrics: React.FC<AnalyticsPerformanceMetricsPr
             <TabsTrigger value="projects">Projects</TabsTrigger>
           </TabsList>
           <TabsContent value="revenue" className="mt-4">
-            <div className="h-[300px] p-4 border border-border rounded-md">
+            <div className="h-[350px] p-4 border border-border rounded-md">
               <ChartContainer 
                 config={{
                   value: {
@@ -70,7 +69,7 @@ export const AnalyticsPerformanceMetrics: React.FC<AnalyticsPerformanceMetricsPr
                   }
                 }}
               >
-                <ResponsiveContainer width="99%" height="99%">
+                <ResponsiveContainer width="100%" height="100%">
                   <AreaChart
                     data={revenueData}
                     margin={{ top: 10, right: 20, left: 5, bottom: 30 }}
@@ -106,7 +105,7 @@ export const AnalyticsPerformanceMetrics: React.FC<AnalyticsPerformanceMetricsPr
             </div>
           </TabsContent>
           <TabsContent value="expenses" className="mt-4">
-            <div className="h-[300px] p-4 border border-border rounded-md">
+            <div className="h-[350px] p-4 border border-border rounded-md">
               <ChartContainer 
                 config={{
                   value: {
@@ -115,7 +114,7 @@ export const AnalyticsPerformanceMetrics: React.FC<AnalyticsPerformanceMetricsPr
                   }
                 }}
               >
-                <ResponsiveContainer width="99%" height="99%">
+                <ResponsiveContainer width="100%" height="100%">
                   <BarChart
                     data={expensesData}
                     margin={{ top: 10, right: 20, left: 5, bottom: 30 }}
@@ -145,7 +144,7 @@ export const AnalyticsPerformanceMetrics: React.FC<AnalyticsPerformanceMetricsPr
             </div>
           </TabsContent>
           <TabsContent value="profit" className="mt-4">
-            <div className="h-[300px] p-4 border border-border rounded-md">
+            <div className="h-[350px] p-4 border border-border rounded-md">
               <ChartContainer 
                 config={{
                   value: {
@@ -154,7 +153,7 @@ export const AnalyticsPerformanceMetrics: React.FC<AnalyticsPerformanceMetricsPr
                   }
                 }}
               >
-                <ResponsiveContainer width="99%" height="99%">
+                <ResponsiveContainer width="100%" height="100%">
                   <LineChart
                     data={profitData}
                     margin={{ top: 10, right: 20, left: 5, bottom: 30 }}
@@ -192,7 +191,7 @@ export const AnalyticsPerformanceMetrics: React.FC<AnalyticsPerformanceMetricsPr
             </div>
           </TabsContent>
           <TabsContent value="projects" className="mt-4">
-            <div className="h-[300px] p-4 border border-border rounded-md">
+            <div className="h-[350px] p-4 border border-border rounded-md">
               <ChartContainer 
                 config={{
                   completed: {
@@ -209,7 +208,7 @@ export const AnalyticsPerformanceMetrics: React.FC<AnalyticsPerformanceMetricsPr
                   }
                 }}
               >
-                <ResponsiveContainer width="99%" height="99%">
+                <ResponsiveContainer width="100%" height="100%">
                   <BarChart
                     data={projectData}
                     margin={{ top: 10, right: 20, left: 5, bottom: 30 }}

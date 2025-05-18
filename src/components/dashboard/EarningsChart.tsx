@@ -1,3 +1,4 @@
+
 import React from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -54,7 +55,7 @@ export function EarningsChart({
           </CardDescription>
         </div>
       </CardHeader>
-      <CardContent className="px-[101px]">
+      <CardContent className="px-4">
         <div className="mb-5">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             <div className="bg-slate-50 p-3 rounded-lg">
@@ -79,7 +80,7 @@ export function EarningsChart({
           </div>
         </div>
         
-        <div className="h-[250px]">
+        <div className="h-[300px]">
           <ChartContainer config={{
           net: {
             label: "Net Earnings",

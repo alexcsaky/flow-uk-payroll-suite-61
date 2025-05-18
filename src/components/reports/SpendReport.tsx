@@ -107,8 +107,8 @@ export const SpendReport: React.FC = () => {
           <p className="text-2xl font-bold">£{totalSpend}</p>
         </div>
         
-        {/* Pie Chart */}
-        <div className="h-80">
+        {/* Pie Chart - Increased height for better visualization */}
+        <div className="h-96">
           <ChartContainer 
             config={{
               Salary: { color: CATEGORY_COLORS.Salary },
@@ -124,7 +124,7 @@ export const SpendReport: React.FC = () => {
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  outerRadius={100}
+                  outerRadius={120}
                   fill="#8884d8"
                   dataKey="value"
                   nameKey="name"
