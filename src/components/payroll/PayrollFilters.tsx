@@ -10,6 +10,7 @@ import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { DateRange } from "react-day-picker";
 
 interface PayrollFiltersProps {
   clients: string[];
@@ -17,14 +18,14 @@ interface PayrollFiltersProps {
   initialFilters?: {
     client: string | null;
     venue: string | null;
-    dateRange: { from: Date | undefined; to: Date | undefined };
+    dateRange: DateRange;
     weekEndingDate: Date | undefined;
     poNumber: string;
   };
   onApplyFilters: (filters: {
     client: string | null;
     venue: string | null;
-    dateRange: { from: Date | undefined; to: Date | undefined };
+    dateRange: DateRange;
     weekEndingDate: Date | undefined;
     poNumber: string;
   }) => void;
@@ -40,7 +41,7 @@ export const PayrollFilters: React.FC<PayrollFiltersProps> = ({
 }) => {
   const [client, setClient] = useState<string | null>(initialFilters?.client || null);
   const [venue, setVenue] = useState<string | null>(initialFilters?.venue || null);
-  const [dateRange, setDateRange] = useState<{ from: Date | undefined; to: Date | undefined }>(
+  const [dateRange, setDateRange] = useState<DateRange>(
     initialFilters?.dateRange || { from: undefined, to: undefined }
   );
   const [weekEndingDate, setWeekEndingDate] = useState<Date | undefined>(initialFilters?.weekEndingDate);
@@ -145,10 +146,7 @@ export const PayrollFilters: React.FC<PayrollFiltersProps> = ({
               <PopoverContent className="w-auto p-0" align="start">
                 <Calendar
                   mode="range"
-                  selected={{
-                    from: dateRange.from,
-                    to: dateRange.to,
-                  }}
+                  selected={dateRange}
                   onSelect={setDateRange}
                   initialFocus
                   className="p-3 pointer-events-auto"

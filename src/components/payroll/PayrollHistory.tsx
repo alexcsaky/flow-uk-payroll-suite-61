@@ -1,18 +1,12 @@
-
 import React, { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Search, Filter, Download, ChevronDown } from "lucide-react";
+import { Search, Filter, Download } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table";
 import { PayrollFilters } from "./PayrollFilters";
 import { format, isWithinInterval, parseISO } from "date-fns";
+import { DateRange } from "react-day-picker";
 
 export const PayrollHistory: React.FC = () => {
   const [showFilters, setShowFilters] = useState(false);
@@ -21,7 +15,7 @@ export const PayrollHistory: React.FC = () => {
   // Filter states
   const [selectedClient, setSelectedClient] = useState<string | null>(null);
   const [selectedVenue, setSelectedVenue] = useState<string | null>(null);
-  const [dateRange, setDateRange] = useState<{ from: Date | undefined; to: Date | undefined }>({
+  const [dateRange, setDateRange] = useState<DateRange>({
     from: undefined,
     to: undefined,
   });
@@ -222,7 +216,7 @@ export const PayrollHistory: React.FC = () => {
   const handleApplyFilters = (filters: {
     client: string | null;
     venue: string | null;
-    dateRange: { from: Date | undefined; to: Date | undefined };
+    dateRange: DateRange;
     weekEndingDate: Date | undefined;
     poNumber: string;
   }) => {
