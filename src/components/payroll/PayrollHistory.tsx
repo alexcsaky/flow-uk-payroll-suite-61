@@ -10,9 +10,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table";
 
 export const PayrollHistory: React.FC = () => {
-  // Mock payroll data
+  // Mock payroll data with additional fields
   const payrollHistory = [
     {
       id: "PR-2025-001",
@@ -20,6 +21,10 @@ export const PayrollHistory: React.FC = () => {
       employees: 146,
       totalAmount: "£287,500",
       status: "scheduled",
+      client: "Acme Corporation",
+      venue: "Corporate HQ",
+      weekEnding: "Apr 26, 2025",
+      poNumber: "PO-2025-ACM-001"
     },
     {
       id: "PR-2025-002",
@@ -27,6 +32,10 @@ export const PayrollHistory: React.FC = () => {
       employees: 145,
       totalAmount: "£285,200",
       status: "completed",
+      client: "Wayne Enterprises",
+      venue: "Downtown Office",
+      weekEnding: "Mar 26, 2025",
+      poNumber: "PO-2025-WAY-002"
     },
     {
       id: "PR-2025-003",
@@ -34,6 +43,10 @@ export const PayrollHistory: React.FC = () => {
       employees: 142,
       totalAmount: "£280,100",
       status: "completed",
+      client: "Stark Industries",
+      venue: "Factory",
+      weekEnding: "Feb 26, 2025",
+      poNumber: "PO-2025-STK-003"
     },
     {
       id: "PR-2025-004",
@@ -41,6 +54,10 @@ export const PayrollHistory: React.FC = () => {
       employees: 140,
       totalAmount: "£275,800",
       status: "completed",
+      client: "Umbrella Corp",
+      venue: "Warehouse",
+      weekEnding: "Jan 26, 2025",
+      poNumber: "PO-2025-UMB-004"
     },
   ];
 
@@ -78,48 +95,54 @@ export const PayrollHistory: React.FC = () => {
       </CardHeader>
       <CardContent>
         <div className="rounded-lg border">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-muted/50">
-                <tr className="text-left">
-                  <th className="px-4 py-3 text-sm font-medium">Run ID</th>
-                  <th className="px-4 py-3 text-sm font-medium">Date</th>
-                  <th className="px-4 py-3 text-sm font-medium">Employees</th>
-                  <th className="px-4 py-3 text-sm font-medium">Total Amount</th>
-                  <th className="px-4 py-3 text-sm font-medium">Status</th>
-                  <th className="px-4 py-3 text-sm font-medium">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {payrollHistory.map((run) => (
-                  <tr key={run.id} className="border-t">
-                    <td className="px-4 py-3 text-sm">{run.id}</td>
-                    <td className="px-4 py-3 text-sm">{run.date}</td>
-                    <td className="px-4 py-3 text-sm">{run.employees}</td>
-                    <td className="px-4 py-3 text-sm">{run.totalAmount}</td>
-                    <td className="px-4 py-3 text-sm">
-                      <span
-                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                          run.status === "completed"
-                            ? "bg-green-100 text-green-800"
-                            : run.status === "scheduled"
-                            ? "bg-blue-100 text-blue-800"
-                            : "bg-yellow-100 text-yellow-800"
-                        }`}
-                      >
-                        {run.status.charAt(0).toUpperCase() + run.status.slice(1)}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-sm">
-                      <Button variant="ghost" size="sm">
-                        View
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Run ID</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Client</TableHead>
+                <TableHead>Venue</TableHead>
+                <TableHead>Week Ending</TableHead>
+                <TableHead>PO Number</TableHead>
+                <TableHead>Employees</TableHead>
+                <TableHead>Total Amount</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {payrollHistory.map((run) => (
+                <TableRow key={run.id}>
+                  <TableCell className="font-medium">{run.id}</TableCell>
+                  <TableCell>{run.date}</TableCell>
+                  <TableCell>{run.client}</TableCell>
+                  <TableCell>{run.venue}</TableCell>
+                  <TableCell>{run.weekEnding}</TableCell>
+                  <TableCell>{run.poNumber}</TableCell>
+                  <TableCell>{run.employees}</TableCell>
+                  <TableCell>{run.totalAmount}</TableCell>
+                  <TableCell>
+                    <span
+                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                        run.status === "completed"
+                          ? "bg-green-100 text-green-800"
+                          : run.status === "scheduled"
+                          ? "bg-blue-100 text-blue-800"
+                          : "bg-yellow-100 text-yellow-800"
+                      }`}
+                    >
+                      {run.status.charAt(0).toUpperCase() + run.status.slice(1)}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <Button variant="ghost" size="sm">
+                      View
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
       </CardContent>
     </Card>
