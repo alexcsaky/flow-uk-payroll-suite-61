@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -30,6 +29,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 // Define the invoice type
 interface Attachment {
@@ -348,144 +353,151 @@ const Invoices = () => {
                 )}
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-80">
-              <DropdownMenuLabel>Filter Invoices</DropdownMenuLabel>
+            <DropdownMenuContent align="end" className="w-80 p-0">
+              <DropdownMenuLabel className="px-4 py-2">Filter Invoices</DropdownMenuLabel>
               <DropdownMenuSeparator />
               
-              <div className="p-2">
-                <h4 className="mb-2 text-sm font-medium">Status</h4>
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox 
-                      id="filter-paid" 
-                      checked={filters.status.includes("Paid")}
-                      onCheckedChange={() => toggleStatusFilter("Paid")} 
-                    />
-                    <label htmlFor="filter-paid" className="text-sm">Paid</label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox 
-                      id="filter-pending" 
-                      checked={filters.status.includes("Pending")}
-                      onCheckedChange={() => toggleStatusFilter("Pending")} 
-                    />
-                    <label htmlFor="filter-pending" className="text-sm">Pending</label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox 
-                      id="filter-overdue" 
-                      checked={filters.status.includes("Overdue")}
-                      onCheckedChange={() => toggleStatusFilter("Overdue")} 
-                    />
-                    <label htmlFor="filter-overdue" className="text-sm">Overdue</label>
-                  </div>
-                </div>
+              <div className="max-h-[70vh] overflow-y-auto">
+                <Accordion type="multiple" defaultValue={["status"]}>
+                  <AccordionItem value="status">
+                    <AccordionTrigger className="px-4 py-2 text-sm font-medium">Status</AccordionTrigger>
+                    <AccordionContent className="px-4 pb-3 pt-0">
+                      <div className="space-y-2">
+                        <div className="flex items-center space-x-2">
+                          <Checkbox 
+                            id="filter-paid" 
+                            checked={filters.status.includes("Paid")}
+                            onCheckedChange={() => toggleStatusFilter("Paid")} 
+                          />
+                          <label htmlFor="filter-paid" className="text-sm">Paid</label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox 
+                            id="filter-pending" 
+                            checked={filters.status.includes("Pending")}
+                            onCheckedChange={() => toggleStatusFilter("Pending")} 
+                          />
+                          <label htmlFor="filter-pending" className="text-sm">Pending</label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox 
+                            id="filter-overdue" 
+                            checked={filters.status.includes("Overdue")}
+                            onCheckedChange={() => toggleStatusFilter("Overdue")} 
+                          />
+                          <label htmlFor="filter-overdue" className="text-sm">Overdue</label>
+                        </div>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                  
+                  <AccordionItem value="client">
+                    <AccordionTrigger className="px-4 py-2 text-sm font-medium">Client</AccordionTrigger>
+                    <AccordionContent className="px-4 pb-3 pt-0">
+                      <div className="max-h-32 overflow-y-auto space-y-2">
+                        {uniqueClients.map(client => (
+                          <div key={client} className="flex items-center space-x-2">
+                            <Checkbox 
+                              id={`filter-client-${client}`} 
+                              checked={filters.client.includes(client)}
+                              onCheckedChange={() => toggleClientFilter(client)} 
+                            />
+                            <label htmlFor={`filter-client-${client}`} className="text-sm text-ellipsis overflow-hidden whitespace-nowrap">{client}</label>
+                          </div>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                  
+                  <AccordionItem value="category">
+                    <AccordionTrigger className="px-4 py-2 text-sm font-medium">Category</AccordionTrigger>
+                    <AccordionContent className="px-4 pb-3 pt-0">
+                      <div className="max-h-32 overflow-y-auto space-y-2">
+                        {uniqueCategories.map(category => (
+                          <div key={category} className="flex items-center space-x-2">
+                            <Checkbox 
+                              id={`filter-category-${category}`} 
+                              checked={filters.category.includes(category)}
+                              onCheckedChange={() => toggleCategoryFilter(category)} 
+                            />
+                            <label htmlFor={`filter-category-${category}`} className="text-sm">{category}</label>
+                          </div>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                  
+                  <AccordionItem value="amount">
+                    <AccordionTrigger className="px-4 py-2 text-sm font-medium">Amount Range</AccordionTrigger>
+                    <AccordionContent className="px-4 pb-3 pt-0">
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <Input
+                            placeholder="Min"
+                            type="number"
+                            value={filters.minAmount}
+                            onChange={(e) => setFilters(prev => ({ ...prev, minAmount: e.target.value }))}
+                            className="h-8"
+                          />
+                        </div>
+                        <div>
+                          <Input
+                            placeholder="Max"
+                            type="number"
+                            value={filters.maxAmount}
+                            onChange={(e) => setFilters(prev => ({ ...prev, maxAmount: e.target.value }))}
+                            className="h-8"
+                          />
+                        </div>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                  
+                  <AccordionItem value="date">
+                    <AccordionTrigger className="px-4 py-2 text-sm font-medium">Date Range</AccordionTrigger>
+                    <AccordionContent className="px-4 pb-3 pt-0">
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <Input
+                            placeholder="From"
+                            type="date"
+                            value={filters.dateFrom}
+                            onChange={(e) => setFilters(prev => ({ ...prev, dateFrom: e.target.value }))}
+                            className="h-8"
+                          />
+                        </div>
+                        <div>
+                          <Input
+                            placeholder="To"
+                            type="date"
+                            value={filters.dateTo}
+                            onChange={(e) => setFilters(prev => ({ ...prev, dateTo: e.target.value }))}
+                            className="h-8"
+                          />
+                        </div>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                  
+                  <AccordionItem value="attachments">
+                    <AccordionTrigger className="px-4 py-2 text-sm font-medium">Attachments</AccordionTrigger>
+                    <AccordionContent className="px-4 pb-3 pt-0">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox 
+                          id="filter-attachments" 
+                          checked={filters.hasAttachments}
+                          onCheckedChange={toggleAttachmentFilter} 
+                        />
+                        <label htmlFor="filter-attachments" className="text-sm">Has attachments</label>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
               </div>
               
               <DropdownMenuSeparator />
               
-              <div className="p-2">
-                <h4 className="mb-2 text-sm font-medium">Client</h4>
-                <div className="max-h-32 overflow-y-auto space-y-2">
-                  {uniqueClients.map(client => (
-                    <div key={client} className="flex items-center space-x-2">
-                      <Checkbox 
-                        id={`filter-client-${client}`} 
-                        checked={filters.client.includes(client)}
-                        onCheckedChange={() => toggleClientFilter(client)} 
-                      />
-                      <label htmlFor={`filter-client-${client}`} className="text-sm text-ellipsis overflow-hidden whitespace-nowrap">{client}</label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              
-              <DropdownMenuSeparator />
-              
-              <div className="p-2">
-                <h4 className="mb-2 text-sm font-medium">Category</h4>
-                <div className="max-h-32 overflow-y-auto space-y-2">
-                  {uniqueCategories.map(category => (
-                    <div key={category} className="flex items-center space-x-2">
-                      <Checkbox 
-                        id={`filter-category-${category}`} 
-                        checked={filters.category.includes(category)}
-                        onCheckedChange={() => toggleCategoryFilter(category)} 
-                      />
-                      <label htmlFor={`filter-category-${category}`} className="text-sm">{category}</label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              
-              <DropdownMenuSeparator />
-              
-              <div className="p-2">
-                <h4 className="mb-2 text-sm font-medium">Amount Range</h4>
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <Input
-                      placeholder="Min"
-                      type="number"
-                      value={filters.minAmount}
-                      onChange={(e) => setFilters(prev => ({ ...prev, minAmount: e.target.value }))}
-                      className="h-8"
-                    />
-                  </div>
-                  <div>
-                    <Input
-                      placeholder="Max"
-                      type="number"
-                      value={filters.maxAmount}
-                      onChange={(e) => setFilters(prev => ({ ...prev, maxAmount: e.target.value }))}
-                      className="h-8"
-                    />
-                  </div>
-                </div>
-              </div>
-              
-              <DropdownMenuSeparator />
-              
-              <div className="p-2">
-                <h4 className="mb-2 text-sm font-medium">Date Range</h4>
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <Input
-                      placeholder="From"
-                      type="date"
-                      value={filters.dateFrom}
-                      onChange={(e) => setFilters(prev => ({ ...prev, dateFrom: e.target.value }))}
-                      className="h-8"
-                    />
-                  </div>
-                  <div>
-                    <Input
-                      placeholder="To"
-                      type="date"
-                      value={filters.dateTo}
-                      onChange={(e) => setFilters(prev => ({ ...prev, dateTo: e.target.value }))}
-                      className="h-8"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <DropdownMenuSeparator />
-              
-              <div className="p-2">
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="filter-attachments" 
-                    checked={filters.hasAttachments}
-                    onCheckedChange={toggleAttachmentFilter} 
-                  />
-                  <label htmlFor="filter-attachments" className="text-sm">Has attachments</label>
-                </div>
-              </div>
-              
-              <DropdownMenuSeparator />
-              
-              <div className="flex items-center justify-between p-2">
+              <div className="flex items-center justify-between p-4">
                 <Button variant="outline" size="sm" onClick={resetFilters}>
                   <X className="mr-2 h-4 w-4" /> Reset Filters
                 </Button>
