@@ -6,6 +6,8 @@ import { AnomalyDetectionFeed } from "@/components/analytics/AnomalyDetectionFee
 import { AnalyticsRevenueExpenseChart } from "@/components/analytics/AnalyticsRevenueExpenseChart";
 import { AnalyticsPerformanceMetrics } from "@/components/analytics/AnalyticsPerformanceMetrics";
 import { CostProjectionChart } from "@/components/analytics/CostProjectionChart";
+import { MarginReport } from "@/components/reports/MarginReport";
+import { SpendReport } from "@/components/reports/SpendReport";
 
 // Sample data for charts
 const revenueData = [
@@ -87,12 +89,19 @@ const Analytics = () => {
           chartType={chartType} 
           setChartType={setChartType} 
         />
-        {/* Replace AnalyticsEmployeeDistribution with AnomalyDetectionFeed */}
         <AnomalyDetectionFeed />
       </div>
 
-      {/* Replacing AnalyticsCostProjections with our new CostProjectionChart */}
       <CostProjectionChart />
+
+      {/* Financial Reports Section - Moved from Reports page */}
+      <div className="mt-8">
+        <h2 className="text-2xl font-bold mb-4">Financial Insights</h2>
+        <div className="space-y-6">
+          <MarginReport />
+          <SpendReport />
+        </div>
+      </div>
 
       <AnalyticsPerformanceMetrics 
         revenueData={revenueData} 
