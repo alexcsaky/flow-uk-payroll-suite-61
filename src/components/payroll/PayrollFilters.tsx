@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -11,55 +11,87 @@ import { CalendarIcon } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
-export const PayrollFilters: React.FC = () => {
-  const [startDate, setStartDate] = React.useState<Date>();
-  const [endDate, setEndDate] = React.useState<Date>();
-  const [weekEndingDate, setWeekEndingDate] = React.useState<Date>();
+interface PayrollFiltersProps {
+  clients: string[];
+  venues: string[];
+  initialFilters?: {
+    client: string | null;
+    venue: string | null;
+    dateRange: { from: Date | undefined; to: Date | undefined };
+    weekEndingDate: Date | undefined;
+    poNumber: string;
+  };
+  onApplyFilters: (filters: {
+    client: string | null;
+    venue: string | null;
+    dateRange: { from: Date | undefined; to: Date | undefined };
+    weekEndingDate: Date | undefined;
+    poNumber: string;
+  }) => void;
+  onResetFilters: () => void;
+}
 
-  // Mock client data
-  const clients = [
-    { id: "1", name: "Acme Corporation" },
-    { id: "2", name: "Wayne Enterprises" },
-    { id: "3", name: "Stark Industries" },
-    { id: "4", name: "Umbrella Corp" }
-  ];
+export const PayrollFilters: React.FC<PayrollFiltersProps> = ({ 
+  clients,
+  venues,
+  initialFilters,
+  onApplyFilters,
+  onResetFilters
+}) => {
+  const [client, setClient] = useState<string | null>(initialFilters?.client || null);
+  const [venue, setVenue] = useState<string | null>(initialFilters?.venue || null);
+  const [dateRange, setDateRange] = useState<{ from: Date | undefined; to: Date | undefined }>(
+    initialFilters?.dateRange || { from: undefined, to: undefined }
+  );
+  const [weekEndingDate, setWeekEndingDate] = useState<Date | undefined>(initialFilters?.weekEndingDate);
+  const [poNumber, setPoNumber] = useState(initialFilters?.poNumber || "");
 
-  // Mock venue data
-  const venues = [
-    { id: "1", name: "Corporate HQ" },
-    { id: "2", name: "Downtown Office" },
-    { id: "3", name: "Warehouse" },
-    { id: "4", name: "Factory" }
-  ];
+  // Update local state when initialFilters change
+  useEffect(() => {
+    if (initialFilters) {
+      setClient(initialFilters.client);
+      setVenue(initialFilters.venue);
+      setDateRange(initialFilters.dateRange);
+      setWeekEndingDate(initialFilters.weekEndingDate);
+      setPoNumber(initialFilters.poNumber);
+    }
+  }, [initialFilters]);
 
   const handleApplyFilters = () => {
-    // Logic to apply filters goes here
-    console.log("Applying filters");
+    onApplyFilters({
+      client,
+      venue,
+      dateRange,
+      weekEndingDate,
+      poNumber
+    });
   };
 
   const handleResetFilters = () => {
-    // Logic to reset filters goes here
-    setStartDate(undefined);
-    setEndDate(undefined);
+    setClient(null);
+    setVenue(null);
+    setDateRange({ from: undefined, to: undefined });
     setWeekEndingDate(undefined);
+    setPoNumber("");
+    onResetFilters();
   };
 
   return (
-    <Card className="mb-4">
+    <Card className="mb-4 mx-6">
       <CardContent className="pt-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
           {/* Client Name Filter */}
           <div className="space-y-2">
             <Label htmlFor="clientName">Client Name</Label>
-            <Select>
+            <Select value={client || ""} onValueChange={(value) => setClient(value === "all" ? null : value)}>
               <SelectTrigger id="clientName">
                 <SelectValue placeholder="Select client" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Clients</SelectItem>
-                {clients.map((client) => (
-                  <SelectItem key={client.id} value={client.id}>
-                    {client.name}
+                {clients.map((clientName) => (
+                  <SelectItem key={clientName} value={clientName}>
+                    {clientName}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -69,15 +101,15 @@ export const PayrollFilters: React.FC = () => {
           {/* Client Venue Filter */}
           <div className="space-y-2">
             <Label htmlFor="clientVenue">Client Venue</Label>
-            <Select>
+            <Select value={venue || ""} onValueChange={(value) => setVenue(value === "all" ? null : value)}>
               <SelectTrigger id="clientVenue">
                 <SelectValue placeholder="Select venue" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Venues</SelectItem>
-                {venues.map((venue) => (
-                  <SelectItem key={venue.id} value={venue.id}>
-                    {venue.name}
+                {venues.map((venueName) => (
+                  <SelectItem key={venueName} value={venueName}>
+                    {venueName}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -93,17 +125,17 @@ export const PayrollFilters: React.FC = () => {
                   variant="outline"
                   className={cn(
                     "w-full justify-start text-left font-normal",
-                    !startDate && "text-muted-foreground"
+                    !dateRange.from && "text-muted-foreground"
                   )}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {startDate ? (
-                    endDate ? (
+                  {dateRange.from ? (
+                    dateRange.to ? (
                       <>
-                        {format(startDate, "PPP")} - {format(endDate, "PPP")}
+                        {format(dateRange.from, "PPP")} - {format(dateRange.to, "PPP")}
                       </>
                     ) : (
-                      format(startDate, "PPP")
+                      format(dateRange.from, "PPP")
                     )
                   ) : (
                     "Select date range"
@@ -114,13 +146,10 @@ export const PayrollFilters: React.FC = () => {
                 <Calendar
                   mode="range"
                   selected={{
-                    from: startDate,
-                    to: endDate,
+                    from: dateRange.from,
+                    to: dateRange.to,
                   }}
-                  onSelect={(range) => {
-                    setStartDate(range?.from);
-                    setEndDate(range?.to);
-                  }}
+                  onSelect={setDateRange}
                   initialFocus
                   className="p-3 pointer-events-auto"
                 />
@@ -163,6 +192,8 @@ export const PayrollFilters: React.FC = () => {
               id="poNumber"
               placeholder="Enter PO number"
               className="w-full"
+              value={poNumber}
+              onChange={(e) => setPoNumber(e.target.value)}
             />
           </div>
         </div>

@@ -1,7 +1,7 @@
 
-import React from "react";
+import React, { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Search, Filter, Download } from "lucide-react";
+import { Search, Filter, Download, ChevronDown } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,55 +11,237 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table";
+import { PayrollFilters } from "./PayrollFilters";
+import { format, isWithinInterval, parseISO } from "date-fns";
 
 export const PayrollHistory: React.FC = () => {
+  const [showFilters, setShowFilters] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  
+  // Filter states
+  const [selectedClient, setSelectedClient] = useState<string | null>(null);
+  const [selectedVenue, setSelectedVenue] = useState<string | null>(null);
+  const [dateRange, setDateRange] = useState<{ from: Date | undefined; to: Date | undefined }>({
+    from: undefined,
+    to: undefined,
+  });
+  const [weekEndingDate, setWeekEndingDate] = useState<Date | undefined>(undefined);
+  const [poNumber, setPoNumber] = useState("");
+
   // Mock payroll data with additional fields
-  const payrollHistory = [
+  const allPayrollHistory = [
     {
       id: "PR-2025-001",
-      date: "Apr 25, 2025",
+      date: "2025-04-25",
       employees: 146,
       totalAmount: "£287,500",
       status: "scheduled",
       client: "Acme Corporation",
       venue: "Corporate HQ",
-      weekEnding: "Apr 26, 2025",
+      weekEnding: "2025-04-26",
       poNumber: "PO-2025-ACM-001"
     },
     {
       id: "PR-2025-002",
-      date: "Mar 25, 2025",
+      date: "2025-03-25",
       employees: 145,
       totalAmount: "£285,200",
       status: "completed",
       client: "Wayne Enterprises",
       venue: "Downtown Office",
-      weekEnding: "Mar 26, 2025",
+      weekEnding: "2025-03-26",
       poNumber: "PO-2025-WAY-002"
     },
     {
       id: "PR-2025-003",
-      date: "Feb 25, 2025",
+      date: "2025-02-25",
       employees: 142,
       totalAmount: "£280,100",
       status: "completed",
       client: "Stark Industries",
       venue: "Factory",
-      weekEnding: "Feb 26, 2025",
+      weekEnding: "2025-02-26",
       poNumber: "PO-2025-STK-003"
     },
     {
       id: "PR-2025-004",
-      date: "Jan 25, 2025",
+      date: "2025-01-25",
       employees: 140,
       totalAmount: "£275,800",
       status: "completed",
       client: "Umbrella Corp",
       venue: "Warehouse",
-      weekEnding: "Jan 26, 2025",
+      weekEnding: "2025-01-26",
       poNumber: "PO-2025-UMB-004"
     },
+    // Additional mock data
+    {
+      id: "PR-2025-005",
+      date: "2025-04-18",
+      employees: 143,
+      totalAmount: "£284,100",
+      status: "completed",
+      client: "Acme Corporation",
+      venue: "Branch Office",
+      weekEnding: "2025-04-19",
+      poNumber: "PO-2025-ACM-002"
+    },
+    {
+      id: "PR-2025-006",
+      date: "2025-04-11",
+      employees: 147,
+      totalAmount: "£290,300",
+      status: "completed",
+      client: "Wayne Enterprises",
+      venue: "Research Lab",
+      weekEnding: "2025-04-12",
+      poNumber: "PO-2025-WAY-003"
+    },
+    {
+      id: "PR-2025-007",
+      date: "2025-03-28",
+      employees: 144,
+      totalAmount: "£283,500",
+      status: "completed",
+      client: "Stark Industries",
+      venue: "Corporate HQ",
+      weekEnding: "2025-03-29",
+      poNumber: "PO-2025-STK-004"
+    },
+    {
+      id: "PR-2025-008",
+      date: "2025-03-21",
+      employees: 142,
+      totalAmount: "£281,900",
+      status: "completed",
+      client: "Umbrella Corp",
+      venue: "Laboratory",
+      weekEnding: "2025-03-22",
+      poNumber: "PO-2025-UMB-005"
+    },
+    {
+      id: "PR-2025-009",
+      date: "2025-03-14",
+      employees: 145,
+      totalAmount: "£286,700",
+      status: "completed",
+      client: "LexCorp",
+      venue: "Headquarters",
+      weekEnding: "2025-03-15",
+      poNumber: "PO-2025-LEX-001"
+    },
+    {
+      id: "PR-2025-010",
+      date: "2025-03-07",
+      employees: 148,
+      totalAmount: "£291,200",
+      status: "completed",
+      client: "LexCorp",
+      venue: "Research Center",
+      weekEnding: "2025-03-08",
+      poNumber: "PO-2025-LEX-002"
+    },
+    {
+      id: "PR-2025-011",
+      date: "2025-02-28",
+      employees: 141,
+      totalAmount: "£277,400",
+      status: "completed",
+      client: "Oscorp",
+      venue: "Main Office",
+      weekEnding: "2025-03-01",
+      poNumber: "PO-2025-OSC-001"
+    },
+    {
+      id: "PR-2025-012",
+      date: "2025-02-21",
+      employees: 143,
+      totalAmount: "£282,600",
+      status: "completed",
+      client: "Oscorp",
+      venue: "Testing Facility",
+      weekEnding: "2025-02-22",
+      poNumber: "PO-2025-OSC-002"
+    }
   ];
+
+  // Apply filters to payroll data
+  const filteredPayrollHistory = useMemo(() => {
+    return allPayrollHistory.filter((run) => {
+      // Search filter
+      if (searchTerm && 
+          !run.id.toLowerCase().includes(searchTerm.toLowerCase()) &&
+          !run.client.toLowerCase().includes(searchTerm.toLowerCase()) &&
+          !run.poNumber.toLowerCase().includes(searchTerm.toLowerCase())) {
+        return false;
+      }
+      
+      // Client filter
+      if (selectedClient && run.client !== selectedClient) {
+        return false;
+      }
+      
+      // Venue filter
+      if (selectedVenue && run.venue !== selectedVenue) {
+        return false;
+      }
+      
+      // Date range filter
+      if (dateRange.from && dateRange.to) {
+        const runDate = parseISO(run.date);
+        if (!isWithinInterval(runDate, { start: dateRange.from, end: dateRange.to })) {
+          return false;
+        }
+      }
+      
+      // Week ending date filter
+      if (weekEndingDate) {
+        const weekEnd = parseISO(run.weekEnding);
+        const formattedWeekEndingDate = format(weekEndingDate, 'yyyy-MM-dd');
+        const formattedRunWeekEnding = format(weekEnd, 'yyyy-MM-dd');
+        
+        if (formattedWeekEndingDate !== formattedRunWeekEnding) {
+          return false;
+        }
+      }
+      
+      // PO Number filter
+      if (poNumber && !run.poNumber.toLowerCase().includes(poNumber.toLowerCase())) {
+        return false;
+      }
+      
+      return true;
+    });
+  }, [searchTerm, selectedClient, selectedVenue, dateRange, weekEndingDate, poNumber, allPayrollHistory]);
+
+  // Extract unique clients and venues for filters
+  const clients = [...new Set(allPayrollHistory.map(run => run.client))];
+  const venues = [...new Set(allPayrollHistory.map(run => run.venue))];
+
+  // Handle filter application
+  const handleApplyFilters = (filters: {
+    client: string | null;
+    venue: string | null;
+    dateRange: { from: Date | undefined; to: Date | undefined };
+    weekEndingDate: Date | undefined;
+    poNumber: string;
+  }) => {
+    setSelectedClient(filters.client);
+    setSelectedVenue(filters.venue);
+    setDateRange(filters.dateRange);
+    setWeekEndingDate(filters.weekEndingDate);
+    setPoNumber(filters.poNumber);
+  };
+
+  // Handle filter reset
+  const handleResetFilters = () => {
+    setSelectedClient(null);
+    setSelectedVenue(null);
+    setDateRange({ from: undefined, to: undefined });
+    setWeekEndingDate(undefined);
+    setPoNumber("");
+    setSearchTerm("");
+  };
 
   return (
     <Card>
@@ -72,27 +254,40 @@ export const PayrollHistory: React.FC = () => {
               type="search"
               placeholder="Search payroll runs..."
               className="w-full pl-8"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="icon">
-                <Filter className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem>All Runs</DropdownMenuItem>
-              <DropdownMenuItem>Completed</DropdownMenuItem>
-              <DropdownMenuItem>Scheduled</DropdownMenuItem>
-              <DropdownMenuItem>Failed</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Button 
+            variant="outline" 
+            size="icon"
+            onClick={() => setShowFilters(!showFilters)}
+          >
+            <Filter className="h-4 w-4" />
+          </Button>
           <Button variant="outline">
             <Download className="mr-2 h-4 w-4" />
             Export
           </Button>
         </div>
       </CardHeader>
+      
+      {showFilters && (
+        <PayrollFilters 
+          clients={clients}
+          venues={venues}
+          onApplyFilters={handleApplyFilters}
+          onResetFilters={handleResetFilters}
+          initialFilters={{
+            client: selectedClient,
+            venue: selectedVenue,
+            dateRange,
+            weekEndingDate,
+            poNumber
+          }}
+        />
+      )}
+      
       <CardContent>
         <div className="rounded-lg border">
           <Table>
@@ -111,13 +306,13 @@ export const PayrollHistory: React.FC = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {payrollHistory.map((run) => (
+              {filteredPayrollHistory.map((run) => (
                 <TableRow key={run.id}>
                   <TableCell className="font-medium">{run.id}</TableCell>
-                  <TableCell>{run.date}</TableCell>
+                  <TableCell>{format(parseISO(run.date), 'MMM dd, yyyy')}</TableCell>
                   <TableCell>{run.client}</TableCell>
                   <TableCell>{run.venue}</TableCell>
-                  <TableCell>{run.weekEnding}</TableCell>
+                  <TableCell>{format(parseISO(run.weekEnding), 'MMM dd, yyyy')}</TableCell>
                   <TableCell>{run.poNumber}</TableCell>
                   <TableCell>{run.employees}</TableCell>
                   <TableCell>{run.totalAmount}</TableCell>
@@ -141,6 +336,13 @@ export const PayrollHistory: React.FC = () => {
                   </TableCell>
                 </TableRow>
               ))}
+              {filteredPayrollHistory.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={10} className="h-24 text-center">
+                    No results found.
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </div>

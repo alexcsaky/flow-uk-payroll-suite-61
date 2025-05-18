@@ -2,29 +2,20 @@
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Calendar, Plus, Filter, ChevronDown } from "lucide-react";
+import { Calendar, Plus } from "lucide-react";
 import { PayrollUpcoming } from "@/components/payroll/PayrollUpcoming";
 import { PayrollHistory } from "@/components/payroll/PayrollHistory";
 import { PayrollApprovalHub } from "@/components/payroll/PayrollApprovalHub";
 import { PayrollSettings } from "@/components/payroll/PayrollSettings";
-import { PayrollFilters } from "@/components/payroll/PayrollFilters";
 
 const Payroll = () => {
   const [activeTab, setActiveTab] = useState("upcoming");
-  const [showFilters, setShowFilters] = useState(false);
 
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold tracking-tight">Payroll</h2>
         <div className="flex items-center gap-2">
-          <Button 
-            variant="outline" 
-            size="icon"
-            onClick={() => setShowFilters(!showFilters)}
-          >
-            <Filter className="h-4 w-4" />
-          </Button>
           <Button variant="outline" size="icon">
             <Calendar className="h-4 w-4" />
           </Button>
@@ -34,8 +25,6 @@ const Payroll = () => {
           </Button>
         </div>
       </div>
-
-      {showFilters && <PayrollFilters />}
 
       <Tabs
         defaultValue="upcoming"
