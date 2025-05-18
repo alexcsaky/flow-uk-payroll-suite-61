@@ -31,7 +31,7 @@ export function EarningsPayrollSection({
     <div className="grid gap-6 md:grid-cols-7 h-full">
       <EarningsChart 
         data={earningsData}
-        className="col-span-5 h-full"
+        className="md:col-span-5 h-full"
       />
       <PayrollSummaryCard
         className="md:col-span-2 h-full"
@@ -43,4 +43,3 @@ export function EarningsPayrollSection({
     </div>
   );
 }
-

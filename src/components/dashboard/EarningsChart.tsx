@@ -4,6 +4,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { ChartColumnStacked } from "lucide-react";
+
 interface EarningsData {
   name: string;
   gross: number;
@@ -18,10 +19,12 @@ const transformDataForStackedChart = (data: EarningsData[]) => {
     deductions: item.gross - item.net
   }));
 };
+
 interface EarningsChartProps {
   data: EarningsData[];
   className?: string;
 }
+
 export function EarningsChart({
   data,
   className
@@ -43,7 +46,9 @@ export function EarningsChart({
   // Calculate tax and deduction
   const taxAndDeductions = totalGross - totalNet;
   const taxPercentage = Math.round(taxAndDeductions / totalGross * 100);
-  return <Card className={className}>
+  
+  return (
+    <Card className={className}>
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <div>
           <CardTitle className="text-lg font-medium flex items-center gap-2">
@@ -55,7 +60,7 @@ export function EarningsChart({
           </CardDescription>
         </div>
       </CardHeader>
-      <CardContent className="px-4">
+      <CardContent className="p-2">
         <div className="mb-5">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             <div className="bg-slate-50 p-3 rounded-lg">
@@ -80,36 +85,50 @@ export function EarningsChart({
           </div>
         </div>
         
-        <div className="h-[300px]">
+        <div className="h-[280px] w-full">
           <ChartContainer config={{
-          net: {
-            label: "Net Earnings",
-            color: "#4E96FF"
-          },
-          deductions: {
-            label: "Tax & Deductions",
-            color: "#94A3B8"
-          }
-        }}>
+            net: {
+              label: "Net Earnings",
+              color: "#4E96FF"
+            },
+            deductions: {
+              label: "Tax & Deductions",
+              color: "#94A3B8"
+            }
+          }}>
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={stackedData} margin={{
-              top: 5,
-              right: 20,
-              left: 15,
-              bottom: 5
-            }} barSize={40}>
+              <BarChart 
+                data={stackedData} 
+                margin={{
+                  top: 5,
+                  right: 5,
+                  left: 5,
+                  bottom: 5
+                }} 
+                barSize={40}
+              >
                 <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
                 <XAxis dataKey="name" axisLine={false} tickLine={false} fontSize={12} tickMargin={8} />
-                <YAxis axisLine={false} tickLine={false} fontSize={12} tickMargin={8} tickFormatter={value => `£${(value / 1000).toFixed(0)}k`} width={50} />
-                <ChartTooltip content={({
-                active,
-                payload
-              }) => {
-                if (active && payload && payload.length) {
-                  return <ChartTooltipContent className="bg-background border border-border/50 shadow-md" indicator="dot" />;
-                }
-                return null;
-              }} />
+                <YAxis 
+                  axisLine={false} 
+                  tickLine={false} 
+                  fontSize={12} 
+                  tickMargin={8} 
+                  tickFormatter={value => `£${(value / 1000).toFixed(0)}k`} 
+                  width={50} 
+                />
+                <ChartTooltip 
+                  content={({active, payload}) => {
+                    if (active && payload && payload.length) {
+                      return <ChartTooltipContent 
+                        className="bg-background border border-border/50 shadow-md" 
+                        indicator="dot"
+                        formatter={(value: number) => `£${value.toLocaleString()}`} 
+                      />;
+                    }
+                    return null;
+                  }} 
+                />
                 <Legend />
                 <Bar stackId="a" dataKey="net" name="Net Earnings" fill="#4E96FF" radius={[4, 4, 0, 0]} />
                 <Bar stackId="a" dataKey="deductions" name="Tax & Deductions" fill="#94A3B8" radius={[0, 0, 4, 4]} />
@@ -118,5 +137,6 @@ export function EarningsChart({
           </ChartContainer>
         </div>
       </CardContent>
-    </Card>;
+    </Card>
+  );
 }
