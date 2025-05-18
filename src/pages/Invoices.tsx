@@ -1,23 +1,317 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Search, FileText, Download, Eye, Filter } from "lucide-react";
+import { Plus, Search, FileText, Download, Eye, Filter, Paperclip, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useBillingFeatures } from "@/hooks/use-billing-features";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuCheckboxItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
+// Define the invoice type
+interface Attachment {
+  id: string;
+  name: string;
+  type: string;
+  size: string;
+}
+
+interface Invoice {
+  id: string;
+  client: string;
+  amount: number;
+  date: string;
+  status: "Paid" | "Pending" | "Overdue";
+  category?: string;
+  attachments?: Attachment[];
+}
 
 const Invoices = () => {
   const { billingEnabled } = useBillingFeatures();
   
-  // Sample invoice data
-  const invoices = [
-    { id: "INV-001", client: "Acme Corporation", amount: 1250.00, date: "2025-04-01", status: "Paid" },
-    { id: "INV-002", client: "Globex Industries", amount: 975.50, date: "2025-04-01", status: "Pending" },
-    { id: "INV-003", client: "Stark Enterprises", amount: 3200.00, date: "2025-03-25", status: "Paid" },
-    { id: "INV-004", client: "Wayne Industries", amount: 1800.00, date: "2025-03-20", status: "Overdue" },
-    { id: "INV-005", client: "Umbrella Corporation", amount: 2500.00, date: "2025-03-15", status: "Pending" },
+  // Enhanced mock invoice data with attachments
+  const allInvoices: Invoice[] = [
+    { 
+      id: "INV-001", 
+      client: "Acme Corporation", 
+      amount: 1250.00, 
+      date: "2025-04-01", 
+      status: "Paid",
+      category: "Consulting",
+      attachments: [
+        { id: "att-001", name: "Receipt_INV001.pdf", type: "PDF", size: "156 KB" },
+        { id: "att-002", name: "Contract_Acme.docx", type: "DOCX", size: "245 KB" }
+      ]
+    },
+    { 
+      id: "INV-002", 
+      client: "Globex Industries", 
+      amount: 975.50, 
+      date: "2025-04-01", 
+      status: "Pending",
+      category: "Software Development"
+    },
+    { 
+      id: "INV-003", 
+      client: "Stark Enterprises", 
+      amount: 3200.00, 
+      date: "2025-03-25", 
+      status: "Paid",
+      category: "Technical Support",
+      attachments: [
+        { id: "att-003", name: "Payment_Confirmation.pdf", type: "PDF", size: "98 KB" }
+      ]
+    },
+    { 
+      id: "INV-004", 
+      client: "Wayne Industries", 
+      amount: 1800.00, 
+      date: "2025-03-20", 
+      status: "Overdue",
+      category: "Consulting",
+      attachments: [
+        { id: "att-004", name: "Service_Agreement.pdf", type: "PDF", size: "312 KB" }
+      ]
+    },
+    { 
+      id: "INV-005", 
+      client: "Umbrella Corporation", 
+      amount: 2500.00, 
+      date: "2025-03-15", 
+      status: "Pending",
+      category: "Software Development"
+    },
+    { 
+      id: "INV-006", 
+      client: "Oscorp Industries", 
+      amount: 4750.00, 
+      date: "2025-03-10", 
+      status: "Paid",
+      category: "Consulting",
+      attachments: [
+        { id: "att-005", name: "Invoice_Receipt.pdf", type: "PDF", size: "124 KB" }
+      ]
+    },
+    { 
+      id: "INV-007", 
+      client: "Cyberdyne Systems", 
+      amount: 3675.25, 
+      date: "2025-03-05", 
+      status: "Pending",
+      category: "Hardware Supply"
+    },
+    { 
+      id: "INV-008", 
+      client: "Initech", 
+      amount: 1890.75, 
+      date: "2025-03-01", 
+      status: "Overdue",
+      category: "Technical Support",
+      attachments: [
+        { id: "att-006", name: "Support_Ticket_Log.xlsx", type: "XLSX", size: "178 KB" },
+        { id: "att-007", name: "Client_Correspondence.pdf", type: "PDF", size: "235 KB" }
+      ]
+    },
+    { 
+      id: "INV-009", 
+      client: "Massive Dynamic", 
+      amount: 5280.50, 
+      date: "2025-02-25", 
+      status: "Paid",
+      category: "Research & Development",
+      attachments: [
+        { id: "att-008", name: "Project_Completion_Report.pdf", type: "PDF", size: "486 KB" }
+      ]
+    },
+    { 
+      id: "INV-010", 
+      client: "LexCorp", 
+      amount: 9870.00, 
+      date: "2025-02-20", 
+      status: "Paid",
+      category: "Consulting"
+    }
   ];
+
+  // State for filtering
+  const [activeTab, setActiveTab] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredInvoices, setFilteredInvoices] = useState<Invoice[]>(allInvoices);
+  const [filters, setFilters] = useState({
+    status: [] as string[],
+    client: [] as string[],
+    category: [] as string[],
+    hasAttachments: false,
+    minAmount: "",
+    maxAmount: "",
+    dateFrom: "",
+    dateTo: "",
+  });
+
+  // Extract unique values for filter options
+  const uniqueClients = [...new Set(allInvoices.map(inv => inv.client))];
+  const uniqueCategories = [...new Set(allInvoices.map(inv => inv.category).filter(Boolean) as string[])];
+
+  // Apply filters when they change
+  useEffect(() => {
+    let result = allInvoices;
+
+    // Filter by tab
+    if (activeTab !== "all") {
+      result = result.filter(inv => inv.status.toLowerCase() === activeTab);
+    }
+
+    // Filter by search term
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      result = result.filter(inv => 
+        inv.id.toLowerCase().includes(term) ||
+        inv.client.toLowerCase().includes(term) ||
+        inv.category?.toLowerCase().includes(term)
+      );
+    }
+
+    // Filter by status
+    if (filters.status.length > 0) {
+      result = result.filter(inv => filters.status.includes(inv.status));
+    }
+
+    // Filter by client
+    if (filters.client.length > 0) {
+      result = result.filter(inv => filters.client.includes(inv.client));
+    }
+
+    // Filter by category
+    if (filters.category.length > 0) {
+      result = result.filter(inv => inv.category && filters.category.includes(inv.category));
+    }
+
+    // Filter by has attachments
+    if (filters.hasAttachments) {
+      result = result.filter(inv => inv.attachments && inv.attachments.length > 0);
+    }
+
+    // Filter by minimum amount
+    if (filters.minAmount) {
+      const minAmount = parseFloat(filters.minAmount);
+      result = result.filter(inv => inv.amount >= minAmount);
+    }
+
+    // Filter by maximum amount
+    if (filters.maxAmount) {
+      const maxAmount = parseFloat(filters.maxAmount);
+      result = result.filter(inv => inv.amount <= maxAmount);
+    }
+
+    // Filter by date range
+    if (filters.dateFrom) {
+      result = result.filter(inv => new Date(inv.date) >= new Date(filters.dateFrom));
+    }
+    if (filters.dateTo) {
+      result = result.filter(inv => new Date(inv.date) <= new Date(filters.dateTo));
+    }
+
+    setFilteredInvoices(result);
+  }, [activeTab, searchTerm, filters, allInvoices]);
+
+  // Handle tab change
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+  };
+
+  // Toggle status filters
+  const toggleStatusFilter = (status: string) => {
+    setFilters(prev => {
+      const statuses = [...prev.status];
+      if (statuses.includes(status)) {
+        return { ...prev, status: statuses.filter(s => s !== status) };
+      } else {
+        return { ...prev, status: [...statuses, status] };
+      }
+    });
+  };
+
+  // Toggle client filters
+  const toggleClientFilter = (client: string) => {
+    setFilters(prev => {
+      const clients = [...prev.client];
+      if (clients.includes(client)) {
+        return { ...prev, client: clients.filter(c => c !== client) };
+      } else {
+        return { ...prev, client: [...clients, client] };
+      }
+    });
+  };
+
+  // Toggle category filters
+  const toggleCategoryFilter = (category: string) => {
+    setFilters(prev => {
+      const categories = [...prev.category];
+      if (categories.includes(category)) {
+        return { ...prev, category: categories.filter(c => c !== category) };
+      } else {
+        return { ...prev, category: [...categories, category] };
+      }
+    });
+  };
+
+  // Toggle attachment filter
+  const toggleAttachmentFilter = () => {
+    setFilters(prev => ({
+      ...prev,
+      hasAttachments: !prev.hasAttachments
+    }));
+  };
+
+  // Reset all filters
+  const resetFilters = () => {
+    setFilters({
+      status: [],
+      client: [],
+      category: [],
+      hasAttachments: false,
+      minAmount: "",
+      maxAmount: "",
+      dateFrom: "",
+      dateTo: "",
+    });
+    setSearchTerm("");
+  };
+
+  // Get number of active filters
+  const getActiveFilterCount = () => {
+    let count = 0;
+    if (filters.status.length) count++;
+    if (filters.client.length) count++;
+    if (filters.category.length) count++;
+    if (filters.hasAttachments) count++;
+    if (filters.minAmount || filters.maxAmount) count++;
+    if (filters.dateFrom || filters.dateTo) count++;
+    return count;
+  };
 
   if (!billingEnabled) {
     return (
@@ -42,10 +336,163 @@ const Invoices = () => {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline">
-            <Filter className="mr-2 h-4 w-4" />
-            Filter
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                <Filter className="mr-2 h-4 w-4" />
+                Filter
+                {getActiveFilterCount() > 0 && (
+                  <span className="ml-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
+                    {getActiveFilterCount()}
+                  </span>
+                )}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-80">
+              <DropdownMenuLabel>Filter Invoices</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              
+              <div className="p-2">
+                <h4 className="mb-2 text-sm font-medium">Status</h4>
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="filter-paid" 
+                      checked={filters.status.includes("Paid")}
+                      onCheckedChange={() => toggleStatusFilter("Paid")} 
+                    />
+                    <label htmlFor="filter-paid" className="text-sm">Paid</label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="filter-pending" 
+                      checked={filters.status.includes("Pending")}
+                      onCheckedChange={() => toggleStatusFilter("Pending")} 
+                    />
+                    <label htmlFor="filter-pending" className="text-sm">Pending</label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="filter-overdue" 
+                      checked={filters.status.includes("Overdue")}
+                      onCheckedChange={() => toggleStatusFilter("Overdue")} 
+                    />
+                    <label htmlFor="filter-overdue" className="text-sm">Overdue</label>
+                  </div>
+                </div>
+              </div>
+              
+              <DropdownMenuSeparator />
+              
+              <div className="p-2">
+                <h4 className="mb-2 text-sm font-medium">Client</h4>
+                <div className="max-h-32 overflow-y-auto space-y-2">
+                  {uniqueClients.map(client => (
+                    <div key={client} className="flex items-center space-x-2">
+                      <Checkbox 
+                        id={`filter-client-${client}`} 
+                        checked={filters.client.includes(client)}
+                        onCheckedChange={() => toggleClientFilter(client)} 
+                      />
+                      <label htmlFor={`filter-client-${client}`} className="text-sm text-ellipsis overflow-hidden whitespace-nowrap">{client}</label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <DropdownMenuSeparator />
+              
+              <div className="p-2">
+                <h4 className="mb-2 text-sm font-medium">Category</h4>
+                <div className="max-h-32 overflow-y-auto space-y-2">
+                  {uniqueCategories.map(category => (
+                    <div key={category} className="flex items-center space-x-2">
+                      <Checkbox 
+                        id={`filter-category-${category}`} 
+                        checked={filters.category.includes(category)}
+                        onCheckedChange={() => toggleCategoryFilter(category)} 
+                      />
+                      <label htmlFor={`filter-category-${category}`} className="text-sm">{category}</label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <DropdownMenuSeparator />
+              
+              <div className="p-2">
+                <h4 className="mb-2 text-sm font-medium">Amount Range</h4>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <Input
+                      placeholder="Min"
+                      type="number"
+                      value={filters.minAmount}
+                      onChange={(e) => setFilters(prev => ({ ...prev, minAmount: e.target.value }))}
+                      className="h-8"
+                    />
+                  </div>
+                  <div>
+                    <Input
+                      placeholder="Max"
+                      type="number"
+                      value={filters.maxAmount}
+                      onChange={(e) => setFilters(prev => ({ ...prev, maxAmount: e.target.value }))}
+                      className="h-8"
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              <DropdownMenuSeparator />
+              
+              <div className="p-2">
+                <h4 className="mb-2 text-sm font-medium">Date Range</h4>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <Input
+                      placeholder="From"
+                      type="date"
+                      value={filters.dateFrom}
+                      onChange={(e) => setFilters(prev => ({ ...prev, dateFrom: e.target.value }))}
+                      className="h-8"
+                    />
+                  </div>
+                  <div>
+                    <Input
+                      placeholder="To"
+                      type="date"
+                      value={filters.dateTo}
+                      onChange={(e) => setFilters(prev => ({ ...prev, dateTo: e.target.value }))}
+                      className="h-8"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <DropdownMenuSeparator />
+              
+              <div className="p-2">
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="filter-attachments" 
+                    checked={filters.hasAttachments}
+                    onCheckedChange={toggleAttachmentFilter} 
+                  />
+                  <label htmlFor="filter-attachments" className="text-sm">Has attachments</label>
+                </div>
+              </div>
+              
+              <DropdownMenuSeparator />
+              
+              <div className="flex items-center justify-between p-2">
+                <Button variant="outline" size="sm" onClick={resetFilters}>
+                  <X className="mr-2 h-4 w-4" /> Reset Filters
+                </Button>
+                <Button size="sm" className="flow-gradient">Apply</Button>
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Button className="flow-gradient">
             <Plus className="mr-2 h-4 w-4" />
             New Invoice
@@ -62,40 +509,45 @@ const Invoices = () => {
               <Input
                 type="search"
                 placeholder="Search invoices..."
-                className="w-full md:w-[200px] pl-8"
+                className="w-full md:w-[250px] pl-8"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
           </div>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="all">
+          <Tabs defaultValue="all" value={activeTab} onValueChange={handleTabChange}>
             <TabsList>
               <TabsTrigger value="all">All</TabsTrigger>
               <TabsTrigger value="paid">Paid</TabsTrigger>
               <TabsTrigger value="pending">Pending</TabsTrigger>
               <TabsTrigger value="overdue">Overdue</TabsTrigger>
             </TabsList>
-            <TabsContent value="all" className="mt-4">
+            <TabsContent value={activeTab} className="mt-4">
               <div className="rounded-md border">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b bg-muted/50">
-                      <th className="py-3 px-4 text-left font-medium">Invoice #</th>
-                      <th className="py-3 px-4 text-left font-medium">Client</th>
-                      <th className="py-3 px-4 text-left font-medium">Amount</th>
-                      <th className="py-3 px-4 text-left font-medium">Date</th>
-                      <th className="py-3 px-4 text-left font-medium">Status</th>
-                      <th className="py-3 px-4 text-left font-medium">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {invoices.map((invoice) => (
-                      <tr key={invoice.id} className="border-b">
-                        <td className="py-3 px-4">{invoice.id}</td>
-                        <td className="py-3 px-4">{invoice.client}</td>
-                        <td className="py-3 px-4">${invoice.amount.toFixed(2)}</td>
-                        <td className="py-3 px-4">{invoice.date}</td>
-                        <td className="py-3 px-4">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Invoice #</TableHead>
+                      <TableHead>Client</TableHead>
+                      <TableHead>Category</TableHead>
+                      <TableHead>Amount</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Attachments</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredInvoices.map((invoice) => (
+                      <TableRow key={invoice.id}>
+                        <TableCell>{invoice.id}</TableCell>
+                        <TableCell>{invoice.client}</TableCell>
+                        <TableCell>{invoice.category || "-"}</TableCell>
+                        <TableCell>${invoice.amount.toFixed(2)}</TableCell>
+                        <TableCell>{invoice.date}</TableCell>
+                        <TableCell>
                           <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
                             invoice.status === "Paid" 
                               ? "bg-green-50 text-green-700" 
@@ -105,8 +557,18 @@ const Invoices = () => {
                           }`}>
                             {invoice.status}
                           </span>
-                        </td>
-                        <td className="py-3 px-4">
+                        </TableCell>
+                        <TableCell>
+                          {invoice.attachments && invoice.attachments.length > 0 ? (
+                            <div className="inline-flex items-center">
+                              <Paperclip className="h-4 w-4 mr-1 text-muted-foreground" />
+                              <span className="text-xs">{invoice.attachments.length}</span>
+                            </div>
+                          ) : (
+                            "-"
+                          )}
+                        </TableCell>
+                        <TableCell>
                           <div className="flex gap-2">
                             <Button variant="ghost" size="sm">
                               <Eye className="h-4 w-4" />
@@ -115,26 +577,18 @@ const Invoices = () => {
                               <Download className="h-4 w-4" />
                             </Button>
                           </div>
-                        </td>
-                      </tr>
+                        </TableCell>
+                      </TableRow>
                     ))}
-                  </tbody>
-                </table>
-              </div>
-            </TabsContent>
-            <TabsContent value="paid" className="mt-4">
-              <div className="p-4 text-sm text-muted-foreground">
-                Paid invoices will appear here.
-              </div>
-            </TabsContent>
-            <TabsContent value="pending" className="mt-4">
-              <div className="p-4 text-sm text-muted-foreground">
-                Pending invoices will appear here.
-              </div>
-            </TabsContent>
-            <TabsContent value="overdue" className="mt-4">
-              <div className="p-4 text-sm text-muted-foreground">
-                Overdue invoices will appear here.
+                    {filteredInvoices.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={8} className="h-24 text-center">
+                          No invoices found matching the current filters.
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
               </div>
             </TabsContent>
           </Tabs>
