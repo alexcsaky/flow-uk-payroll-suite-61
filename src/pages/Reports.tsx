@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart3, Download, FileText, Filter, PieChart, Plus } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { MarginReport } from "@/components/reports/MarginReport";
+import { SpendReport } from "@/components/reports/SpendReport";
 
 const Reports = () => {
   // Sample report data
@@ -76,6 +78,15 @@ const Reports = () => {
             <Button variant="outline" className="w-full">Generate Report</Button>
           </CardContent>
         </Card>
+      </div>
+      
+      {/* Financial Insights Section */}
+      <div className="mt-8">
+        <h2 className="text-2xl font-bold mb-4">Financial Insights</h2>
+        <div className="space-y-6">
+          <MarginReport />
+          <SpendReport />
+        </div>
       </div>
 
       <Card>
