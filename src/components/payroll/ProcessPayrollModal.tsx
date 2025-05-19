@@ -15,21 +15,22 @@ import {
   FileDown,
   Eye,
   Clock,
-  XCircle
+  AlertTriangle
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 // Define the different possible statuses for a step
-type StepStatus = "pending" | "in-progress" | "done" | "error";
+type StepStatus = "pending" | "in-progress" | "done" | "flagged";
 
-// Interface for ValidationError
-interface ValidationError {
+// Interface for ValidationFlag
+interface ValidationFlag {
   id: string;
   employeeId: string;
   employeeName: string;
-  errorType: string;
+  flagType: string;
   description: string;
-  severity: "warning" | "error";
+  severity: "warning" | "info";
 }
 
 // Interface for a payroll step
@@ -41,7 +42,7 @@ interface PayrollStep {
   isCheckpoint: boolean;
   downloadable: boolean;
   reportTitle?: string;
-  errors: ValidationError[];
+  flags: ValidationFlag[];
   requiresConfirmation?: boolean;
 }
 
@@ -53,11 +54,11 @@ interface ProcessPayrollModalProps {
 
 export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, onClose }) => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [overallProgress, setOverallProgress] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
-  const [hasError, setHasError] = useState(false);
   
   // Mock steps data with initial status
   const [steps, setSteps] = useState<PayrollStep[]>([
@@ -69,7 +70,7 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
       isCheckpoint: true,
       downloadable: true,
       reportTitle: "Validation Report",
-      errors: [],
+      flags: [],
     },
     {
       id: 2,
@@ -78,7 +79,7 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
       status: "pending",
       isCheckpoint: false,
       downloadable: false,
-      errors: [],
+      flags: [],
     },
     {
       id: 3,
@@ -87,7 +88,7 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
       status: "pending",
       isCheckpoint: false,
       downloadable: false,
-      errors: [],
+      flags: [],
     },
     {
       id: 4,
@@ -97,7 +98,7 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
       isCheckpoint: false,
       downloadable: true,
       reportTitle: "Gross Pay Breakdown",
-      errors: [],
+      flags: [],
     },
     {
       id: 5,
@@ -106,7 +107,7 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
       status: "pending",
       isCheckpoint: false,
       downloadable: false,
-      errors: [],
+      flags: [],
     },
     {
       id: 6,
@@ -116,7 +117,7 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
       isCheckpoint: true,
       downloadable: true,
       reportTitle: "Payslips & HMRC Documentation",
-      errors: [],
+      flags: [],
     },
     {
       id: 7,
@@ -125,7 +126,7 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
       status: "pending",
       isCheckpoint: false,
       downloadable: false,
-      errors: [],
+      flags: [],
     },
     {
       id: 8,
@@ -133,8 +134,9 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
       description: "Generating payslips, RTI submissions, and compliance documents",
       status: "pending",
       isCheckpoint: false,
-      downloadable: false,
-      errors: [],
+      downloadable: true,
+      reportTitle: "Payment Summary",
+      flags: [],
     },
     {
       id: 9,
@@ -142,34 +144,58 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
       description: "Preparing BACS files and accounting entries",
       status: "pending",
       isCheckpoint: true,
-      downloadable: true,
-      reportTitle: "Payment Summary",
+      downloadable: false,
       requiresConfirmation: true,
-      errors: [],
+      flags: [],
     }
   ]);
 
-  // Generate mock validation errors for the first step (50% chance)
-  const generateMockValidationErrors = (): ValidationError[] => {
-    if (Math.random() > 0.5) {
-      return [
-        {
-          id: "error-1",
-          employeeId: "EMP-2023-001",
-          employeeName: "Jane Smith",
-          errorType: "missing-data",
-          description: "Tax code missing for current tax year",
-          severity: "error",
-        },
-        {
-          id: "error-2",
-          employeeId: "EMP-2023-008",
-          employeeName: "John Davis",
-          errorType: "validation-warning",
-          description: "Unusually high overtime hours (>40)",
-          severity: "warning",
-        }
-      ];
+  // Generate mock validation flags (10-20% chance)
+  const generateMockValidationFlags = (step: number): ValidationFlag[] => {
+    // Only generate flags with a 10-20% chance
+    if (Math.random() > 0.8) {
+      if (step === 0) {
+        return [
+          {
+            id: "flag-1",
+            employeeId: "EMP-2023-001",
+            employeeName: "Jane Smith",
+            flagType: "missing-data",
+            description: "Tax code missing for current tax year",
+            severity: "warning",
+          },
+          {
+            id: "flag-2",
+            employeeId: "EMP-2023-008",
+            employeeName: "John Davis",
+            flagType: "validation-warning",
+            description: "Unusually high overtime hours (>40)",
+            severity: "warning",
+          }
+        ];
+      } else if (step === 3) {
+        return [
+          {
+            id: "flag-3",
+            employeeId: "EMP-2023-015",
+            employeeName: "Sarah Johnson",
+            flagType: "unusual-amount",
+            description: "Bonus amount exceeds typical range",
+            severity: "warning",
+          }
+        ];
+      } else if (step === 5) {
+        return [
+          {
+            id: "flag-4",
+            employeeId: "EMP-2023-002",
+            employeeName: "Michael Brown",
+            flagType: "missing-data",
+            description: "Missing pension enrollment information",
+            severity: "warning",
+          }
+        ];
+      }
     }
     return [];
   };
@@ -185,38 +211,23 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
     const processingTime = Math.random() * 1000 + 1000;
     await new Promise(resolve => setTimeout(resolve, processingTime));
 
-    // Determine if the step generates errors (10% chance except for step 1)
-    const hasStepError = currentStepIndex === 0 
-      ? Math.random() > 0.5 // 50% chance for validation errors in step 1
-      : Math.random() > 0.9; // 10% chance for other steps
+    // Check if the step generates flags
+    const mockFlags = generateMockValidationFlags(currentStepIndex);
+    const hasFlags = mockFlags.length > 0;
       
-    if (hasStepError) {
-      updateStepStatus(currentStepIndex, "error");
-      setHasError(true);
+    if (hasFlags) {
+      updateStepStatus(currentStepIndex, "flagged");
       setIsPaused(true);
       
-      // Generate mock errors for step 1
-      if (currentStepIndex === 0) {
-        const mockErrors = generateMockValidationErrors();
-        if (mockErrors.length > 0) {
-          const updatedSteps = [...steps];
-          updatedSteps[currentStepIndex].errors = mockErrors;
-          setSteps(updatedSteps);
-          
-          toast({
-            title: "Validation Errors",
-            description: `${mockErrors.length} issues found. Review required.`,
-            variant: "destructive",
-          });
-        }
-      } else {
-        // For other steps, just show a generic error
-        toast({
-          title: "Processing Error",
-          description: `Error in ${steps[currentStepIndex].name}. Please review and retry.`,
-          variant: "destructive",
-        });
-      }
+      // Add flags to the step
+      const updatedSteps = [...steps];
+      updatedSteps[currentStepIndex].flags = mockFlags;
+      setSteps(updatedSteps);
+      
+      toast({
+        title: "Data Flags Detected",
+        description: `${mockFlags.length} items require your review before continuing.`,
+      });
     } else {
       // Step completed successfully
       updateStepStatus(currentStepIndex, "done");
@@ -229,14 +240,14 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
         if (currentStep.downloadable) {
           toast({
             title: "Checkpoint Reached",
-            description: `${currentStep.reportTitle} is now available for download.`,
+            description: `${currentStep.reportTitle} is now available for review.`,
           });
         }
         
         if (currentStep.requiresConfirmation) {
           toast({
             title: "Confirmation Required",
-            description: "Please review and approve to continue processing.",
+            description: "Please review and send approval request.",
           });
         }
       } else {
@@ -269,11 +280,15 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
     }
   };
 
-  // Retry the current step if it has an error
-  const retryStep = () => {
-    updateStepStatus(currentStepIndex, "pending");
-    setHasError(false);
+  // Confirm flags and continue
+  const confirmFlags = () => {
+    toast({
+      title: "Flags Confirmed",
+      description: "Processing will continue with your confirmation.",
+    });
+    updateStepStatus(currentStepIndex, "done");
     setIsPaused(false);
+    moveToNextStep();
   };
 
   // Continue processing after a checkpoint
@@ -282,13 +297,10 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
     moveToNextStep();
   };
 
-  // Abort the payroll process
-  const abortPayroll = () => {
-    toast({
-      title: "Payroll Processing Aborted",
-      description: "The payroll run has been cancelled.",
-    });
+  // Navigate to approvals hub
+  const navigateToApprovals = () => {
     onClose();
+    navigate('/approvals');
   };
 
   // Handle downloading of reports
@@ -329,15 +341,15 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
           <h2 className="text-xl font-semibold flex items-center gap-2">
             {isComplete ? (
               <Check className="w-5 h-5 text-green-500" />
-            ) : hasError ? (
-              <AlertCircle className="w-5 h-5 text-red-500" />
+            ) : isPaused && steps[currentStepIndex].status === "flagged" ? (
+              <AlertTriangle className="w-5 h-5 text-amber-500" />
             ) : (
               <Loader2 className="w-5 h-5 text-blue-500 animate-spin" />
             )}
             {isComplete
               ? "Payroll Processing Complete"
-              : hasError
-              ? "Payroll Processing Error"
+              : isPaused && steps[currentStepIndex].status === "flagged"
+              ? "Review Required"
               : "Processing Payroll"}
           </h2>
           <Progress value={overallProgress} className="h-2 mt-2" />
@@ -356,7 +368,7 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
                   <div 
                     key={step.id}
                     className={`relative ${
-                      isCurrentStep ? "animate-pulse" : ""
+                      isCurrentStep && step.status === "in-progress" ? "animate-pulse" : ""
                     }`}
                   >
                     <div className="flex items-start gap-4">
@@ -368,7 +380,7 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
                             ${step.status === "pending" ? "bg-white border-gray-300 text-gray-500" : ""}
                             ${step.status === "in-progress" ? "bg-blue-50 border-blue-500 text-blue-600" : ""}
                             ${step.status === "done" ? "bg-green-50 border-green-500 text-green-600" : ""}
-                            ${step.status === "error" ? "bg-red-50 border-red-500 text-red-600" : ""}
+                            ${step.status === "flagged" ? "bg-amber-50 border-amber-500 text-amber-600" : ""}
                           `}
                         >
                           {step.status === "pending" && step.id}
@@ -378,8 +390,8 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
                           {step.status === "done" && (
                             <Check className="h-4 w-4 text-green-500" />
                           )}
-                          {step.status === "error" && (
-                            <AlertCircle className="h-4 w-4 text-red-500" />
+                          {step.status === "flagged" && (
+                            <AlertTriangle className="h-4 w-4 text-amber-500" />
                           )}
                         </div>
                         
@@ -390,7 +402,7 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
                               absolute top-8 left-4 w-0.5 h-[calc(100%+1.5rem)] -mb-6
                               ${isPast ? "bg-green-500" : "bg-gray-300"}
                               ${isCurrentStep && step.status === "in-progress" ? "bg-blue-500" : ""}
-                              ${step.status === "error" ? "bg-red-500" : ""}
+                              ${step.status === "flagged" ? "bg-amber-500" : ""}
                             `}
                           />
                         )}
@@ -405,7 +417,7 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
                               ${step.status === "pending" ? "text-gray-600" : ""}
                               ${step.status === "in-progress" ? "text-blue-700" : ""}
                               ${step.status === "done" ? "text-green-700" : ""}
-                              ${step.status === "error" ? "text-red-700" : ""}
+                              ${step.status === "flagged" ? "text-amber-700" : ""}
                             `}
                           >
                             {step.name}
@@ -420,58 +432,58 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
                         
                         <p className="text-sm text-gray-500 mt-1">{step.description}</p>
                         
-                        {/* Error Alert */}
-                        {step.status === "error" && (
-                          <Alert variant="destructive" className="mt-3">
-                            <AlertCircle className="h-4 w-4" />
-                            <AlertTitle>Error Processing Step</AlertTitle>
-                            <AlertDescription>
-                              An error occurred while processing this step. Please review and try again.
+                        {/* Flagged Data Alert */}
+                        {step.status === "flagged" && (
+                          <Alert variant="warning" className="mt-3 border-amber-200 bg-amber-50">
+                            <AlertTriangle className="h-4 w-4 text-amber-500" />
+                            <AlertTitle className="text-amber-800">Review Required</AlertTitle>
+                            <AlertDescription className="text-amber-700">
+                              Please review the flagged items before continuing the payroll process.
                             </AlertDescription>
                             <div className="mt-3 flex gap-2">
                               <Button 
                                 size="sm" 
-                                onClick={retryStep}
-                                className="bg-red-600 hover:bg-red-700"
+                                onClick={confirmFlags}
+                                className="bg-amber-600 hover:bg-amber-700 text-white"
                               >
-                                <RefreshCw className="h-4 w-4 mr-1" />
-                                Retry Step
+                                <Check className="h-4 w-4 mr-1" />
+                                Confirm OK
                               </Button>
                               <Button 
                                 size="sm" 
                                 variant="outline" 
-                                onClick={abortPayroll}
+                                onClick={() => handleViewReport(step.reportTitle || "Report")}
                               >
-                                <XCircle className="h-4 w-4 mr-1" />
-                                Abort Payroll
+                                <Eye className="h-4 w-4 mr-1" />
+                                View Details
                               </Button>
                             </div>
                           </Alert>
                         )}
                         
-                        {/* Validation Errors */}
+                        {/* Validation Flags */}
                         {isCurrentStep && 
-                         step.status !== "pending" && 
-                         step.errors && 
-                         step.errors.length > 0 && (
+                         step.status === "flagged" && 
+                         step.flags && 
+                         step.flags.length > 0 && (
                           <div className="mt-3 bg-amber-50 border border-amber-200 rounded-md p-4">
                             <h4 className="font-medium text-amber-800 flex items-center">
-                              <AlertCircle className="h-4 w-4 mr-2" />
-                              Validation Issues ({step.errors.length})
+                              <AlertTriangle className="h-4 w-4 mr-2 text-amber-500" />
+                              Flagged Items ({step.flags.length})
                             </h4>
                             <ul className="mt-2 space-y-2">
-                              {step.errors.map((error) => (
-                                <li key={error.id} className="text-sm">
+                              {step.flags.map((flag) => (
+                                <li key={flag.id} className="text-sm">
                                   <div className="flex items-start gap-1">
                                     <div 
                                       className={`
                                         w-1.5 h-1.5 rounded-full mt-1.5
-                                        ${error.severity === 'error' ? 'bg-red-500' : 'bg-amber-500'}
+                                        ${flag.severity === 'warning' ? 'bg-amber-500' : 'bg-blue-500'}
                                       `}
                                     />
                                     <div>
-                                      <span className="font-medium">{error.employeeName}</span>
-                                      <span className="text-gray-500"> - {error.description}</span>
+                                      <span className="font-medium">{flag.employeeName}</span>
+                                      <span className="text-gray-500"> - {flag.description}</span>
                                     </div>
                                   </div>
                                 </li>
@@ -512,7 +524,7 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
                         {isCurrentStep && step.status === "done" && step.isCheckpoint && (
                           <div className="mt-3">
                             <Button 
-                              onClick={continueProcessing}
+                              onClick={step.requiresConfirmation ? navigateToApprovals : continueProcessing}
                               className="mt-2"
                             >
                               {step.requiresConfirmation 
@@ -540,8 +552,8 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
                   The payroll run has been successfully processed and all required reports are available.
                 </p>
                 <div className="mt-6 flex gap-3">
-                  <Button onClick={onClose}>
-                    Return to Payroll
+                  <Button onClick={navigateToApprovals}>
+                    Go to Approval Hub
                   </Button>
                   <Button variant="outline" onClick={() => handleDownload("Complete Payroll Package")}>
                     <FileDown className="h-4 w-4 mr-1" />
