@@ -1,15 +1,14 @@
 
 import React from "react";
 import { DashboardStats } from "@/components/dashboard/DashboardStats";
-import { DashboardMainContent } from "@/components/dashboard/DashboardMainContent";
 import { EarningsPayrollSection } from "@/components/dashboard/EarningsPayrollSection";
-import { InvoiceSummarySection } from "@/components/dashboard/InvoiceSummarySection";
 import { DashboardTabs } from "@/components/dashboard/DashboardTabs";
 import { PayrollDashboardHeader } from "@/components/dashboard/PayrollDashboardHeader";
 import { useBillingFeatures } from "@/hooks/use-billing-features";
 import { PayrollChart } from "@/components/dashboard/PayrollChart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { InvoiceSummaryCard } from "@/components/dashboard/InvoiceSummaryCard";
+import { RecentActivityCard } from "@/components/dashboard/RecentActivityCard";
 
 const Dashboard = () => {
   const { billingEnabled } = useBillingFeatures();
@@ -126,21 +125,41 @@ const Dashboard = () => {
       {/* Consolidated Summary Cards */}
       <DashboardStats billingEnabled={billingEnabled} />
       
-      {/* EarningsPayrollSection with RecentActivityCard */}
-      <EarningsPayrollSection 
-        earningsData={earningsData}
-        activities={activities}
-      />
-
-      {/* Main Content - Changed to directly include Payroll Chart and Invoice Summary Card */}
+      {/* Main Content with Chart and Recent Activity */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
-        {/* Payroll Chart with no card wrapper */}
+        {/* Payroll Chart */}
         <div className="md:col-span-2 lg:col-span-4">
           <PayrollChart data={payrollData} />
         </div>
 
+        {/* Recent Activity */}
+        <div className="md:col-span-1 lg:col-span-3">
+          <RecentActivityCard
+            activities={activities}
+            className="h-full"
+          />
+        </div>
+      </div>
+
+      {/* Additional Row with Invoice Donut Chart */}
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
+        {/* Earnings Chart */}
+        <div className="md:col-span-2 lg:col-span-4">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg font-medium">
+                Earnings Overview
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-2">
+              {/* You can use your existing EarningsChart component here */}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Invoice Summary Card with Donut Chart */}
         <Card className="md:col-span-1 lg:col-span-3">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
+          <CardHeader className="pb-2">
             <CardTitle className="text-lg font-medium">
               Outstanding Invoices
             </CardTitle>
@@ -156,8 +175,6 @@ const Dashboard = () => {
           </CardContent>
         </Card>
       </div>
-
-      {/* Remove the final InvoiceSummarySection since we've moved it up */}
     </div>
   );
 };
