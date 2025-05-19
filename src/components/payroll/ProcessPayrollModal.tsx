@@ -299,6 +299,57 @@ const MockReportDialog: React.FC<MockReportDialogProps> = ({ open, onClose, repo
   );
 };
 
+// Validation issue review dialog
+interface ValidationReviewDialogProps {
+  open: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  onNavigate: () => void;
+  issueType: string;
+  description: string;
+  targetPage: string;
+}
+
+const ValidationReviewDialog: React.FC<ValidationReviewDialogProps> = ({ 
+  open, 
+  onClose, 
+  onConfirm, 
+  onNavigate,
+  issueType,
+  description,
+  targetPage
+}) => {
+  return (
+    <Dialog open={open} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-md">
+        <div className="flex items-center gap-3 mb-2">
+          <AlertTriangle className="h-6 w-6 text-amber-500" />
+          <h2 className="text-xl font-semibold">{issueType}</h2>
+        </div>
+        
+        <p className="text-muted-foreground mb-4">{description}</p>
+        
+        <div className="bg-muted/30 p-4 rounded-md mb-6">
+          <h3 className="font-medium mb-2">You have two options:</h3>
+          <ul className="space-y-2 ml-5 list-disc text-sm">
+            <li>Navigate to {targetPage} to review and fix the issues</li>
+            <li>Override the warnings and continue with the payroll process</li>
+          </ul>
+        </div>
+        
+        <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2 justify-end">
+          <Button variant="outline" onClick={onNavigate}>
+            Go to {targetPage}
+          </Button>
+          <Button variant="default" onClick={onConfirm}>
+            Override and Continue
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 // Define the different possible statuses for a step
 type StepStatus = "pending" | "in-progress" | "done" | "flagged";
 
@@ -310,6 +361,7 @@ interface ValidationFlag {
   flagType: string;
   description: string;
   severity: "warning" | "info";
+  targetPage?: string;
 }
 
 // Interface for a payroll step
@@ -323,6 +375,7 @@ interface PayrollStep {
   reportTitle?: string;
   flags: ValidationFlag[];
   requiresConfirmation?: boolean;
+  targetPage?: string;
 }
 
 // Props for the ProcessPayrollModal component
@@ -340,6 +393,12 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
   const [isComplete, setIsComplete] = useState(false);
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
   const [currentReportType, setCurrentReportType] = useState("");
+  const [validationDialogOpen, setValidationDialogOpen] = useState(false);
+  const [currentValidationIssue, setCurrentValidationIssue] = useState({ 
+    type: "", 
+    description: "", 
+    targetPage: "" 
+  });
   
   // Mock steps data with initial status
   const [steps, setSteps] = useState<PayrollStep[]>([
@@ -352,6 +411,7 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
       downloadable: true,
       reportTitle: "Validation Report",
       flags: [],
+      targetPage: "employees"
     },
     {
       id: 2,
@@ -361,6 +421,7 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
       isCheckpoint: false,
       downloadable: false,
       flags: [],
+      targetPage: "timesheets"
     },
     {
       id: 3,
@@ -370,6 +431,7 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
       isCheckpoint: false,
       downloadable: false,
       flags: [],
+      targetPage: "payroll"
     },
     {
       id: 4,
@@ -380,6 +442,7 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
       downloadable: true,
       reportTitle: "Gross Pay Breakdown",
       flags: [],
+      targetPage: "payroll"
     },
     {
       id: 5,
@@ -389,6 +452,7 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
       isCheckpoint: false,
       downloadable: false,
       flags: [],
+      targetPage: "settings"
     },
     {
       id: 6,
@@ -399,6 +463,7 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
       downloadable: true,
       reportTitle: "Payslips & HMRC Documentation",
       flags: [],
+      targetPage: "settings"
     },
     {
       id: 7,
@@ -408,6 +473,7 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
       isCheckpoint: false,
       downloadable: false,
       flags: [],
+      targetPage: "dashboard"
     },
     {
       id: 8,
@@ -418,6 +484,7 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
       downloadable: true,
       reportTitle: "Payment Summary",
       flags: [],
+      targetPage: "dashboard"
     },
     {
       id: 9,
@@ -428,6 +495,7 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
       downloadable: false,
       requiresConfirmation: true,
       flags: [],
+      targetPage: "dashboard"
     }
   ]);
 
@@ -440,6 +508,31 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
   // Close report dialog
   const closeReportDialog = () => {
     setReportDialogOpen(false);
+  };
+
+  // Open validation review dialog
+  const openValidationDialog = (type: string, description: string, targetPage: string) => {
+    setCurrentValidationIssue({ type, description, targetPage });
+    setValidationDialogOpen(true);
+  };
+
+  // Close validation dialog
+  const closeValidationDialog = () => {
+    setValidationDialogOpen(false);
+  };
+
+  // Navigate to the relevant page based on the issue
+  const navigateToRelevantPage = () => {
+    const step = steps[currentStepIndex];
+    const targetPage = step.targetPage || "dashboard";
+    closeValidationDialog();
+    onClose();
+    navigate(`/${targetPage}`);
+    
+    toast({
+      title: "Navigated to " + targetPage,
+      description: "Please review and fix the issues before continuing the payroll process.",
+    });
   };
 
   // Generate mock validation flags (10-20% chance)
@@ -455,6 +548,7 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
             flagType: "missing-data",
             description: "Tax code missing for current tax year",
             severity: "warning",
+            targetPage: "employees"
           },
           {
             id: "flag-2",
@@ -463,6 +557,7 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
             flagType: "validation-warning",
             description: "Unusually high overtime hours (>40)",
             severity: "warning",
+            targetPage: "timesheets"
           }
         ];
       } else if (step === 3) {
@@ -474,6 +569,7 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
             flagType: "unusual-amount",
             description: "Bonus amount exceeds typical range",
             severity: "warning",
+            targetPage: "payroll"
           }
         ];
       } else if (step === 5) {
@@ -485,6 +581,7 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
             flagType: "missing-data",
             description: "Missing pension enrollment information",
             severity: "warning",
+            targetPage: "settings"
           }
         ];
       }
@@ -520,6 +617,15 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
         title: "Data Flags Detected",
         description: `${mockFlags.length} items require your review before continuing.`,
       });
+
+      // Open validation dialog with the first flag information
+      const firstFlag = mockFlags[0];
+      const currentStep = updatedSteps[currentStepIndex];
+      openValidationDialog(
+        `${currentStep.name} Issue`,
+        `We found ${mockFlags.length} issues that may need your attention: ${firstFlag.description}`,
+        currentStep.targetPage || "dashboard"
+      );
     } else {
       // Step completed successfully
       updateStepStatus(currentStepIndex, "done");
@@ -574,8 +680,9 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
 
   // Confirm flags and continue
   const confirmFlags = () => {
+    closeValidationDialog();
     toast({
-      title: "Flags Confirmed",
+      title: "Issues Overridden",
       description: "Processing will continue with your confirmation.",
     });
     updateStepStatus(currentStepIndex, "done");
@@ -601,11 +708,6 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
       title: "Downloading Report",
       description: `${reportType} download started.`,
     });
-  };
-
-  // Handle viewing of reports
-  const handleViewReport = (reportType: string) => {
-    openReportDialog(reportType);
   };
 
   // Update overall progress as steps are completed
@@ -733,11 +835,17 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
                               <div className="mt-3 flex gap-2">
                                 <Button 
                                   size="sm" 
-                                  onClick={confirmFlags}
+                                  onClick={() => {
+                                    openValidationDialog(
+                                      `${step.name} Issue`, 
+                                      `We found ${step.flags.length} issues that may need your attention.`, 
+                                      step.targetPage || "dashboard"
+                                    );
+                                  }}
                                   className="bg-amber-600 hover:bg-amber-700 text-white"
                                 >
                                   <Check className="h-4 w-4 mr-1" />
-                                  Confirm OK
+                                  Review Issues
                                 </Button>
                                 <Button 
                                   size="sm" 
@@ -865,6 +973,17 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
           reportType={currentReportType}
         />
       )}
+
+      {/* Validation Review Dialog */}
+      <ValidationReviewDialog
+        open={validationDialogOpen}
+        onClose={closeValidationDialog}
+        onConfirm={confirmFlags}
+        onNavigate={navigateToRelevantPage}
+        issueType={currentValidationIssue.type}
+        description={currentValidationIssue.description}
+        targetPage={currentValidationIssue.targetPage}
+      />
     </>
   );
 };
