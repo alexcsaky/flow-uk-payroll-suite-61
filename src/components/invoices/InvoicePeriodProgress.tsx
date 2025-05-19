@@ -26,6 +26,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { PeriodType } from "./InvoicePeriodSelector";
+import { LockIcon, UnlockIcon } from "lucide-react";
 
 interface InvoicePeriodProgressProps {
   periodType: PeriodType;
@@ -150,11 +151,22 @@ export function InvoicePeriodProgress({
         return "Shift Confirmed Invoice";
     }
   };
+
+  // Determine if current period is in the past
+  const isPeriodInPast = end < today;
+  const isPeriodInFuture = start > today;
   
   return (
-    <Card>
+    <Card className={cn(
+      isPeriodClosed ? "border-amber-500" : 
+      isPeriodInPast ? "border-green-500" : 
+      isPeriodInFuture ? "border-blue-500" : "border-primary"
+    )}>
       <CardHeader>
-        <CardTitle>{getHeaderText()}</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          {getHeaderText()}
+          {isPeriodClosed && <LockIcon className="h-4 w-4 text-amber-500" />}
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
@@ -169,11 +181,20 @@ export function InvoicePeriodProgress({
         
         {periodType !== "shift-confirmed" && (
           <div className="pt-2">
-            <p className="text-sm text-muted-foreground">
+            <div className={cn(
+              "text-sm px-3 py-2 rounded-md",
+              isPeriodClosed ? "bg-amber-50 text-amber-800" : 
+              isPeriodInPast ? "bg-green-50 text-green-800" : 
+              isPeriodInFuture ? "bg-blue-50 text-blue-800" : "bg-gray-50 text-gray-800"
+            )}>
               {isPeriodClosed 
                 ? "This invoice period is closed. No further changes can be made."
-                : "This invoice period is currently open and accepting entries."}
-            </p>
+                : isPeriodInPast
+                ? "This period is in the past. Consider closing it."
+                : isPeriodInFuture
+                ? "This period is in the future."
+                : "This invoice period is currently active and accepting entries."}
+            </div>
           </div>
         )}
       </CardContent>
@@ -181,7 +202,12 @@ export function InvoicePeriodProgress({
         {!isPeriodClosed ? (
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="outline">Close Period</Button>
+              <Button 
+                variant={isPeriodInPast ? "default" : "outline"}
+                disabled={isPeriodInFuture}
+              >
+                {isPeriodInFuture ? "Period Not Started" : "Close Period"}
+              </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
@@ -198,7 +224,11 @@ export function InvoicePeriodProgress({
             </AlertDialogContent>
           </AlertDialog>
         ) : (
-          <Button variant="outline" disabled>Period Closed</Button>
+          <div className="flex gap-2">
+            <Button variant="outline" disabled className="flex items-center gap-1">
+              <LockIcon className="h-4 w-4" /> Period Closed
+            </Button>
+          </div>
         )}
       </CardFooter>
     </Card>

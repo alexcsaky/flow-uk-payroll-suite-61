@@ -54,6 +54,23 @@ export function InvoicePeriodSelector({
     }
   };
 
+  // Helper function to get the highlighted date range for the calendar
+  const getDateRange = () => {
+    if (periodType === "weekly") {
+      const weekStart = startOfWeek(selectedDate, { weekStartsOn: 1 });
+      const weekEnd = endOfWeek(selectedDate, { weekStartsOn: 1 });
+      return { from: weekStart, to: weekEnd };
+    } else if (periodType === "monthly") {
+      const monthStart = startOfMonth(selectedDate);
+      const monthEnd = endOfMonth(selectedDate);
+      return { from: monthStart, to: monthEnd };
+    }
+    return { from: selectedDate, to: selectedDate };
+  };
+
+  // Get the date range for the calendar
+  const dateRange = getDateRange();
+
   return (
     <div className={cn("flex flex-col space-y-2", className)}>
       <div className="flex space-x-2">
@@ -76,7 +93,9 @@ export function InvoicePeriodSelector({
                 variant="outline"
                 className={cn(
                   "w-[240px] pl-3 text-left font-normal",
-                  !selectedDate && "text-muted-foreground"
+                  !selectedDate && "text-muted-foreground",
+                  periodType === "weekly" && "bg-primary/5",
+                  periodType === "monthly" && "bg-primary/5"
                 )}
               >
                 {getDisplayText()}
@@ -90,11 +109,39 @@ export function InvoicePeriodSelector({
                 onSelect={(date) => date && onDateChange(date)}
                 initialFocus
                 className={cn("p-3 pointer-events-auto")}
+                // Show the selected range visually when in weekly or monthly mode
+                selected={dateRange.from}
+                modifiers={{
+                  range: {
+                    from: dateRange.from,
+                    to: dateRange.to
+                  }
+                }}
+                modifiersStyles={{
+                  range: {
+                    backgroundColor: 'var(--primary-50)',
+                  }
+                }}
               />
             </PopoverContent>
           </Popover>
         )}
       </div>
+      
+      {/* Visual indicator of selected period */}
+      {periodType !== "shift-confirmed" && (
+        <div className="text-xs text-muted-foreground">
+          {periodType === "daily" && (
+            <>Selected day: {format(selectedDate, "EEEE, MMMM d, yyyy")}</>
+          )}
+          {periodType === "weekly" && (
+            <>Week {format(selectedDate, "w, yyyy")} selected</>
+          )}
+          {periodType === "monthly" && (
+            <>Full month of {format(selectedDate, "MMMM yyyy")} selected</>
+          )}
+        </div>
+      )}
     </div>
   );
 }
