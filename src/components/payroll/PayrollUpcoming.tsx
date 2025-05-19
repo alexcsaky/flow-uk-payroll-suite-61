@@ -4,7 +4,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 
-export const PayrollUpcoming: React.FC = () => {
+interface PayrollUpcomingProps {
+  onProcessPayroll?: () => void;
+}
+
+export const PayrollUpcoming: React.FC<PayrollUpcomingProps> = ({ onProcessPayroll }) => {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
@@ -35,7 +39,7 @@ export const PayrollUpcoming: React.FC = () => {
             </div>
 
             <div className="mt-6 flex items-center gap-2">
-              <Button>Process Payroll</Button>
+              <Button onClick={onProcessPayroll}>Process Payroll</Button>
               <Button variant="outline">Preview</Button>
               <Button variant="outline">Edit</Button>
             </div>

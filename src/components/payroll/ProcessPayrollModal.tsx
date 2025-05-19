@@ -696,10 +696,16 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
     moveToNextStep();
   };
 
-  // Navigate to approvals hub
+  // Navigate to approvals tab in Payroll instead of Approvals page
   const navigateToApprovals = () => {
     onClose();
-    navigate('/approvals');
+    // Navigate to the payroll page with approvals tab active
+    navigate('/payroll', { state: { activeTab: 'approvals' } });
+    
+    toast({
+      title: "Redirected to Approvals",
+      description: "Please complete the approval process for this payroll run.",
+    });
   };
 
   // Handle downloading of reports

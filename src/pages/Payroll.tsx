@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Calendar, Plus } from "lucide-react";
@@ -8,10 +8,19 @@ import { PayrollHistory } from "@/components/payroll/PayrollHistory";
 import { PayrollApprovalHub } from "@/components/payroll/PayrollApprovalHub";
 import { PayrollSettings } from "@/components/payroll/PayrollSettings";
 import { ProcessPayrollModal } from "@/components/payroll/ProcessPayrollModal";
+import { useLocation } from "react-router-dom";
 
 const Payroll = () => {
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState("upcoming");
   const [isProcessingPayroll, setIsProcessingPayroll] = useState(false);
+
+  // Check if we're navigating from another page with a specific tab to activate
+  useEffect(() => {
+    if (location.state && location.state.activeTab) {
+      setActiveTab(location.state.activeTab);
+    }
+  }, [location]);
 
   const handleProcessPayroll = () => {
     setIsProcessingPayroll(true);
@@ -51,7 +60,7 @@ const Payroll = () => {
 
         <div className="mt-6">
           <TabsContent value="upcoming">
-            <PayrollUpcoming />
+            <PayrollUpcoming onProcessPayroll={handleProcessPayroll} />
           </TabsContent>
 
           <TabsContent value="history">
