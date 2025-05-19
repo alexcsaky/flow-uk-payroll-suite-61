@@ -17,7 +17,7 @@ const Progress = React.forwardRef<
       ref={ref}
       className={cn(
         "relative overflow-hidden rounded-full bg-secondary",
-        isVertical ? "h-full w-full" : "h-4 w-full",
+        isVertical ? "h-full w-2" : "h-2 w-full", // Reduced height from h-4 to h-2 for better UI consistency
         className
       )}
       {...props}

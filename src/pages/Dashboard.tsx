@@ -1,15 +1,14 @@
 
 import React from "react";
 import { DashboardStats } from "@/components/dashboard/DashboardStats";
-import { DashboardMainContent } from "@/components/dashboard/DashboardMainContent";
 import { EarningsPayrollSection } from "@/components/dashboard/EarningsPayrollSection";
-import { InvoiceSummarySection } from "@/components/dashboard/InvoiceSummarySection";
 import { DashboardTabs } from "@/components/dashboard/DashboardTabs";
 import { PayrollDashboardHeader } from "@/components/dashboard/PayrollDashboardHeader";
 import { useBillingFeatures } from "@/hooks/use-billing-features";
 import { PayrollChart } from "@/components/dashboard/PayrollChart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { InvoiceSummaryCard } from "@/components/dashboard/InvoiceSummaryCard";
+import { RecentActivityCard } from "@/components/dashboard/RecentActivityCard";
 
 const Dashboard = () => {
   const { billingEnabled } = useBillingFeatures();
@@ -80,7 +79,7 @@ const Dashboard = () => {
     percentageComplete: 69
   };
 
-  // Mock data for the OpenPayRunWidget (now used for PayrollDashboardHeader)
+  // Current pay run data
   const currentPayRun = {
     payRunName: "April 2025 Monthly Pay Run",
     payRunDate: new Date(2025, 3, 25), // April 25, 2025
@@ -100,9 +99,9 @@ const Dashboard = () => {
   };
   
   // Calculate days until next payroll
-  const daysUntilPayroll = 8; // Updated to 8 days
+  const daysUntilPayroll = 8;
   
-  // Mock user data - changed from Sarah to John
+  // User data
   const userName = "John";
 
   return (
@@ -114,7 +113,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* New Payroll Dashboard Header */}
+      {/* Dashboard Header */}
       <PayrollDashboardHeader
         userName={userName}
         employeesNeedingUpdates={3}
@@ -123,29 +122,54 @@ const Dashboard = () => {
         issues={currentPayRun.issues}
       />
 
-      {/* Consolidated Summary Cards */}
+      {/* Summary Stats */}
       <DashboardStats billingEnabled={billingEnabled} />
       
-      {/* EarningsPayrollSection with RecentActivityCard */}
-      <EarningsPayrollSection 
-        earningsData={earningsData}
-        activities={activities}
-      />
+      {/* Recent Activity - Now in main section */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg font-medium">
+            Recent Activity
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          <RecentActivityCard 
+            activities={activities}
+            className="border-0 shadow-none"
+          />
+        </CardContent>
+      </Card>
 
-      {/* Main Content - Changed to directly include Payroll Chart and Invoice Summary Card */}
+      {/* Main Content Area */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
-        {/* Payroll Chart with no card wrapper */}
+        {/* Earnings Chart */}
         <div className="md:col-span-2 lg:col-span-4">
-          <PayrollChart data={payrollData} />
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg font-medium">
+                Earnings
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-3 pt-0">
+              <EarningsPayrollSection 
+                earningsData={earningsData}
+                activities={activities}
+                chartOnly={true}
+                className=""
+                chartClassName="h-[280px]"
+              />
+            </CardContent>
+          </Card>
         </div>
 
+        {/* Invoice Summary - Now vertical */}
         <Card className="md:col-span-1 lg:col-span-3">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
+          <CardHeader className="pb-3">
             <CardTitle className="text-lg font-medium">
               Outstanding Invoices
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-6">
             <InvoiceSummaryCard
               totalOutstanding={invoiceSummary.totalOutstanding}
               totalPaid={invoiceSummary.totalPaid}
@@ -157,7 +181,21 @@ const Dashboard = () => {
         </Card>
       </div>
 
-      {/* Remove the final InvoiceSummarySection since we've moved it up */}
+      {/* Payroll Chart */}
+      <div className="w-full">
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg font-medium">
+              Payroll History
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-3 pt-0">
+            <div className="h-[280px]">
+              <PayrollChart data={payrollData} />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };

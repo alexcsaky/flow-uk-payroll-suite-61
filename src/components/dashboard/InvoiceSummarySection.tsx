@@ -9,14 +9,16 @@ interface InvoiceSummarySectionProps {
     percentageComplete: number;
   };
   vertical?: boolean;
+  className?: string;
 }
 
 export function InvoiceSummarySection({ 
   invoiceSummary, 
-  vertical = false 
+  vertical = false,
+  className
 }: InvoiceSummarySectionProps) {
   return (
-    <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-1">
+    <div className={className}>
       <InvoiceSummaryCard
         totalOutstanding={invoiceSummary.totalOutstanding}
         totalPaid={invoiceSummary.totalPaid}

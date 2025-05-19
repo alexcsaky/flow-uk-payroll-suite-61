@@ -16,10 +16,10 @@ interface PayrollApprovalDetailsProps {
 
 export const PayrollApprovalDetails: React.FC<PayrollApprovalDetailsProps> = ({ payroll, onClose }) => {
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
+    <Card className="border border-border/60 shadow-sm">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
         <div>
-          <CardTitle className="text-xl">Approval Details: {payroll.runId}</CardTitle>
+          <CardTitle className="text-xl font-semibold">Approval Details: {payroll.runId}</CardTitle>
           <CardDescription>
             {payroll.runDate} • {payroll.amount} • {payroll.employees} employees
           </CardDescription>
@@ -34,7 +34,7 @@ export const PayrollApprovalDetails: React.FC<PayrollApprovalDetailsProps> = ({ 
           </Alert>
         )}
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-2">
         <div className="mb-6">
           <ApprovalSteps payroll={payroll} />
         </div>

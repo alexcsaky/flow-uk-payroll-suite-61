@@ -4,26 +4,43 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { BillingFeaturesProvider } from "@/hooks/use-billing-features";
-import Analytics from "@/pages/Analytics";
-import Approvals from "@/pages/Approvals";
-import Clients from "@/pages/Clients";
-import Dashboard from "@/pages/Dashboard";
-import EmployeeDetails from "@/pages/EmployeeDetails";
-import EmployeeOnboarding from "@/pages/EmployeeOnboarding";
-import Employees from "@/pages/Employees";
-import Invoices from "@/pages/Invoices";
-import NotFound from "@/pages/NotFound";
-import Payments from "@/pages/Payments";
-import Payroll from "@/pages/Payroll";
-import Payslip from "@/pages/Payslip";
-import Reports from "@/pages/Reports";
-import Settings from "@/pages/Settings";
-import Timesheets from "@/pages/Timesheets";
-import UserRoles from "@/pages/UserRoles";
+import { lazy, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
-const queryClient = new QueryClient();
+// Create a loading component 
+const LoadingFallback = () => (
+  <div className="flex items-center justify-center h-screen">
+    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+  </div>
+);
+
+// Lazy-load page components
+const Dashboard = lazy(() => import("@/pages/Dashboard"));
+const Settings = lazy(() => import("@/pages/Settings"));
+const Employees = lazy(() => import("@/pages/Employees"));
+const EmployeeOnboarding = lazy(() => import("@/pages/EmployeeOnboarding"));
+const EmployeeDetails = lazy(() => import("@/pages/EmployeeDetails"));
+const Payroll = lazy(() => import("@/pages/Payroll"));
+const Timesheets = lazy(() => import("@/pages/Timesheets"));
+const Approvals = lazy(() => import("@/pages/Approvals"));
+const Reports = lazy(() => import("@/pages/Reports"));
+const Clients = lazy(() => import("@/pages/Clients"));
+const Invoices = lazy(() => import("@/pages/Invoices"));
+const Payments = lazy(() => import("@/pages/Payments"));
+const Analytics = lazy(() => import("@/pages/Analytics"));
+const Payslip = lazy(() => import("@/pages/Payslip"));
+const UserRoles = lazy(() => import("@/pages/UserRoles"));
+const NotFound = lazy(() => import("@/pages/NotFound"));
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false, // Prevent refetching when window regains focus
+      retry: 1, // Only retry failed queries once
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -33,25 +50,139 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<AppLayout />}>
-              <Route index element={<Dashboard />} />
-              <Route path="settings" element={<Settings />} />
-              <Route path="employees" element={<Employees />} />
-              <Route path="employees/onboarding" element={<EmployeeOnboarding />} />
-              <Route path="employees/:employeeId" element={<EmployeeDetails />} />
-              <Route path="payroll" element={<Payroll />} />
-              <Route path="timesheets" element={<Timesheets />} />
-              <Route path="approvals" element={<Approvals />} />
-              <Route path="reports" element={<Reports />} />
-              <Route path="clients" element={<Clients />} />
-              <Route path="invoices" element={<Invoices />} />
-              <Route path="payments" element={<Payments />} />
-              <Route path="analytics" element={<Analytics />} />
-              <Route path="payslips/:employeeId/:payslipId" element={<Payslip />} />
-              <Route path="user-roles" element={<UserRoles />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route 
+              path="/" 
+              element={<AppLayout />}
+            >
+              <Route 
+                index 
+                element={
+                  <Suspense fallback={<LoadingFallback />}>
+                    <Dashboard />
+                  </Suspense>
+                } 
+              />
+              <Route 
+                path="settings" 
+                element={
+                  <Suspense fallback={<LoadingFallback />}>
+                    <Settings />
+                  </Suspense>
+                } 
+              />
+              <Route 
+                path="employees" 
+                element={
+                  <Suspense fallback={<LoadingFallback />}>
+                    <Employees />
+                  </Suspense>
+                } 
+              />
+              <Route 
+                path="employees/onboarding" 
+                element={
+                  <Suspense fallback={<LoadingFallback />}>
+                    <EmployeeOnboarding />
+                  </Suspense>
+                } 
+              />
+              <Route 
+                path="employees/:employeeId" 
+                element={
+                  <Suspense fallback={<LoadingFallback />}>
+                    <EmployeeDetails />
+                  </Suspense>
+                } 
+              />
+              <Route 
+                path="payroll" 
+                element={
+                  <Suspense fallback={<LoadingFallback />}>
+                    <Payroll />
+                  </Suspense>
+                } 
+              />
+              <Route 
+                path="timesheets" 
+                element={
+                  <Suspense fallback={<LoadingFallback />}>
+                    <Timesheets />
+                  </Suspense>
+                } 
+              />
+              <Route 
+                path="approvals" 
+                element={
+                  <Suspense fallback={<LoadingFallback />}>
+                    <Approvals />
+                  </Suspense>
+                } 
+              />
+              <Route 
+                path="reports" 
+                element={
+                  <Suspense fallback={<LoadingFallback />}>
+                    <Reports />
+                  </Suspense>
+                } 
+              />
+              <Route 
+                path="clients" 
+                element={
+                  <Suspense fallback={<LoadingFallback />}>
+                    <Clients />
+                  </Suspense>
+                } 
+              />
+              <Route 
+                path="invoices" 
+                element={
+                  <Suspense fallback={<LoadingFallback />}>
+                    <Invoices />
+                  </Suspense>
+                } 
+              />
+              <Route 
+                path="payments" 
+                element={
+                  <Suspense fallback={<LoadingFallback />}>
+                    <Payments />
+                  </Suspense>
+                } 
+              />
+              <Route 
+                path="analytics" 
+                element={
+                  <Suspense fallback={<LoadingFallback />}>
+                    <Analytics />
+                  </Suspense>
+                } 
+              />
+              <Route 
+                path="payslips/:employeeId/:payslipId" 
+                element={
+                  <Suspense fallback={<LoadingFallback />}>
+                    <Payslip />
+                  </Suspense>
+                } 
+              />
+              <Route 
+                path="user-roles" 
+                element={
+                  <Suspense fallback={<LoadingFallback />}>
+                    <UserRoles />
+                  </Suspense>
+                } 
+              />
             </Route>
-            <Route path="*" element={<NotFound />} />
+            <Route 
+              path="*" 
+              element={
+                <Suspense fallback={<LoadingFallback />}>
+                  <NotFound />
+                </Suspense>
+              } 
+            />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
