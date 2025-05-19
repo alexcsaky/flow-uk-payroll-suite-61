@@ -7,9 +7,19 @@ import { PayrollUpcoming } from "@/components/payroll/PayrollUpcoming";
 import { PayrollHistory } from "@/components/payroll/PayrollHistory";
 import { PayrollApprovalHub } from "@/components/payroll/PayrollApprovalHub";
 import { PayrollSettings } from "@/components/payroll/PayrollSettings";
+import { ProcessPayrollModal } from "@/components/payroll/ProcessPayrollModal";
 
 const Payroll = () => {
   const [activeTab, setActiveTab] = useState("upcoming");
+  const [isProcessingPayroll, setIsProcessingPayroll] = useState(false);
+
+  const handleProcessPayroll = () => {
+    setIsProcessingPayroll(true);
+  };
+
+  const handleCloseProcessModal = () => {
+    setIsProcessingPayroll(false);
+  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -19,7 +29,7 @@ const Payroll = () => {
           <Button variant="outline" size="icon">
             <Calendar className="h-4 w-4" />
           </Button>
-          <Button>
+          <Button onClick={handleProcessPayroll}>
             <Plus className="mr-2 h-4 w-4" />
             New Payroll Run
           </Button>
@@ -57,6 +67,12 @@ const Payroll = () => {
           </TabsContent>
         </div>
       </Tabs>
+
+      {/* Process Payroll Modal */}
+      <ProcessPayrollModal 
+        open={isProcessingPayroll} 
+        onClose={handleCloseProcessModal} 
+      />
     </div>
   );
 };
