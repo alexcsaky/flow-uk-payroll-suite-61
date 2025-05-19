@@ -17,6 +17,7 @@ import {
   Calendar,
   LogOut,
   LucideIcon,
+  CheckCircle2,
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -48,7 +49,7 @@ export function SideNavigation({ isOpen, setIsOpen }: SideNavigationProps) {
     { name: "Employees", href: "/employees", icon: Users },
     { name: "Timesheets", href: "/timesheets", icon: Calendar },
     { name: "Payroll", href: "/payroll", icon: ClipboardList },
-    //{ name: "Approvals", href: "/approvals", icon: CheckCircle2 },
+    { name: "Approvals", href: "/approvals", icon: CheckCircle2 },
     { name: "Reports", href: "/reports", icon: BarChart3 },
     { name: "Clients", href: "/clients", icon: Building, requiresBilling: true },
     { name: "Invoices", href: "/invoices", icon: FileText, requiresBilling: true },
