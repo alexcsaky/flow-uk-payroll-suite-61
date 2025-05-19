@@ -9,6 +9,7 @@ import { PayrollChart } from "@/components/dashboard/PayrollChart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { InvoiceSummaryCard } from "@/components/dashboard/InvoiceSummaryCard";
 import { RecentActivityCard } from "@/components/dashboard/RecentActivityCard";
+import { EarningsChart } from "@/components/dashboard/EarningsChart";
 
 const Dashboard = () => {
   const { billingEnabled } = useBillingFeatures();
@@ -145,35 +146,31 @@ const Dashboard = () => {
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
         {/* Earnings Chart */}
         <div className="md:col-span-2 lg:col-span-4">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg font-medium">
-                Earnings Overview
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-2">
-              {/* You can use your existing EarningsChart component here */}
-            </CardContent>
-          </Card>
+          <EarningsChart
+            data={earningsData}
+            className="h-full"
+          />
         </div>
 
         {/* Invoice Summary Card with Donut Chart */}
-        <Card className="md:col-span-1 lg:col-span-3">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg font-medium">
-              Outstanding Invoices
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <InvoiceSummaryCard
-              totalOutstanding={invoiceSummary.totalOutstanding}
-              totalPaid={invoiceSummary.totalPaid}
-              percentageComplete={invoiceSummary.percentageComplete}
-              className="border-0 shadow-none p-0"
-              vertical={true}
-            />
-          </CardContent>
-        </Card>
+        <div className="md:col-span-1 lg:col-span-3">
+          <Card className="h-full">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg font-medium">
+                Outstanding Invoices
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <InvoiceSummaryCard
+                totalOutstanding={invoiceSummary.totalOutstanding}
+                totalPaid={invoiceSummary.totalPaid}
+                percentageComplete={invoiceSummary.percentageComplete}
+                className="border-0 shadow-none p-0"
+                vertical={true}
+              />
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
