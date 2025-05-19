@@ -109,8 +109,6 @@ export function InvoicePeriodSelector({
                 onSelect={(date) => date && onDateChange(date)}
                 initialFocus
                 className={cn("p-3 pointer-events-auto")}
-                // Show the selected range visually when in weekly or monthly mode
-                selected={dateRange.from}
                 modifiers={{
                   range: {
                     from: dateRange.from,
