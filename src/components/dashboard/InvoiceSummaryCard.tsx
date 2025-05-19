@@ -17,6 +17,7 @@ interface InvoiceSummaryProps {
   totalPaid: number;
   percentageComplete: number;
   className?: string;
+  vertical?: boolean;
 }
 
 export function InvoiceSummaryCard({
@@ -24,7 +25,35 @@ export function InvoiceSummaryCard({
   totalPaid,
   percentageComplete,
   className,
+  vertical = false,
 }: InvoiceSummaryProps) {
+  if (vertical) {
+    return (
+      <div className={cn("flow-transition", className)}>
+        <div className="grid gap-4">
+          <div className="flex flex-col">
+            <Progress value={percentageComplete} className="h-48 w-6 rounded-full flex flex-col justify-end bg-gray-100" orientation="vertical" />
+            <span className="text-sm font-medium mt-2">{percentageComplete}% paid</span>
+          </div>
+          
+          <div className="grid gap-4">
+            <div>
+              <p className="text-sm font-medium">Outstanding</p>
+              <p className="text-2xl font-bold">£{totalOutstanding.toLocaleString()}</p>
+            </div>
+            <div>
+              <p className="text-sm font-medium">Paid</p>
+              <p className="text-2xl font-bold">£{totalPaid.toLocaleString()}</p>
+            </div>
+            <Button className="w-full" variant="outline">
+              View All Invoices
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <Card className={cn("flow-transition", className)}>
       <CardHeader className="pb-2">

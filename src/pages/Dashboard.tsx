@@ -1,3 +1,4 @@
+
 import React from "react";
 import { DashboardStats } from "@/components/dashboard/DashboardStats";
 import { DashboardMainContent } from "@/components/dashboard/DashboardMainContent";
@@ -8,7 +9,7 @@ import { PayrollDashboardHeader } from "@/components/dashboard/PayrollDashboardH
 import { useBillingFeatures } from "@/hooks/use-billing-features";
 import { PayrollChart } from "@/components/dashboard/PayrollChart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { RecentActivityCard } from "@/components/dashboard/RecentActivityCard";
+import { InvoiceSummaryCard } from "@/components/dashboard/InvoiceSummaryCard";
 
 const Dashboard = () => {
   const { billingEnabled } = useBillingFeatures();
@@ -72,13 +73,6 @@ const Dashboard = () => {
     }
   ];
 
-  // Modified payrollSummary without upcomingDeadlines
-  const payrollSummary = {
-    nextPayrollDate: new Date(2025, 3, 25), // Using numeric constructor for stability
-    employeesCount: 146,
-    totalAmount: 287500
-  };
-
   // Mock data for InvoiceSummaryCard
   const invoiceSummary = {
     totalOutstanding: 68500,
@@ -132,13 +126,13 @@ const Dashboard = () => {
       {/* Consolidated Summary Cards */}
       <DashboardStats billingEnabled={billingEnabled} />
       
-      {/* EarningsPayrollSection with simplified payrollSummary */}
+      {/* EarningsPayrollSection with RecentActivityCard */}
       <EarningsPayrollSection 
         earningsData={earningsData}
-        payrollSummary={payrollSummary}
+        activities={activities}
       />
 
-      {/* Main Content - Changed to directly include Payroll Chart and Recent Activity */}
+      {/* Main Content - Changed to directly include Payroll Chart and Invoice Summary Card */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
         {/* Payroll Chart with no card wrapper */}
         <div className="md:col-span-2 lg:col-span-4">
@@ -148,19 +142,22 @@ const Dashboard = () => {
         <Card className="md:col-span-1 lg:col-span-3">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-lg font-medium">
-              Recent Activity
+              Outstanding Invoices
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <RecentActivityCard activities={activities} />
+            <InvoiceSummaryCard
+              totalOutstanding={invoiceSummary.totalOutstanding}
+              totalPaid={invoiceSummary.totalPaid}
+              percentageComplete={invoiceSummary.percentageComplete}
+              className="border-0 shadow-none p-0"
+              vertical={true}
+            />
           </CardContent>
         </Card>
       </div>
 
-      {/* Only show Invoice Summary if billing is enabled */}
-      {billingEnabled && (
-        <InvoiceSummarySection invoiceSummary={invoiceSummary} />
-      )}
+      {/* Remove the final InvoiceSummarySection since we've moved it up */}
     </div>
   );
 };

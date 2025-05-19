@@ -1,7 +1,7 @@
 
 import React from "react";
 import { EarningsChart } from "@/components/dashboard/EarningsChart";
-import { PayrollSummaryCard } from "@/components/dashboard/PayrollSummaryCard";
+import { RecentActivityCard } from "@/components/dashboard/RecentActivityCard";
 
 interface EarningsPayrollSectionProps {
   earningsData: Array<{
@@ -9,16 +9,18 @@ interface EarningsPayrollSectionProps {
     gross: number;
     net: number;
   }>;
-  payrollSummary: {
-    nextPayrollDate: Date;
-    employeesCount: number;
-    totalAmount: number;
-  };
+  activities: Array<{
+    id: string;
+    title: string;
+    description: string;
+    timestamp: string;
+    type: "payroll" | "invoice" | "employee" | "client" | "system";
+  }>;
 }
 
 export function EarningsPayrollSection({ 
   earningsData,
-  payrollSummary
+  activities
 }: EarningsPayrollSectionProps) {
   return (
     <div className="grid gap-6 md:grid-cols-7 h-full">
@@ -26,11 +28,9 @@ export function EarningsPayrollSection({
         data={earningsData}
         className="md:col-span-5 h-full"
       />
-      <PayrollSummaryCard
+      <RecentActivityCard
+        activities={activities}
         className="md:col-span-2 h-full"
-        nextPayrollDate={payrollSummary.nextPayrollDate}
-        employeesCount={payrollSummary.employeesCount}
-        totalAmount={payrollSummary.totalAmount}
       />
     </div>
   );
