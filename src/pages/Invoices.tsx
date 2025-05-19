@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Search, FileText, Download, Eye, Filter, Paperclip, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useBillingFeatures } from "@/hooks/use-billing-features";
+import { useToast } from "@/hooks/use-toast";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,6 +37,11 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
+// Import our new components
+import { InvoiceDialog, InvoiceFormValues } from "@/components/invoices/InvoiceDialog";
+import { InvoicePeriodSelector, PeriodType } from "@/components/invoices/InvoicePeriodSelector";
+import { InvoicePeriodProgress } from "@/components/invoices/InvoicePeriodProgress";
+
 // Define the invoice type
 interface Attachment {
   id: string;
@@ -54,8 +60,26 @@ interface Invoice {
   attachments?: Attachment[];
 }
 
+interface InvoicePeriod {
+  id: string;
+  type: PeriodType;
+  startDate: Date;
+  endDate: Date;
+  closed: boolean;
+}
+
 const Invoices = () => {
   const { billingEnabled } = useBillingFeatures();
+  const { toast } = useToast();
+  
+  // State for invoice dialog
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  
+  // State for invoice period
+  const [periodType, setPeriodType] = useState<PeriodType>("weekly");
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [isPeriodClosed, setIsPeriodClosed] = useState(false);
+  const [showPeriodProgress, setShowPeriodProgress] = useState(false);
   
   // Enhanced mock invoice data with attachments
   const allInvoices: Invoice[] = [
@@ -318,6 +342,47 @@ const Invoices = () => {
     return count;
   };
 
+  // Handle period type change
+  const handlePeriodTypeChange = (type: PeriodType) => {
+    setPeriodType(type);
+    // Reset period closed state when changing period type
+    setIsPeriodClosed(false);
+  };
+
+  // Handle date change for period
+  const handleDateChange = (date: Date) => {
+    setSelectedDate(date);
+    // Reset period closed state when changing date
+    setIsPeriodClosed(false);
+  };
+
+  // Handle closing invoice period
+  const handleClosePeriod = () => {
+    setIsPeriodClosed(true);
+    toast({
+      title: "Invoice period closed",
+      description: "The invoice period has been successfully closed.",
+    });
+  };
+
+  // Handle view invoice in progress toggle
+  const togglePeriodProgress = () => {
+    setShowPeriodProgress(!showPeriodProgress);
+  };
+
+  // Handle new invoice submission
+  const handleNewInvoice = (values: InvoiceFormValues, attachments: File[]) => {
+    // Here you would typically make an API call to save the invoice
+    // For now, we'll just show a toast notification
+    console.log("New invoice:", values);
+    console.log("Attachments:", attachments);
+    
+    toast({
+      title: "Invoice created",
+      description: `Invoice for ${values.client} has been created successfully.`,
+    });
+  };
+
   if (!billingEnabled) {
     return (
       <div className="flex flex-col items-center justify-center h-[80vh]">
@@ -341,6 +406,12 @@ const Invoices = () => {
           </p>
         </div>
         <div className="flex gap-2">
+          <Button 
+            variant={showPeriodProgress ? "default" : "outline"} 
+            onClick={togglePeriodProgress}
+          >
+            View Invoice in Progress
+          </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline">
@@ -505,12 +576,48 @@ const Invoices = () => {
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button className="flow-gradient">
+          <Button className="flow-gradient" onClick={() => setIsDialogOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
             New Invoice
           </Button>
+          
+          {/* New Invoice Dialog */}
+          <InvoiceDialog 
+            open={isDialogOpen}
+            onOpenChange={setIsDialogOpen}
+            onSubmit={handleNewInvoice}
+          />
         </div>
       </div>
+      
+      {/* Invoice Period Section */}
+      {showPeriodProgress && (
+        <div className="grid gap-6 md:grid-cols-2">
+          <div>
+            <Card>
+              <CardHeader>
+                <CardTitle>Invoice Period Settings</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <InvoicePeriodSelector 
+                  periodType={periodType}
+                  selectedDate={selectedDate}
+                  onPeriodTypeChange={handlePeriodTypeChange}
+                  onDateChange={handleDateChange}
+                />
+              </CardContent>
+            </Card>
+          </div>
+          <div>
+            <InvoicePeriodProgress 
+              periodType={periodType}
+              selectedDate={selectedDate}
+              isPeriodClosed={isPeriodClosed}
+              onClosePeriod={handleClosePeriod}
+            />
+          </div>
+        </div>
+      )}
 
       <Card>
         <CardHeader>
