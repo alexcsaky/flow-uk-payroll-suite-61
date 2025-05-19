@@ -85,7 +85,7 @@ export function InvoicePeriodSelector({
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
               <Calendar
-                mode={periodType === "monthly" ? "month" : "single"}
+                mode="single"
                 selected={selectedDate}
                 onSelect={(date) => date && onDateChange(date)}
                 initialFocus
