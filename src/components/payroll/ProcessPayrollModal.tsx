@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
@@ -6,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { 
   Check, 
-  AlertCircle, 
+  AlertTriangle, 
   Loader2, 
   FileText, 
   Download, 
@@ -15,7 +14,6 @@ import {
   FileDown,
   Eye,
   Clock,
-  AlertTriangle,
   X
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -83,7 +81,7 @@ const MockReportDialog: React.FC<MockReportDialogProps> = ({ open, onClose, repo
                   <tr>
                     <td className="border p-2">John Davis</td>
                     <td className="border p-2">Overtime</td>
-                    <td className="border p-2">Unusually high hours (>40)</td>
+                    <td className="border p-2">Unusually high hours ({">"} 40)</td>
                     <td className="border p-2">
                       <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
                         Flagged
@@ -744,7 +742,7 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
                                 <Button 
                                   size="sm" 
                                   variant="outline" 
-                                  onClick={() => handleViewReport(step.reportTitle || "Report")}
+                                  onClick={() => openReportDialog(step.reportTitle || "Report")}
                                 >
                                   <Eye className="h-4 w-4 mr-1" />
                                   View Details
@@ -782,7 +780,7 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
                                 ))}
                               </ul>
                               <div className="mt-3">
-                                <Button size="sm" variant="secondary" onClick={() => handleViewReport("Validation Report")}>
+                                <Button size="sm" variant="secondary" onClick={() => openReportDialog("Validation Report")}>
                                   <Eye className="h-4 w-4 mr-1" />
                                   View Full Report
                                 </Button>
@@ -804,7 +802,7 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
                               <Button 
                                 size="sm" 
                                 variant="secondary"
-                                onClick={() => handleViewReport(step.reportTitle!)}
+                                onClick={() => openReportDialog(step.reportTitle!)}
                               >
                                 <Eye className="h-4 w-4 mr-1" />
                                 View {step.reportTitle}
