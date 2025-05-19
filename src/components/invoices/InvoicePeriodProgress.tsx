@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import {
   format,
   differenceInDays,
@@ -26,7 +26,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { PeriodType } from "./InvoicePeriodSelector";
-import { LockIcon, UnlockIcon } from "lucide-react";
+import { LockIcon, UnlockIcon, FileText } from "lucide-react";
 
 interface InvoicePeriodProgressProps {
   periodType: PeriodType;
@@ -42,6 +42,7 @@ export function InvoicePeriodProgress({
   onClosePeriod,
 }: InvoicePeriodProgressProps) {
   const today = new Date();
+  const [showMockInvoice, setShowMockInvoice] = useState(false);
   
   // Calculate period start, end, and progress based on period type
   const getPeriodDetails = () => {
@@ -61,6 +62,7 @@ export function InvoicePeriodProgress({
         break;
         
       case "weekly":
+        // Always use Monday-Sunday week regardless of the current day
         start = startOfWeek(selectedDate, { weekStartsOn: 1 }); // Monday
         end = endOfWeek(selectedDate, { weekStartsOn: 1 }); // Sunday
         days = eachDayOfInterval({ start, end });
@@ -156,6 +158,66 @@ export function InvoicePeriodProgress({
   const isPeriodInPast = end < today;
   const isPeriodInFuture = start > today;
   
+  // Mock invoice content based on period type
+  const renderMockInvoice = () => {
+    if (!showMockInvoice) return null;
+    
+    let totalAmount = 0;
+    let lineItems = [];
+    
+    if (periodType === "daily") {
+      totalAmount = 345.67;
+      lineItems = [
+        { description: "Daily services", hours: 8, rate: 35, amount: 280 },
+        { description: "Materials", quantity: 2, rate: 32.84, amount: 65.67 }
+      ];
+    } else if (periodType === "weekly") {
+      totalAmount = 1875.50;
+      lineItems = [
+        { description: "Weekly consulting", hours: 38, rate: 45, amount: 1710 },
+        { description: "Software licenses", quantity: 5, rate: 33.10, amount: 165.50 }
+      ];
+    } else if (periodType === "monthly") {
+      totalAmount = 7450.00;
+      lineItems = [
+        { description: "Monthly retainer", hours: 160, rate: 40, amount: 6400 },
+        { description: "Hardware rental", quantity: 3, rate: 350, amount: 1050 }
+      ];
+    } else {
+      totalAmount = 925.75;
+      lineItems = [
+        { description: "Confirmed shifts", hours: 22, rate: 38.50, amount: 847 },
+        { description: "Additional expenses", quantity: 1, rate: 78.75, amount: 78.75 }
+      ];
+    }
+    
+    return (
+      <div className="mt-4 border rounded-md p-4">
+        <h3 className="font-semibold text-md mb-2">Mock Invoice Preview</h3>
+        <p className="text-sm text-muted-foreground mb-3">Period: {format(start, "MMM d, yyyy")} - {format(end, "MMM d, yyyy")}</p>
+        
+        <div className="space-y-1 mb-4">
+          {lineItems.map((item, index) => (
+            <div key={index} className="grid grid-cols-12 text-sm">
+              <span className="col-span-6">{item.description}</span>
+              <span className="col-span-2 text-right">{item.hours || item.quantity}</span>
+              <span className="col-span-2 text-right">${item.rate.toFixed(2)}</span>
+              <span className="col-span-2 text-right font-medium">${item.amount.toFixed(2)}</span>
+            </div>
+          ))}
+          <div className="border-t pt-2 mt-2 grid grid-cols-12 text-sm font-bold">
+            <span className="col-span-10 text-right">Total:</span>
+            <span className="col-span-2 text-right">${totalAmount.toFixed(2)}</span>
+          </div>
+        </div>
+        
+        <Button size="sm" variant="outline" onClick={() => setShowMockInvoice(false)}>
+          Close Preview
+        </Button>
+      </div>
+    );
+  };
+  
   return (
     <Card className={cn(
       isPeriodClosed ? "border-amber-500" : 
@@ -197,8 +259,20 @@ export function InvoicePeriodProgress({
             </div>
           </div>
         )}
+
+        {renderMockInvoice()}
       </CardContent>
-      <CardFooter>
+      <CardFooter className="flex justify-between">
+        <Button
+          variant="outline" 
+          size="sm" 
+          onClick={() => setShowMockInvoice(!showMockInvoice)}
+          className="flex items-center gap-1"
+        >
+          <FileText className="h-4 w-4" /> 
+          {showMockInvoice ? "Hide Mock Invoice" : "View Mock Invoice"}
+        </Button>
+        
         {!isPeriodClosed ? (
           <AlertDialog>
             <AlertDialogTrigger asChild>

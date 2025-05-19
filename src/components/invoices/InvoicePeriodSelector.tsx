@@ -1,6 +1,6 @@
 
 import React from "react";
-import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from "date-fns";
+import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, addDays } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -41,6 +41,7 @@ export function InvoicePeriodSelector({
       case "daily":
         return format(selectedDate, "PPP");
       case "weekly": {
+        // Always use Monday-Sunday week regardless of the current day
         const weekStart = startOfWeek(selectedDate, { weekStartsOn: 1 }); // Monday
         const weekEnd = endOfWeek(selectedDate, { weekStartsOn: 1 }); // Sunday
         return `${format(weekStart, "MMM d")} – ${format(weekEnd, "MMM d, yyyy")}`;
@@ -57,6 +58,7 @@ export function InvoicePeriodSelector({
   // Helper function to get the highlighted date range for the calendar
   const getDateRange = () => {
     if (periodType === "weekly") {
+      // Always use Monday-Sunday week regardless of the current day
       const weekStart = startOfWeek(selectedDate, { weekStartsOn: 1 });
       const weekEnd = endOfWeek(selectedDate, { weekStartsOn: 1 });
       return { from: weekStart, to: weekEnd };
@@ -133,7 +135,7 @@ export function InvoicePeriodSelector({
             <>Selected day: {format(selectedDate, "EEEE, MMMM d, yyyy")}</>
           )}
           {periodType === "weekly" && (
-            <>Week {format(selectedDate, "w, yyyy")} selected</>
+            <>Week {format(selectedDate, "w, yyyy")} selected | Monday-Sunday</>
           )}
           {periodType === "monthly" && (
             <>Full month of {format(selectedDate, "MMMM yyyy")} selected</>
