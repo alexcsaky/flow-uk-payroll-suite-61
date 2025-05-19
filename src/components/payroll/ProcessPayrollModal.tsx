@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
@@ -434,7 +433,7 @@ export const ProcessPayrollModal: React.FC<ProcessPayrollModalProps> = ({ open, 
                         
                         {/* Flagged Data Alert */}
                         {step.status === "flagged" && (
-                          <Alert variant="warning" className="mt-3 border-amber-200 bg-amber-50">
+                          <Alert className="mt-3 border-amber-200 bg-amber-50">
                             <AlertTriangle className="h-4 w-4 text-amber-500" />
                             <AlertTitle className="text-amber-800">Review Required</AlertTitle>
                             <AlertDescription className="text-amber-700">
