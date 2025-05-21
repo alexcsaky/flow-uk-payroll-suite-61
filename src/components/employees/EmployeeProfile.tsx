@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -7,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
 import { Briefcase, Calendar, Mail, Phone } from "lucide-react";
+import { EmployeeTags } from "./EmployeeTags";
 
 interface EmployeeProfileProps {
   employee: {
@@ -98,6 +98,12 @@ const EmployeeProfile: React.FC<EmployeeProfileProps> = ({ employee }) => {
                 Performance
               </Button>
             </div>
+          </div>
+
+          <Separator />
+          
+          <div className="pt-2">
+            <EmployeeTags />
           </div>
         </div>
       </CardContent>

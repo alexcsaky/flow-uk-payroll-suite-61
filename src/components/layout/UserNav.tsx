@@ -1,4 +1,3 @@
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,10 +8,27 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
-import { LogOut, Settings, User } from "lucide-react";
+import { LogOut, Settings, User, ChevronDown } from "lucide-react";
+import { useState } from "react";
+
+const ROLES = [
+  "Payroll Manager",
+  "HR",
+  "Finance",
+  "Director"
+] as const;
+
+type Role = typeof ROLES[number];
 
 export function UserNav() {
+  const [selectedRole, setSelectedRole] = useState<Role>("Payroll Manager");
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -32,6 +48,21 @@ export function UserNav() {
             </p>
           </div>
         </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger>
+            <span>View as: {selectedRole}</span>
+          </DropdownMenuSubTrigger>
+          <DropdownMenuSubContent>
+            <DropdownMenuRadioGroup value={selectedRole} onValueChange={(value) => setSelectedRole(value as Role)}>
+              {ROLES.map((role) => (
+                <DropdownMenuRadioItem key={role} value={role}>
+                  {role}
+                </DropdownMenuRadioItem>
+              ))}
+            </DropdownMenuRadioGroup>
+          </DropdownMenuSubContent>
+        </DropdownMenuSub>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem>
