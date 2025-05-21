@@ -1,16 +1,22 @@
 import React, { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Search, Filter, Download } from "lucide-react";
+import { Search, Filter, Download, Mail, Lock, Unlock } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table";
 import { PayrollFilters } from "./PayrollFilters";
 import { format, isWithinInterval, parseISO } from "date-fns";
 import { DateRange } from "react-day-picker";
+import { ResendPayslipsModal } from "./ResendPayslipsModal";
 
 export const PayrollHistory: React.FC = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [showResendModal, setShowResendModal] = useState(false);
+  const [payrollLockStatus, setPayrollLockStatus] = useState<Record<string, boolean>>({
+    "PR-2025-001": false, // Open
+    "PR-2025-002": true,  // Locked
+  });
   
   // Filter states
   const [selectedClient, setSelectedClient] = useState<string | null>(null);
@@ -237,110 +243,120 @@ export const PayrollHistory: React.FC = () => {
     setSearchTerm("");
   };
 
+  const togglePayrollLock = (payrollId: string) => {
+    setPayrollLockStatus(prev => ({
+      ...prev,
+      [payrollId]: !prev[payrollId]
+    }));
+  };
+
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Payroll History</CardTitle>
-        <div className="flex items-center gap-2">
-          <div className="relative w-64">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search payroll runs..."
-              className="w-full pl-8"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle>Payroll History</CardTitle>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                className="flex items-center gap-2"
+                onClick={() => setShowResendModal(true)}
+              >
+                <Mail className="h-4 w-4" />
+                Manual Payslip Resend
+              </Button>
+              <Button
+                variant={showFilters ? "secondary" : "outline"}
+                onClick={() => setShowFilters(!showFilters)}
+              >
+                <Filter className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
-          <Button 
-            variant="outline" 
-            size="icon"
-            onClick={() => setShowFilters(!showFilters)}
-          >
-            <Filter className="h-4 w-4" />
-          </Button>
-          <Button variant="outline">
-            <Download className="mr-2 h-4 w-4" />
-            Export
-          </Button>
-        </div>
-      </CardHeader>
-      
-      {showFilters && (
-        <PayrollFilters 
-          clients={clients}
-          venues={venues}
-          onApplyFilters={handleApplyFilters}
-          onResetFilters={handleResetFilters}
-          initialFilters={{
-            client: selectedClient,
-            venue: selectedVenue,
-            dateRange,
-            weekEndingDate,
-            poNumber
-          }}
-        />
-      )}
-      
-      <CardContent>
-        <div className="rounded-lg border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Run ID</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Client</TableHead>
-                <TableHead>Venue</TableHead>
-                <TableHead>Week Ending</TableHead>
-                <TableHead>PO Number</TableHead>
-                <TableHead>Employees</TableHead>
-                <TableHead>Total Amount</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredPayrollHistory.map((run) => (
-                <TableRow key={run.id}>
-                  <TableCell className="font-medium">{run.id}</TableCell>
-                  <TableCell>{format(parseISO(run.date), 'MMM dd, yyyy')}</TableCell>
-                  <TableCell>{run.client}</TableCell>
-                  <TableCell>{run.venue}</TableCell>
-                  <TableCell>{format(parseISO(run.weekEnding), 'MMM dd, yyyy')}</TableCell>
-                  <TableCell>{run.poNumber}</TableCell>
-                  <TableCell>{run.employees}</TableCell>
-                  <TableCell>{run.totalAmount}</TableCell>
-                  <TableCell>
-                    <span
-                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                        run.status === "completed"
-                          ? "bg-green-100 text-green-800"
-                          : run.status === "scheduled"
-                          ? "bg-blue-100 text-blue-800"
-                          : "bg-yellow-100 text-yellow-800"
-                      }`}
-                    >
-                      {run.status.charAt(0).toUpperCase() + run.status.slice(1)}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <Button variant="ghost" size="sm">
-                      View
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-              {filteredPayrollHistory.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={10} className="h-24 text-center">
-                    No results found.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      </CardContent>
-    </Card>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {/* Search bar */}
+            <div className="relative">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Search by ID, client, or PO number..."
+                className="pl-8"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+
+            {/* Filters */}
+            {showFilters && (
+              <PayrollFilters
+                clients={clients}
+                venues={venues}
+                onApplyFilters={handleApplyFilters}
+                onResetFilters={handleResetFilters}
+              />
+            )}
+
+            {/* Payroll history table */}
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Run ID</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Client</TableHead>
+                    <TableHead>Venue</TableHead>
+                    <TableHead>Week Ending</TableHead>
+                    <TableHead>PO Number</TableHead>
+                    <TableHead>Employees</TableHead>
+                    <TableHead>Total Amount</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Lock Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredPayrollHistory.map((run) => (
+                    <TableRow key={run.id}>
+                      <TableCell className="font-medium">{run.id}</TableCell>
+                      <TableCell>{format(parseISO(run.date), 'dd/MM/yyyy')}</TableCell>
+                      <TableCell>{run.client}</TableCell>
+                      <TableCell>{run.venue}</TableCell>
+                      <TableCell>{format(parseISO(run.weekEnding), 'dd/MM/yyyy')}</TableCell>
+                      <TableCell>{run.poNumber}</TableCell>
+                      <TableCell>{run.employees}</TableCell>
+                      <TableCell>{run.totalAmount}</TableCell>
+                      <TableCell>{run.status}</TableCell>
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => togglePayrollLock(run.id)}
+                          className="flex items-center gap-1"
+                        >
+                          {payrollLockStatus[run.id] ? (
+                            <Lock className="h-4 w-4 text-red-500" />
+                          ) : (
+                            <Unlock className="h-4 w-4 text-green-500" />
+                          )}
+                          <span className="text-xs">
+                            {payrollLockStatus[run.id] ? "Locked" : "Open"}
+                          </span>
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <ResendPayslipsModal
+        open={showResendModal}
+        onOpenChange={setShowResendModal}
+      />
+    </div>
   );
 };

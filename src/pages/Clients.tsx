@@ -1,22 +1,51 @@
-
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Search, Building, Users, Mail, Phone, MoreHorizontal } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useBillingFeatures } from "@/hooks/use-billing-features";
+import { AddClientDialog } from "@/components/clients/AddClientDialog";
+import { useNavigate } from "react-router-dom";
+
+interface Client {
+  id: number;
+  name: string;
+  contact: string;
+  email: string;
+  phone: string;
+  projects: number;
+}
 
 const Clients = () => {
   const { billingEnabled } = useBillingFeatures();
-  
-  // Sample client data
-  const clients = [
+  const navigate = useNavigate();
+  const [clients, setClients] = useState<Client[]>([
     { id: 1, name: "Acme Corporation", contact: "John Smith", email: "john@acmecorp.com", phone: "(555) 123-4567", projects: 3 },
     { id: 2, name: "Globex Industries", contact: "Jane Doe", email: "jane@globex.com", phone: "(555) 765-4321", projects: 2 },
     { id: 3, name: "Stark Enterprises", contact: "Tony Stark", email: "tony@stark.com", phone: "(555) 987-6543", projects: 5 },
     { id: 4, name: "Wayne Industries", contact: "Bruce Wayne", email: "bruce@wayne.com", phone: "(555) 456-7890", projects: 1 },
     { id: 5, name: "Umbrella Corporation", contact: "Alice Wong", email: "alice@umbrella.com", phone: "(555) 234-5678", projects: 4 },
-  ];
+  ]);
+
+  const handleAddClient = (newClient: {
+    name: string;
+    contact: string;
+    email: string;
+    phone: string;
+  }) => {
+    setClients([
+      ...clients,
+      {
+        id: clients.length + 1,
+        ...newClient,
+        projects: 0,
+      },
+    ]);
+  };
+
+  const handleViewClient = (clientId: number) => {
+    navigate(`/clients/${clientId}`);
+  };
 
   if (!billingEnabled) {
     return (
@@ -40,10 +69,7 @@ const Clients = () => {
             Manage your client relationships and projects
           </p>
         </div>
-        <Button className="flow-gradient">
-          <Plus className="mr-2 h-4 w-4" />
-          Add Client
-        </Button>
+        <AddClientDialog onClientAdded={handleAddClient} />
       </div>
 
       <Card>
@@ -105,7 +131,13 @@ const Clients = () => {
                     <td className="py-3 px-4">{client.projects}</td>
                     <td className="py-3 px-4">
                       <div className="flex gap-2">
-                        <Button variant="outline" size="sm">View</Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleViewClient(client.id)}
+                        >
+                          View
+                        </Button>
                         <Button variant="ghost" size="sm">
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>

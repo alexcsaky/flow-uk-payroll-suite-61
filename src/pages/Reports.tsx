@@ -1,12 +1,42 @@
-
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart3, Download, FileText, Filter, PieChart, Plus } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ReportTypeSelectModal } from "@/components/reports/ReportTypeSelectModal";
+import { ReportFilterModal } from "@/components/reports/ReportFilterModal";
+import { MockReportDisplay } from "@/components/reports/MockReportDisplay";
+
+const REPORT_CARD_MAP = [
+  {
+    key: "Payroll Report",
+    icon: <BarChart3 className="h-5 w-5" />,
+    title: "Payroll Reports",
+    desc: "View payroll and tax reports",
+    filterName: "Payroll Report"
+  },
+  {
+    key: "Employee Report",
+    icon: <FileText className="h-5 w-5" />,
+    title: "Employee Reports",
+    desc: "View employee statistics",
+    filterName: "Employee Report"
+  },
+  {
+    key: "Financial Report",
+    icon: <PieChart className="h-5 w-5" />,
+    title: "Financial Reports",
+    desc: "View financial statistics",
+    filterName: "Financial Report"
+  },
+];
 
 const Reports = () => {
+  const [showTypeModal, setShowTypeModal] = useState(false);
+  const [showFilterModal, setShowFilterModal] = useState(false);
+  const [selectedReportName, setSelectedReportName] = useState<string | null>(null);
+  const [showMockReport, setShowMockReport] = useState(false);
+
   // Sample report data
   const reports = [
     { id: 1, name: "Payroll Summary - Q1 2025", type: "Payroll", date: "2025-04-01", format: "PDF" },
@@ -15,6 +45,16 @@ const Reports = () => {
     { id: 4, name: "New Hire Report", type: "HR", date: "2025-03-20", format: "Excel" },
     { id: 5, name: "Tax Documents - Q1", type: "Finance", date: "2025-03-15", format: "PDF" },
   ];
+
+  const handleGenerateReport = (reportName: string) => {
+    setSelectedReportName(reportName);
+    setShowFilterModal(true);
+  };
+
+  const handleApplyFilters = () => {
+    setShowFilterModal(false);
+    setShowMockReport(true);
+  };
 
   return (
     <div className="space-y-6">
@@ -30,7 +70,7 @@ const Reports = () => {
             <Filter className="mr-2 h-4 w-4" />
             Filter
           </Button>
-          <Button className="flow-gradient">
+          <Button className="flow-gradient" onClick={() => setShowTypeModal(true)}>
             <Plus className="mr-2 h-4 w-4" />
             New Report
           </Button>
@@ -38,44 +78,22 @@ const Reports = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5" />
-              Payroll Reports
-            </CardTitle>
-            <CardDescription>View payroll and tax reports</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button variant="outline" className="w-full">Generate Report</Button>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5" />
-              Employee Reports
-            </CardTitle>
-            <CardDescription>View employee statistics</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button variant="outline" className="w-full">Generate Report</Button>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2">
-              <PieChart className="h-5 w-5" />
-              Financial Reports
-            </CardTitle>
-            <CardDescription>View financial statistics</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button variant="outline" className="w-full">Generate Report</Button>
-          </CardContent>
-        </Card>
+        {REPORT_CARD_MAP.map((card) => (
+          <Card key={card.key}>
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2">
+                {card.icon}
+                {card.title}
+              </CardTitle>
+              <CardDescription>{card.desc}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button variant="outline" className="w-full" onClick={() => handleGenerateReport(card.filterName)}>
+                Generate Report
+              </Button>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       <Card>
@@ -128,6 +146,24 @@ const Reports = () => {
           </div>
         </CardContent>
       </Card>
+
+      <ReportTypeSelectModal
+        open={showTypeModal}
+        onOpenChange={setShowTypeModal}
+        onSelect={(type) => {
+          setSelectedReportName(type);
+          setShowFilterModal(true);
+        }}
+      />
+      <ReportFilterModal
+        open={showFilterModal}
+        onOpenChange={setShowFilterModal}
+        reportName={selectedReportName || "Report"}
+        onApply={handleApplyFilters}
+      />
+      {showMockReport && selectedReportName && (
+        <MockReportDisplay reportName={selectedReportName} />
+      )}
     </div>
   );
 };

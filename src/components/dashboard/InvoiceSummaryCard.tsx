@@ -1,4 +1,3 @@
-
 import { 
   Card, 
   CardContent, 
@@ -11,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { FileText } from "lucide-react";
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
+import { Link } from "react-router-dom";
 
 interface InvoiceSummaryProps {
   totalOutstanding: number;
@@ -84,8 +84,8 @@ export function InvoiceSummaryCard({
         <div className="grid gap-4">
           {renderDonutChart()}
           
-          <Button className="w-full mt-2" variant="outline">
-            View All Invoices
+          <Button className="w-full mt-2" variant="outline" asChild>
+            <Link to="/invoices">View All Invoices</Link>
           </Button>
         </div>
       </div>
@@ -105,8 +105,8 @@ export function InvoiceSummaryCard({
         {renderDonutChart()}
       </CardContent>
       <CardFooter>
-        <Button className="w-full" variant="outline">
-          View All Invoices
+        <Button className="w-full" variant="outline" asChild>
+          <Link to="/invoices">View All Invoices</Link>
         </Button>
       </CardFooter>
     </Card>

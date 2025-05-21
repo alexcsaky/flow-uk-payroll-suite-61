@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,18 +5,94 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar, Clock, Plus, Search, Users } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AttachmentModal } from "@/components/timesheets/AttachmentModal";
+import { AttachmentButton } from "@/components/timesheets/AttachmentButton";
+import { LinkTimesheetModal } from "@/components/timesheets/LinkTimesheetModal";
+import { Badge } from "@/components/ui/badge";
+
+interface Timesheet {
+  id: number;
+  employee: string;
+  date: string;
+  hoursWorked: number;
+  status: string;
+  linkedPayRun?: string;
+  isPendingNextRun?: boolean;
+}
 
 const Timesheets = () => {
   const [activeTab, setActiveTab] = useState("week");
+  const [isAttachmentModalOpen, setIsAttachmentModalOpen] = useState(false);
+  const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
+  const [selectedTimesheetId, setSelectedTimesheetId] = useState<number | null>(null);
+  const [timesheetAttachments, setTimesheetAttachments] = useState<Record<number, number>>({});
   
-  // Sample timesheet data
-  const timesheets = [
+  // Sample timesheet data with linked pay run information
+  const [timesheets, setTimesheets] = useState<Timesheet[]>([
     { id: 1, employee: "Jane Cooper", date: "2025-04-01", hoursWorked: 8, status: "Approved" },
     { id: 2, employee: "Wade Warren", date: "2025-04-01", hoursWorked: 7.5, status: "Pending" },
     { id: 3, employee: "Esther Howard", date: "2025-04-02", hoursWorked: 8, status: "Approved" },
     { id: 4, employee: "Cameron Williamson", date: "2025-04-02", hoursWorked: 6, status: "Pending" },
     { id: 5, employee: "Brooklyn Simmons", date: "2025-04-03", hoursWorked: 8, status: "Approved" },
-  ];
+  ]);
+
+  const handleAttachmentClick = (timesheetId: number) => {
+    setSelectedTimesheetId(timesheetId);
+    setIsAttachmentModalOpen(true);
+  };
+
+  const handleAttachmentUpload = () => {
+    if (selectedTimesheetId) {
+      setTimesheetAttachments(prev => ({
+        ...prev,
+        [selectedTimesheetId]: (prev[selectedTimesheetId] || 0) + 1
+      }));
+    }
+  };
+
+  const handleViewClick = (timesheetId: number) => {
+    setSelectedTimesheetId(timesheetId);
+    setIsLinkModalOpen(true);
+  };
+
+  const handleLinkTimesheet = (payRunId: string) => {
+    if (selectedTimesheetId) {
+      setTimesheets(prev => prev.map(timesheet => {
+        if (timesheet.id === selectedTimesheetId) {
+          const isClosedPayRun = payRunId.includes("2025-04") || payRunId.includes("2025-03");
+          return {
+            ...timesheet,
+            linkedPayRun: payRunId,
+            isPendingNextRun: isClosedPayRun,
+            status: isClosedPayRun ? "Pending Next Run" : "Linked"
+          };
+        }
+        return timesheet;
+      }));
+    }
+  };
+
+  const getStatusBadge = (timesheet: Timesheet) => {
+    if (timesheet.isPendingNextRun) {
+      return (
+        <Badge variant="warning" className="bg-amber-100 text-amber-800">
+          Pending Next Run
+        </Badge>
+      );
+    }
+    if (timesheet.linkedPayRun) {
+      return (
+        <Badge variant="success" className="bg-green-100 text-green-800">
+          Linked
+        </Badge>
+      );
+    }
+    return (
+      <Badge variant={timesheet.status === "Approved" ? "success" : "warning"}>
+        {timesheet.status}
+      </Badge>
+    );
+  };
 
   return (
     <div className="space-y-6">
@@ -28,10 +103,6 @@ const Timesheets = () => {
             Manage and track employee working hours
           </p>
         </div>
-        <Button className="flow-gradient">
-          <Plus className="mr-2 h-4 w-4" />
-          New Timesheet
-        </Button>
       </div>
 
       <div className="flex flex-col md:flex-row gap-4">
@@ -95,16 +166,22 @@ const Timesheets = () => {
                           <td className="py-3 px-4">{timesheet.date}</td>
                           <td className="py-3 px-4">{timesheet.hoursWorked}</td>
                           <td className="py-3 px-4">
-                            <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
-                              timesheet.status === "Approved" 
-                                ? "bg-green-50 text-green-700" 
-                                : "bg-yellow-50 text-yellow-700"
-                            }`}>
-                              {timesheet.status}
-                            </span>
+                            {getStatusBadge(timesheet)}
                           </td>
                           <td className="py-3 px-4">
-                            <Button variant="ghost" size="sm">View</Button>
+                            <div className="flex items-center gap-2">
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                onClick={() => handleViewClick(timesheet.id)}
+                              >
+                                View
+                              </Button>
+                              <AttachmentButton
+                                count={timesheetAttachments[timesheet.id]}
+                                onClick={() => handleAttachmentClick(timesheet.id)}
+                              />
+                            </div>
                           </td>
                         </tr>
                       ))}
@@ -186,6 +263,20 @@ const Timesheets = () => {
           </Card>
         </div>
       </div>
+
+      <AttachmentModal
+        isOpen={isAttachmentModalOpen}
+        onClose={() => setIsAttachmentModalOpen(false)}
+        onUpload={handleAttachmentUpload}
+      />
+
+      <LinkTimesheetModal
+        isOpen={isLinkModalOpen}
+        onClose={() => setIsLinkModalOpen(false)}
+        timesheetId={selectedTimesheetId || 0}
+        timesheetDate={timesheets.find(t => t.id === selectedTimesheetId)?.date || ""}
+        onLink={handleLinkTimesheet}
+      />
     </div>
   );
 };

@@ -41,6 +41,7 @@ import {
 import { InvoiceDialog, InvoiceFormValues } from "@/components/invoices/InvoiceDialog";
 import { InvoicePeriodSelector, PeriodType } from "@/components/invoices/InvoicePeriodSelector";
 import { InvoicePeriodProgress } from "@/components/invoices/InvoicePeriodProgress";
+import { InvoiceDetailsModal } from "@/components/invoices/InvoiceDetailsModal";
 
 // Define the invoice type
 interface Attachment {
@@ -383,6 +384,14 @@ const Invoices = () => {
     });
   };
 
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+
+  const handleViewInvoice = (invoice: Invoice) => {
+    setSelectedInvoice(invoice);
+    setIsDetailsModalOpen(true);
+  };
+
   if (!billingEnabled) {
     return (
       <div className="flex flex-col items-center justify-center h-[80vh]">
@@ -637,12 +646,47 @@ const Invoices = () => {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="all" value={activeTab} onValueChange={handleTabChange}>
-            <TabsList>
-              <TabsTrigger value="all">All</TabsTrigger>
-              <TabsTrigger value="paid">Paid</TabsTrigger>
-              <TabsTrigger value="pending">Pending</TabsTrigger>
-              <TabsTrigger value="overdue">Overdue</TabsTrigger>
-            </TabsList>
+            <div className="flex items-center justify-between mb-4">
+              <TabsList>
+                <TabsTrigger value="all">All</TabsTrigger>
+                <TabsTrigger value="paid">Paid</TabsTrigger>
+                <TabsTrigger value="pending">Pending</TabsTrigger>
+                <TabsTrigger value="overdue">Overdue</TabsTrigger>
+              </TabsList>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  // Create a CSV string
+                  const headers = ["Invoice #", "Client", "Category", "Amount", "Date", "Status"];
+                  const csvContent = [
+                    headers.join(","),
+                    ...filteredInvoices.map(invoice => [
+                      invoice.id,
+                      invoice.client,
+                      invoice.category || "",
+                      invoice.amount.toFixed(2),
+                      invoice.date,
+                      invoice.status
+                    ].join(","))
+                  ].join("\n");
+
+                  // Create a blob and download link
+                  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+                  const link = document.createElement("a");
+                  const url = URL.createObjectURL(blob);
+                  link.setAttribute("href", url);
+                  link.setAttribute("download", "Invoices.CSV");
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                }}
+                className="flex items-center gap-1"
+              >
+                <Download className="h-4 w-4" />
+                Export CSV
+              </Button>
+            </div>
             <TabsContent value={activeTab} className="mt-4">
               <div className="rounded-md border">
                 <Table>
@@ -661,7 +705,9 @@ const Invoices = () => {
                   <TableBody>
                     {filteredInvoices.map((invoice) => (
                       <TableRow key={invoice.id}>
-                        <TableCell>{invoice.id}</TableCell>
+                        <TableCell className="cursor-pointer hover:underline" onClick={() => handleViewInvoice(invoice)}>
+                          {invoice.id}
+                        </TableCell>
                         <TableCell>{invoice.client}</TableCell>
                         <TableCell>{invoice.category || "-"}</TableCell>
                         <TableCell>${invoice.amount.toFixed(2)}</TableCell>
@@ -689,7 +735,11 @@ const Invoices = () => {
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-2">
-                            <Button variant="ghost" size="sm">
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => handleViewInvoice(invoice)}
+                            >
                               <Eye className="h-4 w-4" />
                             </Button>
                             <Button variant="ghost" size="sm">
@@ -713,6 +763,31 @@ const Invoices = () => {
           </Tabs>
         </CardContent>
       </Card>
+
+      {/* Add the InvoiceDetailsModal */}
+      {selectedInvoice && (
+        <InvoiceDetailsModal
+          isOpen={isDetailsModalOpen}
+          onClose={() => setIsDetailsModalOpen(false)}
+          invoiceId={selectedInvoice.id}
+          clientName={selectedInvoice.client}
+          date={selectedInvoice.date}
+          initialTimesheets={[
+            {
+              id: "ts-1",
+              employee: "John Doe",
+              hours: 16,
+              amount: 1600,
+            },
+            {
+              id: "ts-2",
+              employee: "Jane Smith",
+              hours: 20,
+              amount: 2000,
+            },
+          ]}
+        />
+      )}
     </div>
   );
 };
