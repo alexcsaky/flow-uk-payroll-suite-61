@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { MetricCard } from "./MetricCard";
 import { AnomalyCard } from "./AnomalyCard";
@@ -85,9 +84,8 @@ export function PayrollInsights() {
     }
   };
 
-  const handleDismiss = (anomalyId: string) => {
-    setAnomalies((current) => current.filter((a) => a.id !== anomalyId));
-    toast.success("Anomaly dismissed");
+  const handleDismissAnomaly = (anomalyId: string) => {
+    setAnomalies(prev => prev.filter(a => a.id !== anomalyId));
   };
 
   return (
@@ -127,7 +125,7 @@ export function PayrollInsights() {
                 description={anomaly.description}
                 primaryActionText={anomaly.primaryActionText}
                 onPrimaryAction={() => handlePrimaryAction(anomaly.id, anomaly.route)}
-                onDismiss={() => handleDismiss(anomaly.id)}
+                onDismiss={() => handleDismissAnomaly(anomaly.id)}
               />
             ))
           ) : (

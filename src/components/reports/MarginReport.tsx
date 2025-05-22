@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from "react";
 import { FinancialReportCard } from "./FinancialReportCard";
 import { DateRange } from "react-day-picker";
@@ -145,7 +144,7 @@ export const MarginReport: React.FC = () => {
       onExportCSV={handleExportCSV}
       onDownloadPDF={handleDownloadPDF}
     >
-      <div className="space-y-6">
+      <div className="space-y-8">
         {/* Metrics Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="bg-card rounded-lg p-4 border">
@@ -166,8 +165,8 @@ export const MarginReport: React.FC = () => {
           </div>
         </div>
         
-        {/* Bar Chart - Increased height for better readability */}
-        <div className="h-96">
+        {/* Bar Chart - Increased container height further */}
+        <div className="h-[600px] p-6 border border-border rounded-md">
           <ChartContainer 
             config={{
               revenue: { color: "#8B5CF6" },
@@ -210,8 +209,8 @@ export const MarginReport: React.FC = () => {
           </ChartContainer>
         </div>
         
-        {/* Data Table */}
-        <div className="border rounded-md overflow-hidden">
+        {/* Data Table - Much more spacing */}
+        <div className="mt-32">
           <Table>
             <TableHeader>
               <TableRow>

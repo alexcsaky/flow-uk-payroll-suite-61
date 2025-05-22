@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
@@ -18,7 +17,7 @@ export function PayrollChart({ data }: PayrollChartProps) {
         <CardDescription>Monthly payroll totals for the last 6 months</CardDescription>
       </CardHeader>
       <CardContent className="p-2">
-        <div className="h-[300px] w-full">
+        <div className="h-[350px] w-full">
           <ChartContainer 
             config={{
               value: {
@@ -28,7 +27,7 @@ export function PayrollChart({ data }: PayrollChartProps) {
             }}
           >
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data}>
+              <BarChart data={data} margin={{ top: 10, right: 20, left: 20, bottom: 20 }}>
                 <XAxis 
                   dataKey="name" 
                   axisLine={false} 

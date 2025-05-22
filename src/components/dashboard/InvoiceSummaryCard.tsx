@@ -38,15 +38,15 @@ export function InvoiceSummaryCard({
 
   const renderDonutChart = () => (
     <div className="relative w-full flex justify-center">
-      <div className="w-48 h-48">
+      <div className="w-64 h-64">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
               data={data}
               cx="50%"
               cy="50%"
-              innerRadius={60}
-              outerRadius={80}
+              innerRadius={80}
+              outerRadius={110}
               fill="#8884d8"
               paddingAngle={0}
               dataKey="value"
@@ -65,12 +65,12 @@ export function InvoiceSummaryCard({
         <div className="text-xs space-y-1 mt-1">
           <div className="flex items-center justify-center gap-1 text-green-500">
             <span>﹢</span>
-            <span>£{totalPaid.toLocaleString()}</span>
+            <span className="truncate max-w-[150px]">£{totalPaid.toLocaleString()}</span>
             <span className="text-muted-foreground">Paid</span>
           </div>
           <div className="flex items-center justify-center gap-1 text-muted-foreground">
             <span>﹣</span>
-            <span>£{totalOutstanding.toLocaleString()}</span>
+            <span className="truncate max-w-[150px]">£{totalOutstanding.toLocaleString()}</span>
             <span>Outstanding</span>
           </div>
         </div>

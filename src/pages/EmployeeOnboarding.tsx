@@ -1,12 +1,11 @@
-
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect, useCallback } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ArrowLeft, Info, ShieldCheck, ShieldAlert, ShieldX } from "lucide-react";
+import { ArrowLeft, Info, ShieldCheck, ShieldAlert, ShieldX, Save } from "lucide-react";
 import { PersonalInfoForm } from "@/components/employees/onboarding/PersonalInfoForm";
 import { JobDetailsForm } from "@/components/employees/onboarding/JobDetailsForm";
 import { PayrollTaxForm } from "@/components/employees/onboarding/PayrollTaxForm";
@@ -16,6 +15,11 @@ import { ReviewForm } from "@/components/employees/onboarding/ReviewForm";
 import { OnboardingProgress } from "@/components/employees/onboarding/OnboardingProgress";
 import { validateEmployeeData } from "@/utils/hmrc-validation";
 import { v4 as uuidv4 } from "uuid";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/components/ui/use-toast";
 
 // Draft employee key for local storage
 const EMPLOYEE_DRAFT_KEY = "employee_onboarding_draft";
@@ -23,13 +27,13 @@ const EMPLOYEE_DRAFT_KEY = "employee_onboarding_draft";
 // Initial employee data structure
 const initialEmployeeState = {
   // Top level fields
-  employee_id: uuidv4(),
+  employeeId: uuidv4(),
   status: "onboarding",
-  compliance_status: "needs_approval",
-  created_at: new Date().toISOString(),
-  created_by: "current-user", // This would normally be the current user's ID
-  updated_at: new Date().toISOString(),
-  updated_by: "current-user", // This would normally be the current user's ID
+  complianceStatus: "needs_approval",
+  createdAt: new Date().toISOString(),
+  createdBy: "current-user", // This would normally be the current user's ID
+  updatedAt: new Date().toISOString(),
+  updatedBy: "current-user", // This would normally be the current user's ID
 
   // Main sections
   personal: {
@@ -123,14 +127,14 @@ const initialEmployeeState = {
   },
 
   // External IDs (optional)
-  external_ids: {
-    hr_system_id: "",
-    payroll_id: "",
-    gl_code: "",
+  externalIds: {
+    hrSystemId: "",
+    payrollId: "",
+    glCode: "",
   },
 
   // No change requests initially
-  change_requests: []
+  changeRequests: []
 };
 
 // Steps in the onboarding process
@@ -149,7 +153,12 @@ const EmployeeOnboarding = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [hasDraft, setHasDraft] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [isDirty, setIsDirty] = useState(false);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { toast } = useToast();
+  const isEditMode = searchParams.get("edit") !== null;
+  const employeeId = searchParams.get("edit");
 
   // Load draft data from localStorage on component mount
   useEffect(() => {
@@ -165,17 +174,23 @@ const EmployeeOnboarding = () => {
     }
   }, []);
 
-  // Auto-save changes to localStorage
-  useEffect(() => {
-    // Only save if we've made changes to the initial state
-    if (JSON.stringify(employeeData) !== JSON.stringify(initialEmployeeState)) {
+  // Debounced save function
+  const debouncedSave = useCallback(() => {
+    if (isDirty) {
       localStorage.setItem(EMPLOYEE_DRAFT_KEY, JSON.stringify({
         ...employeeData,
-        updated_at: new Date().toISOString()
+        updatedAt: new Date().toISOString()
       }));
       setHasDraft(true);
+      setIsDirty(false);
     }
-  }, [employeeData]);
+  }, [employeeData, isDirty]);
+
+  // Set up debounced save effect
+  useEffect(() => {
+    const timeoutId = setTimeout(debouncedSave, 500);
+    return () => clearTimeout(timeoutId);
+  }, [debouncedSave, employeeData]);
 
   // Handle step navigation
   const handleNextStep = () => {
@@ -201,6 +216,7 @@ const EmployeeOnboarding = () => {
         ...data
       }
     }));
+    setIsDirty(true);
 
     // Update validation errors when data changes
     const result = validateEmployeeData(employeeData);
@@ -249,26 +265,41 @@ const EmployeeOnboarding = () => {
   const handleSubmit = async () => {
     setIsLoading(true);
     try {
-      // Update the compliance status before submission
+      // Validate the data
+      const result = validateEmployeeData(employeeData);
+      if (!result.isValid) {
+        setValidationErrors(result.errors);
+        toast.error("Please fix the validation errors before submitting");
+        return;
+      }
+
+      // Calculate compliance status
       const complianceStatus = calculateComplianceStatus();
-      const finalData = {
+
+      // Prepare the data for submission
+      const submissionData = {
         ...employeeData,
-        compliance_status: complianceStatus,
-        status: complianceStatus === "error" ? "info-incomplete" : "active",
-        updated_at: new Date().toISOString()
+        complianceStatus,
+        updatedAt: new Date().toISOString()
       };
 
-      // Here you would normally make an API call to save the employee data
-      // For now, we'll simulate a successful submission
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // In a real app, this would be an API call
+      console.log("Submitting employee data:", submissionData);
       
-      // Clear the draft from localStorage after successful submission
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Clear the draft
       localStorage.removeItem(EMPLOYEE_DRAFT_KEY);
       
-      toast.success("Employee added successfully");
+      // Show success message
+      toast.success("Employee onboarding completed successfully");
+      
+      // Navigate to employee list
       navigate("/employees");
     } catch (error) {
-      toast.error("Failed to add employee. Please try again.");
+      console.error("Error submitting employee data:", error);
+      toast.error("Failed to submit employee data. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -285,6 +316,53 @@ const EmployeeOnboarding = () => {
     }
   };
 
+  useEffect(() => {
+    if (isEditMode && employeeId) {
+      // In a real app, you would fetch the employee data from your API
+      // For now, we'll use mock data that matches the profile structure
+      const mockEmployeeData = {
+        id: employeeId,
+        name: "John Doe",
+        email: "john.doe@example.com",
+        phone: "+44 7123 456789",
+        department: "Engineering",
+        role: "Software Engineer",
+        status: "Active",
+        startDate: "2024-01-01",
+        nationalInsurance: "AB123456C",
+        taxCode: "1250L"
+      };
+
+      // Map the profile data to the onboarding form structure
+      setEmployeeData({
+        ...initialEmployeeState,
+        employeeId: mockEmployeeData.id,
+        status: mockEmployeeData.status.toLowerCase(),
+        personal: {
+          ...initialEmployeeState.personal,
+          firstName: mockEmployeeData.name.split(" ")[0],
+          lastName: mockEmployeeData.name.split(" ").slice(1).join(" "),
+          email: mockEmployeeData.email,
+          phone: mockEmployeeData.phone,
+          niNumber: mockEmployeeData.nationalInsurance,
+          isComplete: true
+        },
+        job: {
+          ...initialEmployeeState.job,
+          title: mockEmployeeData.role,
+          department: mockEmployeeData.department,
+          startDate: mockEmployeeData.startDate,
+          isComplete: true
+        },
+        payroll: {
+          ...initialEmployeeState.payroll,
+          taxCode: mockEmployeeData.taxCode,
+          isComplete: true
+        }
+      });
+    }
+  }, [isEditMode, employeeId]);
+
   return (
     <div className="flex flex-col gap-6 max-w-5xl mx-auto">
       <div className="flex items-center gap-4">
@@ -297,7 +375,9 @@ const EmployeeOnboarding = () => {
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Employee Onboarding</h2>
+          <h2 className="text-3xl font-bold tracking-tight">
+            {isEditMode ? "Edit Employee Details" : "Employee Onboarding"}
+          </h2>
           <p className="text-muted-foreground">Add a new employee to your organization</p>
         </div>
       </div>

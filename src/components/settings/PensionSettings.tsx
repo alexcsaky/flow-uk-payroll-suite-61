@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -98,7 +97,7 @@ export default function PensionSettings() {
   };
 
   const handleDelete = (id: string) => {
-    setSchemes(schemes.filter(s => s.id !== id));
+    setSchemes(prev => prev.filter(s => s.id !== id));
     toast.success("Pension scheme deleted");
   };
 

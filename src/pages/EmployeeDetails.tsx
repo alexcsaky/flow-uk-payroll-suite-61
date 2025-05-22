@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -27,16 +26,27 @@ const EmployeeDetails = () => {
     const employeePayslips = payslipsData[employeeId] || [];
     setPayslips(employeePayslips);
     
+    // Create abort controller for fetch operations
+    const controller = new AbortController();
+    
     // Fetch exceptions for the employee
-    fetchExceptions();
+    fetchExceptions(controller.signal);
+    
+    // Cleanup function
+    return () => {
+      controller.abort();
+    };
   }, [employeeId]);
   
-  const fetchExceptions = async () => {
+  const fetchExceptions = async (signal?: AbortSignal) => {
     setLoadingExceptions(true);
     try {
       // In a real application, this would be a real API call
       // For demo purposes, we'll simulate an API call
-      await simulateFetch();
+      await simulateFetch(signal);
+      
+      // Check if the operation was aborted
+      if (signal?.aborted) return;
       
       // Generate mock exceptions for specific employees to demonstrate functionality
       let mockExceptions: Exception[] = [];
@@ -70,28 +80,52 @@ const EmployeeDetails = () => {
         ];
       }
       
+      // Check if the operation was aborted before setting state
+      if (signal?.aborted) return;
       setExceptions(mockExceptions);
     } catch (error) {
+      if (error.name === 'AbortError') {
+        // Ignore abort errors
+        return;
+      }
       console.error("Error fetching exceptions:", error);
     } finally {
-      setLoadingExceptions(false);
+      if (!signal?.aborted) {
+        setLoadingExceptions(false);
+      }
     }
   };
   
   // Simulate API fetch delay
-  const simulateFetch = () => {
-    return new Promise(resolve => setTimeout(resolve, 1000));
+  const simulateFetch = (signal?: AbortSignal) => {
+    return new Promise((resolve, reject) => {
+      const timeoutId = setTimeout(resolve, 1000);
+      
+      // Add abort listener
+      signal?.addEventListener('abort', () => {
+        clearTimeout(timeoutId);
+        reject(new DOMException('Aborted', 'AbortError'));
+      });
+    });
   };
   
   const resolveException = async (exceptionId: string) => {
+    const controller = new AbortController();
     try {
       // In a real application, this would be a real API call to resolve the exception
       // POST /api/employees/{id}/exceptions/{exceptionId}/resolve
-      await simulateFetch();
+      await simulateFetch(controller.signal);
+      
+      // Check if the operation was aborted
+      if (controller.signal.aborted) return;
       
       // Remove the resolved exception from state
-      setExceptions(exceptions.filter(exc => exc.id !== exceptionId));
+      setExceptions(prev => prev.filter(exc => exc.id !== exceptionId));
     } catch (error) {
+      if (error.name === 'AbortError') {
+        // Ignore abort errors
+        return;
+      }
       console.error("Error resolving exception:", error);
       throw error;
     }

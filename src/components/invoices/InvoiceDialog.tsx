@@ -1,4 +1,3 @@
-
 import React from "react";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon, Paperclip, X } from "lucide-react";
@@ -103,7 +102,7 @@ export function InvoiceDialog({
 
   // Remove an attachment
   const removeAttachment = (index: number) => {
-    setAttachments((prev) => prev.filter((_, i) => i !== index));
+    setAttachments(prev => prev.filter((_, i) => i !== index));
   };
 
   // Handle form submission

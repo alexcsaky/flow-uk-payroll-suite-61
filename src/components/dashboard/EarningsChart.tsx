@@ -1,4 +1,3 @@
-
 import React from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -85,25 +84,27 @@ export function EarningsChart({
           </div>
         </div>
         
-        <div className="h-[280px] w-full">
-          <ChartContainer config={{
-            net: {
-              label: "Net Earnings",
-              color: "#4E96FF"
-            },
-            deductions: {
-              label: "Tax & Deductions",
-              color: "#94A3B8"
-            }
-          }}>
+        <div className="h-[350px] w-full">
+          <ChartContainer 
+            config={{
+              net: {
+                label: "Net Earnings",
+                color: "#4E96FF"
+              },
+              deductions: {
+                label: "Tax & Deductions",
+                color: "#94A3B8"
+              }
+            }}
+          >
             <ResponsiveContainer width="100%" height="100%">
               <BarChart 
                 data={stackedData} 
                 margin={{
-                  top: 5,
-                  right: 5,
-                  left: 5,
-                  bottom: 5
+                  top: 10,
+                  right: 20,
+                  left: 20,
+                  bottom: 20
                 }} 
                 barSize={40}
               >

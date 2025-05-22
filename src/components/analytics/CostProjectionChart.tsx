@@ -169,7 +169,7 @@ export function CostProjectionChart() {
         </div>
         
         {/* Main Chart Area - Adjusted padding */}
-        <div className="h-[450px] p-4 border border-border py-4 rounded px-4">
+        <div className="px-6 pb-2">
           <ChartContainer config={{
           actual: {
             label: "Actual",
@@ -230,53 +230,67 @@ export function CostProjectionChart() {
         }}>
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={chartType === 'variance' ? varianceData : data} margin={{
-              top: 20,
-              right: 30,
-              left: 20,
-              bottom: 60
-            }}>
+                top: 20,
+                right: 30,
+                left: 20,
+                bottom: 100
+              }}>
                 <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-                <XAxis dataKey="month" tick={{
-                fontSize: 12
-              }} dy={10} />
+                <XAxis 
+                  dataKey="month" 
+                  tick={{
+                    fontSize: 12
+                  }} 
+                  dy={10}
+                  angle={-45}
+                  textAnchor="end"
+                  height={80}
+                />
                 
                 {/* Primary Y Axis for monetary values */}
                 <YAxis yAxisId="left" tickFormatter={value => `$${value / 1000}k`} domain={['auto', 'auto']} label={{
-                value: 'Cost ($)',
-                angle: -90,
-                position: 'insideLeft',
-                dx: -10,
-                style: {
-                  textAnchor: 'middle'
-                }
-              }} tick={{
-                fontSize: 12
-              }} />
+                  value: 'Cost ($)',
+                  angle: -90,
+                  position: 'insideLeft',
+                  dx: -10,
+                  style: {
+                    textAnchor: 'middle'
+                  }
+                }} tick={{
+                  fontSize: 12
+                }} />
                 
                 {/* Secondary Y Axis for FTE count */}
                 {chartType === 'fte' && <YAxis yAxisId="right" orientation="right" label={{
-                value: 'FTE Count',
-                angle: 90,
-                position: 'insideRight',
-                dx: 10,
-                style: {
-                  textAnchor: 'middle'
-                }
-              }} tick={{
-                fontSize: 12
-              }} />}
+                  value: 'FTE Count',
+                  angle: 90,
+                  position: 'insideRight',
+                  dx: 10,
+                  style: {
+                    textAnchor: 'middle'
+                  }
+                }} tick={{
+                  fontSize: 12
+                }} />}
                 
                 <ChartTooltip content={({
-                active,
-                payload
-              }) => {
-                if (active && payload && payload.length) {
-                  return <ChartTooltipContent className="bg-background border border-border/50 shadow-md" indicator="dot" />;
-                }
-                return null;
-              }} />
+                  active,
+                  payload
+                }) => {
+                  if (active && payload && payload.length) {
+                    return <ChartTooltipContent className="bg-background border border-border/50 shadow-md" indicator="dot" />;
+                  }
+                  return null;
+                }} />
                 
-                <Legend verticalAlign="bottom" height={36} />
+                <Legend 
+                  verticalAlign="bottom" 
+                  height={36}
+                  wrapperStyle={{
+                    paddingTop: "20px",
+                    paddingBottom: "20px"
+                  }}
+                />
                 
                 {/* Monthly View - Actuals vs. Forecast with budget */}
                 {chartType === 'monthly' && <>
@@ -352,14 +366,21 @@ export function CostProjectionChart() {
                     <Line type="monotone" dataKey="budget" name="Budget" stroke="#F59E0B" strokeWidth={2} dot={false} yAxisId="left" />
                   </>}
                 
-                <Brush dataKey="month" height={30} stroke="#8884d8" startIndex={0} endIndex={Math.min(5, data.length - 1)} />
+                <Brush 
+                  dataKey="month" 
+                  height={30} 
+                  stroke="#8884d8" 
+                  startIndex={0} 
+                  endIndex={Math.min(5, data.length - 1)}
+                  y={450}
+                />
               </ComposedChart>
             </ResponsiveContainer>
           </ChartContainer>
         </div>
         
         {/* Chart Type Selector - moved to be higher up for better spacing */}
-        <div className="flex justify-center mt-10 pt-4">
+        <div className="flex justify-center mt-2 pt-2">
           <Tabs value={chartType} onValueChange={value => setChartType(value as any)} className="w-full max-w-3xl mx-auto">
             <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="monthly">Monthly</TabsTrigger>
@@ -371,8 +392,8 @@ export function CostProjectionChart() {
           </Tabs>
         </div>
         
-        {/* Summary KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+        {/* Summary KPI Cards - Reduced spacing further */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2 px-6">
           <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-xl shadow-sm">
             <h4 className="text-sm text-muted-foreground mb-1">Next Quarter Projection</h4>
             <p className="text-2xl font-bold">{currencyFormatter(summaryMetrics.nextQuarterProjection)}</p>
@@ -388,7 +409,7 @@ export function CostProjectionChart() {
         </div>
         
         {/* Export Buttons */}
-        <div className="flex justify-end gap-2">
+        <div className="flex justify-end gap-2 mt-2 px-6 pb-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline">

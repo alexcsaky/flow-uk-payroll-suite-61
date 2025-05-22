@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -285,14 +284,7 @@ export default function UserRoles() {
   };
 
   const handleDelete = (id: string) => {
-    const roleToDelete = roles.find(r => r.id === id);
-    
-    if (!roleToDelete?.isEditable) {
-      toast.error("System roles cannot be deleted");
-      return;
-    }
-    
-    setRoles(roles.filter(r => r.id !== id));
+    setRoles(prev => prev.filter(r => r.id !== id));
     toast.success("Role deleted");
   };
 

@@ -22,7 +22,7 @@ export function EmployeeTags({ initialTags = ['Full-Time', 'Salaried', 'Sales De
   };
 
   const handleRemoveTag = (tagToRemove: string) => {
-    setTags(tags.filter(tag => tag !== tagToRemove));
+    setTags(prev => prev.filter(tag => tag !== tagToRemove));
   };
 
   return (

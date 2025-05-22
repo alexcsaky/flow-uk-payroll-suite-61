@@ -7,6 +7,7 @@ import { Download, RefreshCw, Send } from "lucide-react";
 import MemberUpdatesSection from "@/components/reports/pensions/MemberUpdatesSection";
 import ContributionScheduleSection from "@/components/reports/pensions/ContributionScheduleSection";
 import ScheduleDetailsModal from "@/components/reports/pensions/ScheduleDetailsModal";
+import AutoEnrolmentCommunicationsSection from "@/components/reports/pensions/AutoEnrolmentCommunicationsSection";
 
 const PensionsReport = () => {
   const [lastSynced, setLastSynced] = useState<Date>(new Date());
@@ -44,6 +45,9 @@ const PensionsReport = () => {
       </div>
 
       <div className="grid gap-6">
+        {/* Auto-Enrolment Communications Section */}
+        <AutoEnrolmentCommunicationsSection />
+
         {/* Member Updates Section */}
         <MemberUpdatesSection onSync={() => setLastSynced(new Date())} />
 

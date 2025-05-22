@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -113,7 +112,7 @@ export default function Departments() {
   };
 
   const handleDelete = (id: string) => {
-    setDepartments(departments.filter(d => d.id !== id));
+    setDepartments(prev => prev.filter(d => d.id !== id));
     toast.success("Department deleted");
   };
 

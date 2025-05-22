@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -56,7 +55,7 @@ export const AnalyticsRevenueExpenseChart: React.FC<AnalyticsRevenueExpenseChart
         </div>
       </CardHeader>
       <CardContent className="p-2">
-        <div className="h-[300px] w-full">
+        <div className="h-[400px] w-full">
           <ChartContainer config={{
             revenue: {
               label: "Revenue",

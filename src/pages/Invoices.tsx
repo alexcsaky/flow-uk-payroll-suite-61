@@ -42,6 +42,7 @@ import { InvoiceDialog, InvoiceFormValues } from "@/components/invoices/InvoiceD
 import { InvoicePeriodSelector, PeriodType } from "@/components/invoices/InvoicePeriodSelector";
 import { InvoicePeriodProgress } from "@/components/invoices/InvoicePeriodProgress";
 import { InvoiceDetailsModal } from "@/components/invoices/InvoiceDetailsModal";
+import { InvoiceExportButton } from "@/components/invoices/InvoiceExportButton";
 
 // Define the invoice type
 interface Attachment {
@@ -392,6 +393,55 @@ const Invoices = () => {
     setIsDetailsModalOpen(true);
   };
 
+  const handleExport = (format: "standard" | "factoring" | "epsys") => {
+    // Define headers based on format
+    let headers: string[];
+    switch (format) {
+      case "factoring":
+        headers = ["Invoice #", "Client", "Amount", "Date", "Status", "Factoring Reference"];
+        break;
+      case "epsys":
+        headers = ["Invoice #", "Client", "Category", "Amount", "Date", "Status", "EPSYS Code"];
+        break;
+      default:
+        headers = ["Invoice #", "Client", "Category", "Amount", "Date", "Status"];
+    }
+
+    // Create CSV content
+    const csvContent = [
+      headers.join(","),
+      ...filteredInvoices.map(invoice => {
+        const baseRow = [
+          invoice.id,
+          invoice.client,
+          invoice.category || "",
+          invoice.amount.toFixed(2),
+          invoice.date,
+          invoice.status
+        ];
+
+        // Add format-specific fields
+        if (format === "factoring") {
+          baseRow.push(`FACT-${invoice.id}`); // Example factoring reference
+        } else if (format === "epsys") {
+          baseRow.push(`EPS-${invoice.id}`); // Example EPSYS code
+        }
+
+        return baseRow.join(",");
+      })
+    ].join("\n");
+
+    // Create and trigger download
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `Invoices-${format}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   if (!billingEnabled) {
     return (
       <div className="flex flex-col items-center justify-center h-[80vh]">
@@ -414,7 +464,7 @@ const Invoices = () => {
             Create and manage client invoices
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
           <Button 
             variant={showPeriodProgress ? "default" : "outline"} 
             onClick={togglePeriodProgress}
@@ -585,6 +635,7 @@ const Invoices = () => {
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
+          <InvoiceExportButton onExport={handleExport} />
           <Button className="flow-gradient" onClick={() => setIsDialogOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
             New Invoice
@@ -653,39 +704,6 @@ const Invoices = () => {
                 <TabsTrigger value="pending">Pending</TabsTrigger>
                 <TabsTrigger value="overdue">Overdue</TabsTrigger>
               </TabsList>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  // Create a CSV string
-                  const headers = ["Invoice #", "Client", "Category", "Amount", "Date", "Status"];
-                  const csvContent = [
-                    headers.join(","),
-                    ...filteredInvoices.map(invoice => [
-                      invoice.id,
-                      invoice.client,
-                      invoice.category || "",
-                      invoice.amount.toFixed(2),
-                      invoice.date,
-                      invoice.status
-                    ].join(","))
-                  ].join("\n");
-
-                  // Create a blob and download link
-                  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-                  const link = document.createElement("a");
-                  const url = URL.createObjectURL(blob);
-                  link.setAttribute("href", url);
-                  link.setAttribute("download", "Invoices.CSV");
-                  document.body.appendChild(link);
-                  link.click();
-                  document.body.removeChild(link);
-                }}
-                className="flex items-center gap-1"
-              >
-                <Download className="h-4 w-4" />
-                Export CSV
-              </Button>
             </div>
             <TabsContent value={activeTab} className="mt-4">
               <div className="rounded-md border">

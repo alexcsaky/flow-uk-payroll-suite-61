@@ -26,10 +26,10 @@ interface AnalyticsPerformanceMetricsProps {
   expensesData: { name: string; value: number }[];
 }
 
-export const AnalyticsPerformanceMetrics: React.FC<AnalyticsPerformanceMetricsProps> = ({ 
+export const AnalyticsPerformanceMetrics = ({ 
   revenueData, 
   expensesData 
-}) => {
+}: AnalyticsPerformanceMetricsProps) => {
   // Create data for metrics
   const profitData = revenueData.map((item, index) => ({
     name: item.name,
@@ -60,7 +60,7 @@ export const AnalyticsPerformanceMetrics: React.FC<AnalyticsPerformanceMetricsPr
             <TabsTrigger value="projects">Projects</TabsTrigger>
           </TabsList>
           <TabsContent value="revenue" className="mt-4">
-            <div className="h-[350px] p-4 border border-border rounded-md">
+            <div className="h-[450px] p-4 border border-border rounded-md">
               <ChartContainer 
                 config={{
                   value: {
@@ -72,12 +72,13 @@ export const AnalyticsPerformanceMetrics: React.FC<AnalyticsPerformanceMetricsPr
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart
                     data={revenueData}
-                    margin={{ top: 10, right: 20, left: 5, bottom: 30 }}
+                    margin={{ top: 20, right: 30, left: 30, bottom: 30 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
                     <XAxis dataKey="name" dy={10} />
                     <YAxis 
                       tickFormatter={(value) => `$${value / 1000}k`}
+                      width={60}
                     />
                     <ChartTooltip
                       content={({ active, payload }) => {
@@ -105,7 +106,7 @@ export const AnalyticsPerformanceMetrics: React.FC<AnalyticsPerformanceMetricsPr
             </div>
           </TabsContent>
           <TabsContent value="expenses" className="mt-4">
-            <div className="h-[350px] p-4 border border-border rounded-md">
+            <div className="h-[450px] p-4 border border-border rounded-md">
               <ChartContainer 
                 config={{
                   value: {
@@ -117,12 +118,13 @@ export const AnalyticsPerformanceMetrics: React.FC<AnalyticsPerformanceMetricsPr
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
                     data={expensesData}
-                    margin={{ top: 10, right: 20, left: 5, bottom: 30 }}
+                    margin={{ top: 20, right: 30, left: 30, bottom: 30 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
                     <XAxis dataKey="name" dy={10} />
                     <YAxis 
                       tickFormatter={(value) => `$${value / 1000}k`}
+                      width={60}
                     />
                     <ChartTooltip
                       content={({ active, payload }) => {
@@ -144,7 +146,7 @@ export const AnalyticsPerformanceMetrics: React.FC<AnalyticsPerformanceMetricsPr
             </div>
           </TabsContent>
           <TabsContent value="profit" className="mt-4">
-            <div className="h-[350px] p-4 border border-border rounded-md">
+            <div className="h-[450px] p-4 border border-border rounded-md">
               <ChartContainer 
                 config={{
                   value: {
@@ -156,12 +158,13 @@ export const AnalyticsPerformanceMetrics: React.FC<AnalyticsPerformanceMetricsPr
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart
                     data={profitData}
-                    margin={{ top: 10, right: 20, left: 5, bottom: 30 }}
+                    margin={{ top: 20, right: 30, left: 30, bottom: 30 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
                     <XAxis dataKey="name" dy={10} />
                     <YAxis 
                       tickFormatter={(value) => `$${value / 1000}k`}
+                      width={60}
                     />
                     <ChartTooltip
                       content={({ active, payload }) => {
@@ -191,7 +194,7 @@ export const AnalyticsPerformanceMetrics: React.FC<AnalyticsPerformanceMetricsPr
             </div>
           </TabsContent>
           <TabsContent value="projects" className="mt-4">
-            <div className="h-[350px] p-4 border border-border rounded-md">
+            <div className="h-[450px] p-4 border border-border rounded-md">
               <ChartContainer 
                 config={{
                   completed: {
@@ -211,12 +214,12 @@ export const AnalyticsPerformanceMetrics: React.FC<AnalyticsPerformanceMetricsPr
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
                     data={projectData}
-                    margin={{ top: 10, right: 20, left: 5, bottom: 30 }}
+                    margin={{ top: 20, right: 30, left: 30, bottom: 30 }}
                     barGap={0}
                   >
                     <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
                     <XAxis dataKey="name" dy={10} />
-                    <YAxis />
+                    <YAxis width={60} />
                     <ChartTooltip
                       content={({ active, payload }) => {
                         if (active && payload && payload.length) {

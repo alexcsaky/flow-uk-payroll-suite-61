@@ -1,6 +1,7 @@
 import { format } from 'date-fns';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { Employee, Payslip, PayslipItem, YearToDateData, CompanyInfo } from '../../types/employee';
 
 // Add necessary type augmentations for jsPDF
 declare module 'jspdf' {
@@ -11,29 +12,8 @@ declare module 'jspdf' {
   }
 }
 
-// Function to generate and download a PDF payslip
-export const generatePayslipPDF = ({
-  employee,
-  payslip,
-  earnings,
-  deductions,
-  totalEarnings,
-  totalDeductions,
-  ytdData,
-  companyInfo
-}) => {
-  // Create a new PDF document
-  const doc = new jsPDF();
-  
-  // Set document properties
-  doc.setProperties({
-    title: `Payslip_${employee.id}_${payslip.id}`,
-    subject: `Payslip for ${employee.name} - ${payslip.period}`,
-    author: companyInfo.name,
-    creator: 'Bolt HR Platform'
-  });
-  
-  // Add company header
+// Helper function to add company header
+const addCompanyHeader = (doc: jsPDF, companyInfo: CompanyInfo): void => {
   doc.setFontSize(16);
   doc.setFont('helvetica', 'bold');
   doc.text(companyInfo.name, 105, 15, { align: 'center' });
@@ -42,17 +22,21 @@ export const generatePayslipPDF = ({
   doc.setFont('helvetica', 'normal');
   doc.text(companyInfo.address, 105, 20, { align: 'center' });
   doc.text(`${companyInfo.phone} | ${companyInfo.email}`, 105, 25, { align: 'center' });
-  
-  // Add payslip title
+};
+
+// Helper function to add payslip title and reference
+const addPayslipTitle = (doc: jsPDF, payslip: Payslip): void => {
   doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
   doc.text(`PAYSLIP - ${payslip.period}`, 105, 35, { align: 'center' });
   
-  // Add reference number and dates
   doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
   doc.text(`Reference: ${payslip.id} | Payment Date: ${format(new Date(payslip.date), 'dd MMM yyyy')} | Tax Year: 2024/2025`, 105, 40, { align: 'center' });
-  
+};
+
+// Helper function to add employee and payment details
+const addEmployeeAndPaymentDetails = (doc: jsPDF, employee: Employee, payslip: Payslip): void => {
   // Employee & Payment Info Section
   doc.setFontSize(11);
   doc.setFont('helvetica', 'bold');
@@ -102,8 +86,10 @@ export const generatePayslipPDF = ({
   // Add separator line
   doc.setDrawColor(200, 200, 200);
   doc.line(14, 90, 196, 90);
-  
-  // Earnings Table
+};
+
+// Helper function to add earnings table
+const addEarningsTable = (doc: jsPDF, earnings: PayslipItem[], totalEarnings: number): void => {
   doc.setFontSize(11);
   doc.setFont('helvetica', 'bold');
   doc.text('Earnings', 14, 100);
@@ -124,8 +110,10 @@ export const generatePayslipPDF = ({
     margin: { left: 14, right: 105 },
     tableWidth: 85
   });
-  
-  // Deductions Table
+};
+
+// Helper function to add deductions table
+const addDeductionsTable = (doc: jsPDF, deductions: PayslipItem[], totalDeductions: number): void => {
   doc.setFontSize(11);
   doc.setFont('helvetica', 'bold');
   doc.text('Deductions', 120, 100);
@@ -146,11 +134,10 @@ export const generatePayslipPDF = ({
     margin: { left: 120, right: 14 },
     tableWidth: 85
   });
-  
-  // Get the final Y position after tables
-  const finalY = doc.previousAutoTable?.finalY || 150;
-  
-  // Net Pay Box
+};
+
+// Helper function to add net pay box
+const addNetPayBox = (doc: jsPDF, payslip: Payslip, finalY: number): void => {
   doc.setFillColor(240, 240, 240);
   doc.rect(14, finalY + 10, 85, 25, 'F');
   
@@ -164,8 +151,10 @@ export const generatePayslipPDF = ({
   doc.setFontSize(8);
   doc.setFont('helvetica', 'normal');
   doc.text(`Amount transferred to your bank account on ${format(new Date(payslip.date), 'dd MMM yyyy')}`, 18, finalY + 25);
-  
-  // Year-to-date Table
+};
+
+// Helper function to add year-to-date summary
+const addYearToDateSummary = (doc: jsPDF, ytdData: YearToDateData, finalY: number): void => {
   doc.setFontSize(11);
   doc.setFont('helvetica', 'bold');
   doc.text('Year-to-Date Summary', 120, finalY + 18);
@@ -191,10 +180,11 @@ export const generatePayslipPDF = ({
     margin: { left: 120, right: 14 },
     tableWidth: 85
   });
-  
-  // Footer with company information
-  // Using any to bypass TypeScript errors with jsPDF's internal methods
-  const pageCount = (doc as any).internal.getNumberOfPages();
+};
+
+// Helper function to add footer
+const addFooter = (doc: jsPDF, companyInfo: CompanyInfo): void => {
+  const pageCount = doc.internal.getNumberOfPages();
   doc.setFontSize(8);
   doc.setFont('helvetica', 'normal');
   
@@ -209,8 +199,56 @@ export const generatePayslipPDF = ({
   doc.text(`${companyInfo.name} | ${companyInfo.address} | ${companyInfo.phone}`, 105, pageHeight - 15, { align: 'center' });
   doc.text(`${companyInfo.registrationNumber} | ${companyInfo.vatNumber}`, 105, pageHeight - 10, { align: 'center' });
   
-  // Add page numbers - use type assertion to bypass TypeScript errors
-  doc.text(`Page ${(doc as any).internal.getCurrentPageInfo().pageNumber} of ${pageCount}`, 196, pageHeight - 5, { align: 'right' });
+  // Add page numbers
+  doc.text(`Page ${doc.internal.getCurrentPageInfo().pageNumber} of ${pageCount}`, 196, pageHeight - 5, { align: 'right' });
+};
+
+interface GeneratePayslipPDFParams {
+  employee: Employee;
+  payslip: Payslip;
+  earnings: PayslipItem[];
+  deductions: PayslipItem[];
+  totalEarnings: number;
+  totalDeductions: number;
+  ytdData: YearToDateData;
+  companyInfo: CompanyInfo;
+}
+
+// Main function to generate and download a PDF payslip
+export const generatePayslipPDF = ({
+  employee,
+  payslip,
+  earnings,
+  deductions,
+  totalEarnings,
+  totalDeductions,
+  ytdData,
+  companyInfo
+}: GeneratePayslipPDFParams): void => {
+  // Create a new PDF document
+  const doc = new jsPDF();
+  
+  // Set document properties
+  doc.setProperties({
+    title: `Payslip_${employee.id}_${payslip.id}`,
+    subject: `Payslip for ${employee.name} - ${payslip.period}`,
+    author: companyInfo.name,
+    creator: 'Bolt HR Platform'
+  });
+  
+  // Add all sections in order
+  addCompanyHeader(doc, companyInfo);
+  addPayslipTitle(doc, payslip);
+  addEmployeeAndPaymentDetails(doc, employee, payslip);
+  addEarningsTable(doc, earnings, totalEarnings);
+  addDeductionsTable(doc, deductions, totalDeductions);
+  
+  // Get the final Y position after tables
+  const finalY = doc.previousAutoTable?.finalY || 150;
+  
+  addNetPayBox(doc, payslip, finalY);
+  addYearToDateSummary(doc, ytdData, finalY);
+  addFooter(doc, companyInfo);
   
   // Save the PDF with a specific name
   doc.save(`Payslip_${employee.name.replace(/\s+/g, '_')}_${payslip.period.replace(/\s+/g, '_')}.pdf`);

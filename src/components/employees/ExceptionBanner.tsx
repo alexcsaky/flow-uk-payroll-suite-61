@@ -70,20 +70,29 @@ const ExceptionBanner: React.FC<ExceptionBannerProps> = ({
       (tabElement as HTMLElement).click();
     }
 
-    // Small delay to allow tab content to render before scrolling
-    setTimeout(() => {
-      // Find and scroll to the specific element if available
-      if (targetElementId) {
-        const targetElement = document.querySelector(`[data-id="${targetElementId}"]`);
-        if (targetElement) {
-          targetElement.scrollIntoView({ behavior: "smooth", block: "center" });
-          targetElement.classList.add("bg-orange-50");
-          setTimeout(() => {
-            targetElement.classList.remove("bg-orange-50");
-          }, 2000);
+    // Use useEffect for cleanup of timeouts
+    React.useEffect(() => {
+      const scrollTimeoutId = setTimeout(() => {
+        // Find and scroll to the specific element if available
+        if (targetElementId) {
+          const targetElement = document.querySelector(`[data-id="${targetElementId}"]`);
+          if (targetElement) {
+            targetElement.scrollIntoView({ behavior: "smooth", block: "center" });
+            targetElement.classList.add("bg-orange-50");
+            
+            const highlightTimeoutId = setTimeout(() => {
+              targetElement.classList.remove("bg-orange-50");
+            }, 2000);
+
+            // Cleanup highlight timeout
+            return () => clearTimeout(highlightTimeoutId);
+          }
         }
-      }
-    }, 100);
+      }, 100);
+
+      // Cleanup scroll timeout
+      return () => clearTimeout(scrollTimeoutId);
+    }, [targetElementId]);
   };
 
   // Helper function to get badge color based on severity

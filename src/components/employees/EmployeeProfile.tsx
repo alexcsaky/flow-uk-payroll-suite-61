@@ -1,16 +1,18 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
-import { Briefcase, Calendar, Mail, Phone, FileText } from "lucide-react";
+import { Briefcase, Calendar, Mail, Phone, FileText, Edit } from "lucide-react";
 import { EmployeeTags } from "./EmployeeTags";
 import { P45Modal } from "./P45Modal";
 
 interface EmployeeProfileProps {
   employee: {
+    id: string;
     name: string;
     email: string;
     phone: string;
@@ -26,11 +28,17 @@ interface EmployeeProfileProps {
 
 const EmployeeProfile: React.FC<EmployeeProfileProps> = ({ employee }) => {
   const [showP45Modal, setShowP45Modal] = useState(false);
+  const navigate = useNavigate();
 
   // Mock employer data - in a real app, this would come from your company settings
   const employer = {
     name: "Acme Corp",
     payeReference: "123/AB456"
+  };
+
+  const handleEditDetails = () => {
+    // Navigate to onboarding form with employee data
+    navigate(`/employees/onboarding?edit=${employee.id}`);
   };
 
   return (
@@ -94,10 +102,16 @@ const EmployeeProfile: React.FC<EmployeeProfileProps> = ({ employee }) => {
             
             <Separator />
             
-            <div>
+            <div className="space-y-3">
               <h4 className="font-medium mb-3">Quick Actions</h4>
               <div className="grid grid-cols-2 gap-2">
-                <Button variant="outline" size="sm">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={handleEditDetails}
+                  className="flex items-center gap-2"
+                >
+                  <Edit className="h-4 w-4" />
                   Edit Details
                 </Button>
                 <Button variant="outline" size="sm">

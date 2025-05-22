@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -210,7 +209,7 @@ export default function OpeningBalances() {
   };
 
   const handleDelete = (id: string) => {
-    setEmployees(employees.filter(e => e.id !== id));
+    setEmployees(prev => prev.filter(e => e.id !== id));
     toast.success("Employee balance deleted");
   };
 

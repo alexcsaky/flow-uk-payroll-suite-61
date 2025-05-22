@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertTriangle, Bell, Info } from "lucide-react";
@@ -117,9 +116,8 @@ export const AnomalyDetectionFeed = () => {
     }
   };
 
-  const handleDismiss = (anomalyId: string) => {
-    setAnomalies((current) => current.filter((a) => a.id !== anomalyId));
-    toast.success("Anomaly dismissed");
+  const handleDismissAnomaly = (anomalyId: string) => {
+    setAnomalies(prev => prev.filter(a => a.id !== anomalyId));
   };
 
   return (
@@ -135,7 +133,7 @@ export const AnomalyDetectionFeed = () => {
               key={anomaly.id}
               anomaly={anomaly}
               onAction={handleAction}
-              onDismiss={handleDismiss}
+              onDismiss={handleDismissAnomaly}
             />
           ))
         ) : (
