@@ -103,7 +103,7 @@ export function SideNavigation({ isOpen, setIsOpen }: SideNavigationProps) {
         <TooltipProvider delayDuration={0}>
           <nav className="grid gap-1 px-2">
             {filteredNavigation.map((item) => {
-              const isActive = pathname === item.href;
+              const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
               return (
                 <Tooltip key={item.name} delayDuration={0}>
                   <TooltipTrigger asChild>

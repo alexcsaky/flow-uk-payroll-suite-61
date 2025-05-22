@@ -1,41 +1,91 @@
 import React, { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BarChart3, Download, FileText, Filter, PieChart, Plus } from "lucide-react";
+import { Download, Filter, Search } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ReportTypeSelectModal } from "@/components/reports/ReportTypeSelectModal";
+import { Input } from "@/components/ui/input";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ReportFilterModal } from "@/components/reports/ReportFilterModal";
 import { MockReportDisplay } from "@/components/reports/MockReportDisplay";
+import { useNavigate } from "react-router-dom";
 
-const REPORT_CARD_MAP = [
+const REPORT_TYPES = [
   {
-    key: "Payroll Report",
-    icon: <BarChart3 className="h-5 w-5" />,
-    title: "Payroll Reports",
-    desc: "View payroll and tax reports",
-    filterName: "Payroll Report"
+    name: "Working Time & Leave Compliance Report",
+    description: "View working time regulations and leave compliance metrics",
+    path: "/reports/wtr-leave-report",
+    category: "Compliance"
   },
   {
-    key: "Employee Report",
-    icon: <FileText className="h-5 w-5" />,
-    title: "Employee Reports",
-    desc: "View employee statistics",
-    filterName: "Employee Report"
+    name: "AWR Compliance Report",
+    description: "View AWR compliance metrics",
+    path: "/reports/awr",
+    category: "Compliance"
   },
   {
-    key: "Financial Report",
-    icon: <PieChart className="h-5 w-5" />,
-    title: "Financial Reports",
-    desc: "View financial statistics",
-    filterName: "Financial Report"
+    name: "Gender Pay Gap Report",
+    description: "View gender pay gap analysis",
+    path: "/reports/gpgr",
+    category: "Compliance"
   },
+  {
+    name: "Statutory Pay Overview",
+    description: "View statutory pay statistics",
+    path: "/reports/statutory-pay-overview",
+    category: "Compliance"
+  },
+  {
+    name: "Pensions Report",
+    description: "Manage NEST pension contributions and member updates",
+    path: "/reports/pensions",
+    category: "Payroll"
+  },
+  {
+    name: "General Payroll Summary",
+    description: "View payroll and tax reports",
+    path: "/reports/payroll-summary",
+    category: "Payroll"
+  },
+  {
+    name: "Tax Withholding Report",
+    description: "View tax withholding details",
+    path: "/reports/tax-withholding",
+    category: "Payroll"
+  },
+  {
+    name: "Employee Demographics",
+    description: "View employee statistics",
+    path: "/reports/employee-demographics",
+    category: "HR"
+  },
+  {
+    name: "Time Off Accrual",
+    description: "View time off and leave balances",
+    path: "/reports/time-off",
+    category: "HR"
+  },
+  {
+    name: "Benefit Utilization",
+    description: "View benefits usage and costs",
+    path: "/reports/benefits",
+    category: "HR"
+  },
+  {
+    name: "Detailed Financial Overview",
+    description: "View financial statistics",
+    path: "/reports/financial-overview",
+    category: "Finance"
+  }
 ];
 
 const Reports = () => {
-  const [showTypeModal, setShowTypeModal] = useState(false);
+  const navigate = useNavigate();
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [selectedReportName, setSelectedReportName] = useState<string | null>(null);
   const [showMockReport, setShowMockReport] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
 
   // Sample report data
   const reports = [
@@ -56,6 +106,21 @@ const Reports = () => {
     setShowMockReport(true);
   };
 
+  const handleReportSelect = (report: typeof REPORT_TYPES[0]) => {
+    navigate(report.path);
+    setSearchOpen(false);
+    setSearchValue("");
+  };
+
+  // Group reports by category
+  const groupedReports = REPORT_TYPES.reduce((acc, report) => {
+    if (!acc[report.category]) {
+      acc[report.category] = [];
+    }
+    acc[report.category].push(report);
+    return acc;
+  }, {} as Record<string, typeof REPORT_TYPES>);
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -70,32 +135,62 @@ const Reports = () => {
             <Filter className="mr-2 h-4 w-4" />
             Filter
           </Button>
-          <Button className="flow-gradient" onClick={() => setShowTypeModal(true)}>
-            <Plus className="mr-2 h-4 w-4" />
-            New Report
-          </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {REPORT_CARD_MAP.map((card) => (
-          <Card key={card.key}>
-            <CardHeader className="pb-2">
-              <CardTitle className="flex items-center gap-2">
-                {card.icon}
-                {card.title}
-              </CardTitle>
-              <CardDescription>{card.desc}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button variant="outline" className="w-full" onClick={() => handleGenerateReport(card.filterName)}>
-                Generate Report
+      {/* Dynamic Search Bar */}
+      <Card>
+        <CardContent className="pt-6">
+          <Popover open={searchOpen} onOpenChange={setSearchOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                role="combobox"
+                aria-expanded={searchOpen}
+                className="w-full justify-between h-12"
+              >
+                <div className="flex items-center gap-2">
+                  <Search className="h-4 w-4" />
+                  {searchValue ? searchValue : "Search for a report..."}
+                </div>
               </Button>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+            </PopoverTrigger>
+            <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+              <Command className="w-full">
+                <CommandInput 
+                  placeholder="Search reports..." 
+                  className="h-9"
+                />
+                <CommandList className="max-h-[300px]">
+                  <CommandEmpty>No reports found.</CommandEmpty>
+                  {Object.entries(groupedReports).map(([category, reports], index) => (
+                    <React.Fragment key={category}>
+                      {index > 0 && <CommandSeparator />}
+                      <CommandGroup heading={category}>
+                        {reports.map((report) => (
+                          <CommandItem
+                            key={report.name}
+                            value={report.name}
+                            onSelect={() => handleReportSelect(report)}
+                            className="flex flex-col items-start py-3 px-2"
+                          >
+                            <div className="font-medium">{report.name}</div>
+                            <div className="text-sm text-muted-foreground">
+                              {report.description}
+                            </div>
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </React.Fragment>
+                  ))}
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
+        </CardContent>
+      </Card>
 
+      {/* Report History */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -147,14 +242,6 @@ const Reports = () => {
         </CardContent>
       </Card>
 
-      <ReportTypeSelectModal
-        open={showTypeModal}
-        onOpenChange={setShowTypeModal}
-        onSelect={(type) => {
-          setSelectedReportName(type);
-          setShowFilterModal(true);
-        }}
-      />
       <ReportFilterModal
         open={showFilterModal}
         onOpenChange={setShowFilterModal}

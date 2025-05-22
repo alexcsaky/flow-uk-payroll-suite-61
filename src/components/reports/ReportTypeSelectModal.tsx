@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
 const REPORT_TYPES = [
+  "Working Time & Leave Compliance Report",
   "General Payroll Summary",
   "Employee Demographics",
   "Detailed Financial Overview",
@@ -11,6 +12,7 @@ const REPORT_TYPES = [
   "Benefit Utilization",
   "AWR Compliance Report",
   "Gender Pay Gap Report",
+  "Statutory Pay Overview",
 ];
 
 export function ReportTypeSelectModal({ open, onOpenChange, onSelect }: {
@@ -21,10 +23,14 @@ export function ReportTypeSelectModal({ open, onOpenChange, onSelect }: {
   const navigate = useNavigate();
 
   const handleSelect = (type: string) => {
-    if (type === "AWR Compliance Report") {
+    if (type === "Working Time & Leave Compliance Report") {
+      navigate("/reports/wtr-leave-report");
+    } else if (type === "AWR Compliance Report") {
       navigate("/reports/awr");
     } else if (type === "Gender Pay Gap Report") {
       navigate("/reports/gpgr");
+    } else if (type === "Statutory Pay Overview") {
+      navigate("/reports/statutory-pay-overview");
     } else {
       onSelect(type);
     }

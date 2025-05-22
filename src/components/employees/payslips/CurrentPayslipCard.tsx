@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -143,6 +142,26 @@ const CurrentPayslipCard: React.FC<CurrentPayslipCardProps> = ({ payslip, employ
     { label: "Travel Allowance", amount: 200 },
   ];
   
+  // Find employee data for PDF generation
+  const employee = employeesData.find(emp => emp.id === employeeId) as Employee;
+  
+  // Determine which statutory pay to show based on employee name
+  const isFemaleName = ['Sarah', 'Emma'].includes(employee.name.split(' ')[0]);
+  const isMaleName = ['John', 'Michael', 'James'].includes(employee.name.split(' ')[0]);
+  
+  // Add statutory pay components based on employee name
+  const statutoryPay = [
+    // SSP is shown for everyone
+    { label: "SSP 14/3-18/3", amount: 250.00 },
+    // SMP only for female names
+    ...(isFemaleName ? [{ label: "SMP 01/4-30/4", amount: 800.00 }] : []),
+    // SPP only for male names
+    ...(isMaleName ? [{ label: "SPP 05/6-19/6", amount: 450.00 }] : []),
+  ];
+  
+  // Combine regular earnings with statutory pay
+  const allEarnings = [...earnings, ...statutoryPay];
+  
   // Sample deductions breakdown
   const deductions = [
     { label: "Income Tax", amount: payslip.taxPaid },
@@ -161,7 +180,7 @@ const CurrentPayslipCard: React.FC<CurrentPayslipCardProps> = ({ payslip, employ
   }
   
   // Calculate totals
-  const totalEarnings = earnings.reduce((sum, item) => sum + item.amount, 0);
+  const totalEarnings = allEarnings.reduce((sum, item) => sum + item.amount, 0);
   const totalDeductions = deductions.reduce((sum, item) => sum + item.amount, 0);
   
   // Year-to-date calculations (mock data - in a real app would come from the API)
@@ -173,9 +192,6 @@ const CurrentPayslipCard: React.FC<CurrentPayslipCardProps> = ({ payslip, employ
     studentLoan: payslip.studentLoan * 4,
     netPay: payslip.netPay * 4
   };
-  
-  // Find employee data for PDF generation
-  const employee = employeesData.find(emp => emp.id === employeeId) as Employee;
   
   // Company information for the payslip
   const companyInfo = {
@@ -248,6 +264,15 @@ const CurrentPayslipCard: React.FC<CurrentPayslipCardProps> = ({ payslip, employ
                       <span className="text-sm font-medium">£{item.amount.toFixed(2)}</span>
                     </div>
                   ))}
+                  <div className="pt-2 mt-2 border-t">
+                    <h4 className="text-sm font-medium text-muted-foreground mb-2">Statutory Pay</h4>
+                    {statutoryPay.map((item, index) => (
+                      <div key={index} className="flex justify-between">
+                        <span className="text-sm">{item.label}</span>
+                        <span className="text-sm font-medium">£{item.amount.toFixed(2)}</span>
+                      </div>
+                    ))}
+                  </div>
                   <div className="pt-2 mt-2 border-t flex justify-between">
                     <span className="font-medium">Total Earnings</span>
                     <span className="font-bold">£{totalEarnings.toFixed(2)}</span>

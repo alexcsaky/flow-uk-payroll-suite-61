@@ -1,9 +1,7 @@
-
 import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { SideNavigation } from "./SideNavigation";
-import { Toaster } from "@/components/ui/sonner";
 import Header from "./Header";
 
 interface AppLayoutProps {
@@ -24,11 +22,8 @@ export function AppLayout({ children }: AppLayoutProps) {
         <Header toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
         <main className="flex-1 p-4 md:p-6 max-w-7xl mx-auto w-full">
           {children || <Outlet />}
-          <Toaster />
         </main>
       </div>
     </div>
   );
 }
-
-export default AppLayout;

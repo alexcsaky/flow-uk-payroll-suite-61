@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PersonalInformationCard from "./PersonalInformationCard";
@@ -8,6 +7,7 @@ import DeductionsBenefitsCard from "./DeductionsBenefitsCard";
 import CurrentPayslipCard from "./payslips/CurrentPayslipCard";
 import PayslipHistory from "./payslips/PayslipHistory";
 import EmptyPayslipCard from "./EmptyPayslipCard";
+import PensionStatusCard from "./PensionStatusCard";
 import { Exception } from "./ExceptionBanner";
 
 interface Employee {
@@ -68,6 +68,7 @@ const EmployeeTabs: React.FC<EmployeeTabsProps> = ({
       <TabsContent value="details" className="space-y-6 mt-6">
         <PersonalInformationCard employee={employee} />
         <EmploymentInformationCard employee={employee} />
+        <PensionStatusCard employee={employee} />
       </TabsContent>
       
       <TabsContent value="payroll" className="space-y-6 mt-6">

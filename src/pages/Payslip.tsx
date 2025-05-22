@@ -13,6 +13,8 @@ import {
 } from "../components/ui/card";
 import { Separator } from "../components/ui/separator";
 import { generatePayslipPDF } from "../lib/pdf/payslip-pdf";
+import { Switch } from "../components/ui/switch";
+import { Label } from "../components/ui/label";
 
 // Import the same mock data from EmployeeDetails.tsx
 // In a real app, this would come from an API
@@ -286,6 +288,23 @@ const Payslip = () => {
     { label: "Performance Bonus", amount: 300 },
     { label: "Travel Allowance", amount: 200 },
   ];
+
+  // Determine which statutory pay to show based on employee name
+  const isFemaleName = ['Sarah', 'Emma'].includes(employee.name.split(' ')[0]);
+  const isMaleName = ['John', 'Michael', 'James'].includes(employee.name.split(' ')[0]);
+  
+  // Add statutory pay components based on employee name
+  const statutoryPay = [
+    // SSP is shown for everyone
+    { label: "SSP 14/3-18/3", amount: 250.00 },
+    // SMP only for female names
+    ...(isFemaleName ? [{ label: "SMP 01/4-30/4", amount: 800.00 }] : []),
+    // SPP only for male names
+    ...(isMaleName ? [{ label: "SPP 05/6-19/6", amount: 450.00 }] : []),
+  ];
+
+  // Combine regular earnings with statutory pay
+  const allEarnings = [...earnings, ...statutoryPay];
   
   // Sample deductions breakdown
   const deductions = [
@@ -305,7 +324,7 @@ const Payslip = () => {
   }
   
   // Calculate totals
-  const totalEarnings = earnings.reduce((sum, item) => sum + item.amount, 0);
+  const totalEarnings = allEarnings.reduce((sum, item) => sum + item.amount, 0);
   const totalDeductions = deductions.reduce((sum, item) => sum + item.amount, 0);
   
   // Year-to-date calculations (mock data - in a real app would come from the API)
@@ -439,6 +458,15 @@ const Payslip = () => {
                     <span className="font-medium">£{item.amount.toFixed(2)}</span>
                   </div>
                 ))}
+                <div className="pt-2 mt-2 border-t">
+                  <h4 className="text-sm font-medium text-muted-foreground mb-2">Statutory Pay</h4>
+                  {statutoryPay.map((item, index) => (
+                    <div key={index} className="flex justify-between items-center">
+                      <span>{item.label}</span>
+                      <span className="font-medium">£{item.amount.toFixed(2)}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
               <div className="pt-3 border-t flex justify-between items-center font-bold">
                 <span>Total Earnings</span>
